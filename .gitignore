@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+
+backend/.env
+backend/uploads/portraits/*
+backend/uploads/prizes/*
+!backend/uploads/portraits/.gitkeep
+!backend/uploads/prizes/.gitkeep
+
+frontend/dist
+backups/
