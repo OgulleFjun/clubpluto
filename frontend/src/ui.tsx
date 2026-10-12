@@ -43,6 +43,7 @@ export function Layout() {
             <small>{event?.tagline || 'Svartklubben'}</small>
           </span>
         </NavLink>
+        <div className="topbar-right">
         <nav className="desktop-nav">
           <NavLink to="/regler">Regler</NavLink>
           <NavLink to="/priser">Priser</NavLink>
@@ -67,6 +68,8 @@ export function Layout() {
             <NavLink to="/logga-in">Logga in</NavLink>
           )}
         </nav>
+        <span className="git-sha">{__GIT_SHA__}</span>
+        </div>
       </header>
       <main>
         <Outlet />
