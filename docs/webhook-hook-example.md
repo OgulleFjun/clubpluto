@@ -17,12 +17,12 @@ Byt sökvägen om repot ligger hos en annan användare. `deploy-pull.sh` hittar 
 
 Repo → Settings → Webhooks → Add webhook
 
-- Payload URL: `https://salaspel.se/hooks/deploy-clubpluto`
+- Payload URL: `https://clubpluto.eu/hooks/deploy-clubpluto`
 - Content type: `application/json`
 - Secret: samma som `secret` ovan
 - Events: Just the push event
 
-URL:en kan ligga på salaspel.se eftersom det är samma webhook-lyssnare. När nginx för Club Pluto också skickar `/hooks/` till den lyssnaren fungerar även `https://www.clubpluto.eu/hooks/deploy-clubpluto`.
+Nginx på `clubpluto.eu` ska skicka `/hooks/` till samma webhook-lyssnare som salaspel, utan omdirigering till www. Se `docs/nginx-clubpluto.example.conf`.
 
 Gör skriptet körbart på servern:
 

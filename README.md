@@ -55,7 +55,7 @@ API: http://localhost:3010
 4. `npm run migrate` och `node scripts/seed-admin.js`.
 5. Lägg in nginx från `docs/nginx-clubpluto.example.conf`. Kontrollera porten för `/hooks/` mot salaspel-vhosten.
 6. `pm2 start ecosystem.config.cjs`
-7. Lägg till hooken `deploy-clubpluto` i samma webhook-tjänst som `deploy-salaspel`, och peka GitHub-webhooken dit. Content type `application/json`.
+7. Lägg till hooken `deploy-clubpluto` i samma webhook-tjänst som `deploy-salaspel`. GitHub-webhooken ska vara `https://clubpluto.eu/hooks/deploy-clubpluto` med content type `application/json`.
 
 `scripts/deploy-pull.sh` gör `git reset`, backup, `npm ci`, frontend-build, `npm run migrate` och `pm2 restart clubpluto-backend`.
 
