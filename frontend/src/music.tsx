@@ -4,6 +4,9 @@ import { useLocation } from 'react-router-dom';
 const CHOICE_KEY = 'clubpluto_music';
 const TRACK = '/ophanim.mp3';
 const VOLUME = 0.16;
+const BPM = 132;
+const BEAT = 60 / BPM;
+const BEAT_OFFSET = 0.175;
 
 interface MusicValue {
   ask: boolean;
@@ -12,56 +15,23 @@ interface MusicValue {
   accept: () => void;
   decline: () => void;
   toggle: () => void;
-  sampleLevel: () => number;
+  beatPulse: () => number;
 }
 
 const MusicContext = createContext<MusicValue | null>(null);
 
 export function MusicProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const binsRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
-  const levelRef = useRef(0);
-  const wiredRef = useRef(false);
   const [ask, setAsk] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [playing, setPlaying] = useState(false);
   const german = useLocation().pathname === '/';
 
-  function wire(audio: HTMLAudioElement) {
-    if (wiredRef.current) {
-      void audioCtxRef.current?.resume();
-      return;
-    }
-    const ctx = new AudioContext();
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 128;
-    analyser.smoothingTimeConstant = 0.62;
-    const source = ctx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(ctx.destination);
-    audioCtxRef.current = ctx;
-    analyserRef.current = analyser;
-    binsRef.current = new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount));
-    wiredRef.current = true;
-    void ctx.resume();
-  }
-
-  const sampleLevel = useCallback(() => {
-    const analyser = analyserRef.current;
-    const bins = binsRef.current;
-    if (!analyser || !bins) {
-      levelRef.current *= 0.9;
-      return levelRef.current;
-    }
-    analyser.getByteFrequencyData(bins);
-    let bass = 0;
-    const count = Math.min(5, bins.length);
-    for (let i = 0; i < count; i++) bass += bins[i];
-    const next = bass / (count * 255);
-    levelRef.current = levelRef.current * 0.68 + next * 0.32;
-    return levelRef.current;
+  const beatPulse = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio || audio.paused || audio.currentTime < BEAT_OFFSET) return 0;
+    const phase = ((audio.currentTime - BEAT_OFFSET) % BEAT) / BEAT;
+    return Math.exp(-phase * 9);
   }, []);
 
   function play() {
@@ -69,7 +39,6 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     if (!audio) return;
     if (!audio.src.endsWith(TRACK)) audio.src = TRACK;
     audio.volume = VOLUME;
-    wire(audio);
     void audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
   }
 
@@ -115,7 +84,6 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     sessionStorage.setItem(CHOICE_KEY, 'on');
     if (audio.src) {
       audio.volume = VOLUME;
-      wire(audio);
       void audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
       return;
     }
@@ -123,7 +91,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <MusicContext.Provider value={{ ask, accepted, playing, accept, decline, toggle, sampleLevel }}>
+    <MusicContext.Provider value={{ ask, accepted, playing, accept, decline, toggle, beatPulse }}>
       {children}
       <audio ref={audioRef} loop preload="none" />
       {ask && (
@@ -135,7 +103,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
                 Ja
               </button>
               <button type="button" className="btn" onClick={decline}>
-                {german ? 'Nein' : 'Nej'}
+                Nein
               </button>
             </div>
           </div>

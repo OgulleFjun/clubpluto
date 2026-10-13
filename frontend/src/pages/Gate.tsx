@@ -59,7 +59,7 @@ export default function Gate({ kind }: { kind: DoorKind }) {
   const [fileName, setFileName] = useState('');
   const text = copy[kind];
   const markRef = useRef<HTMLDivElement>(null);
-  const { sampleLevel } = useMusic();
+  const { beatPulse } = useMusic();
 
   useEffect(() => {
     if (kind !== 'player') return;
@@ -67,8 +67,8 @@ export default function Gate({ kind }: { kind: DoorKind }) {
     let frame = 0;
     let spin = 0;
     const tick = () => {
-      const level = reduced ? 0 : sampleLevel();
-      spin += reduced ? 0 : 0.08 + level * 2.4;
+      const level = reduced ? 0 : beatPulse();
+      spin += reduced ? 0 : 0.12;
       const mark = markRef.current;
       if (mark) {
         mark.style.setProperty('--pulse', level.toFixed(3));
@@ -78,7 +78,7 @@ export default function Gate({ kind }: { kind: DoorKind }) {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [kind, sampleLevel]);
+  }, [kind, beatPulse]);
 
   if (user) return <Navigate to={homeFor(user.role)} replace />;
 
