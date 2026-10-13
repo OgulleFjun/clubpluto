@@ -18,6 +18,8 @@ export const env = {
   },
   jwtSecret: process.env.JWT_SECRET || 'change-me-in-production',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5174',
+  playerGatePassword: process.env.PLAYER_GATE_PASSWORD || '123ABC!',
+  staffGatePassword: process.env.STAFF_GATE_PASSWORD || 'banan',
   portraitDir: process.env.PORTRAIT_DIR || path.join(root, 'uploads', 'portraits'),
   prizeDir: process.env.PRIZE_DIR || path.join(root, 'uploads', 'prizes'),
 };

@@ -29,8 +29,11 @@ CREATE TABLE IF NOT EXISTS accounts (
   password_hash text NOT NULL,
   role text NOT NULL CHECK (role IN ('admin', 'doorman', 'gamemaster', 'participant')),
   active boolean NOT NULL DEFAULT true,
+  display_name text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS display_name text;
 
 CREATE TABLE IF NOT EXISTS participants (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

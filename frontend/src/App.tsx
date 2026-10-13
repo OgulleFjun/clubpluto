@@ -4,7 +4,7 @@ import { Layout } from './ui';
 import Home from './pages/Home';
 import Rules from './pages/Rules';
 import Prizes from './pages/Prizes';
-import Login from './pages/Login';
+import Personal from './pages/Personal';
 import Register from './pages/Register';
 import Club from './pages/Club';
 import Mystery from './pages/Mystery';
@@ -17,7 +17,7 @@ import Admin from './pages/Admin';
 
 export default function App() {
   const { ready } = useAuth();
-  if (!ready) return <p className="page">Tänder ljuset…</p>;
+  if (!ready) return <div className="boot" />;
   return (
     <Routes>
       <Route element={<Layout />}>
@@ -26,7 +26,8 @@ export default function App() {
         <Route path="/priser" element={<Prizes />} />
         <Route path="/spel" element={<Games />} />
         <Route path="/resultat" element={<Results />} />
-        <Route path="/logga-in" element={<Login />} />
+        <Route path="/logga-in" element={<Navigate to="/" replace />} />
+        <Route path="/personal" element={<Personal />} />
         <Route path="/inbjudan/:token" element={<Register />} />
         <Route path="/klubben" element={<Club />} />
         <Route path="/mysteriet" element={<Mystery />} />

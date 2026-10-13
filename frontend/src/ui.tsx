@@ -2,6 +2,7 @@ import { FormEvent, ReactNode, useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { api } from './api';
 import { homeFor, useAuth } from './auth';
+import { Music } from './music';
 
 export interface PublicEvent {
   clubName: string;
@@ -34,16 +35,21 @@ export function Layout() {
   const name = event?.clubName || 'Club Pluto';
 
   return (
-    <div className="shell">
+    <div className={user ? 'shell' : 'shell quiet'}>
       <header className="topbar">
-        <NavLink to="/" className="brand">
-          <span className="seal">CP</span>
-          <span>
-            <strong>{name}</strong>
-            <small>{event?.tagline || 'Svartklubben'}</small>
-          </span>
-        </NavLink>
+        {user ? (
+          <NavLink to={homeFor(user.role)} className="brand">
+            <span className="seal">CP</span>
+            <span>
+              <strong>{name}</strong>
+              <small>{event?.tagline || 'Svartklubben'}</small>
+            </span>
+          </NavLink>
+        ) : (
+          <span />
+        )}
         <div className="topbar-right">
+        {user ? (
         <nav className="desktop-nav">
           <NavLink to="/regler">Regler</NavLink>
           <NavLink to="/priser">Priser</NavLink>
@@ -64,10 +70,22 @@ export function Layout() {
             >
               Logga ut
             </button>
-          ) : (
-            <NavLink to="/logga-in">Logga in</NavLink>
-          )}
+          ) : null}
         </nav>
+        ) : (
+          <NavLink to="/personal" className="personal-link">Personal</NavLink>
+        )}
+        {user && (
+          <button
+            className="text-button mobile-logout"
+            onClick={() => {
+              logout();
+              navigate('/');
+            }}
+          >
+            Logga ut
+          </button>
+        )}
         <span className="git-sha">{__GIT_SHA__}</span>
         </div>
       </header>
@@ -84,10 +102,13 @@ export function Layout() {
           </NavLink>
         </nav>
       )}
-      <footer>
-        <span>{name}</span>
-        <span>Sala Analoga Spelförening och SUS</span>
-      </footer>
+      {user && (
+        <footer>
+          <span>{name}</span>
+          <span>Sala Analoga Spelförening och SUS</span>
+        </footer>
+      )}
+      <Music />
     </div>
   );
 }
@@ -156,7 +177,7 @@ export function Guard({ children, roles }: { children: ReactNode; roles?: string
   const navigate = useNavigate();
   useEffect(() => {
     if (!ready) return;
-    if (!user) navigate('/logga-in');
+    if (!user) navigate('/');
     else if (roles && !roles.includes(user.role)) navigate(homeFor(user.role));
   }, [ready, user, roles, navigate]);
   if (!ready || !user) return <p className="page">Öppnar dörren…</p>;
