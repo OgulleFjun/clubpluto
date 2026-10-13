@@ -2,7 +2,7 @@ import { FormEvent, ReactNode, useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { api } from './api';
 import { homeFor, useAuth } from './auth';
-import { Music } from './music';
+import { MusicProvider, MusicToggle } from './music';
 
 export interface PublicEvent {
   clubName: string;
@@ -35,6 +35,7 @@ export function Layout() {
   const name = event?.clubName || 'Club Pluto';
 
   return (
+    <MusicProvider>
     <div className={user ? 'shell' : 'shell quiet'}>
       <header className="topbar">
         {user ? (
@@ -87,6 +88,7 @@ export function Layout() {
           </button>
         )}
         <span className="git-sha">{__GIT_SHA__}</span>
+        <MusicToggle />
         </div>
       </header>
       <main>
@@ -108,8 +110,8 @@ export function Layout() {
           <span>Sala Analoga Spelförening och SUS</span>
         </footer>
       )}
-      <Music />
     </div>
+    </MusicProvider>
   );
 }
 
