@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 const CHOICE_KEY = 'clubpluto_music';
 const TRACK = '/ophanim.mp3';
 const VOLUME = 0.16;
-const BPM = 60;
+const BPM = 66;
 const BEAT = 60 / BPM;
 const BEAT_OFFSET = 0.175;
 
