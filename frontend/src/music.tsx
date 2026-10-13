@@ -4,9 +4,15 @@ import { useLocation } from 'react-router-dom';
 const CHOICE_KEY = 'clubpluto_music';
 const TRACK = '/ophanim.mp3';
 const VOLUME = 0.16;
-const BPM = 66;
+const BPM = 33;
 const BEAT = 60 / BPM;
 const BEAT_OFFSET = 0.175;
+const DUB_AFTER = 0.22;
+
+function thump(age: number, strength: number) {
+  if (age < 0) return 0;
+  return strength * Math.exp(-age * 8);
+}
 
 interface MusicValue {
   ask: boolean;
@@ -30,8 +36,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const beatPulse = useCallback(() => {
     const audio = audioRef.current;
     if (!audio || audio.paused || audio.currentTime < BEAT_OFFSET) return 0;
-    const phase = ((audio.currentTime - BEAT_OFFSET) % BEAT) / BEAT;
-    return Math.exp(-phase * 9);
+    const t = (audio.currentTime - BEAT_OFFSET) % BEAT;
+    return Math.max(thump(t, 1), thump(t - DUB_AFTER, 0.82));
   }, []);
 
   function play() {
