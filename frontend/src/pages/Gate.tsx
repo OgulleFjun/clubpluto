@@ -131,7 +131,7 @@ export default function Gate({ kind }: { kind: DoorKind }) {
         )}
         <img className="gate-logo" src="/mark.webp" alt="Club Pluto" />
       </div>
-      {kind === 'staff' && <p className="gate-kicker">Personal</p>}
+      {kind === 'staff' && <p className="gate-kicker">Inlogg personal</p>}
       <form onSubmit={onSubmit(submit)}>
         <Field label={text.email}>
           <input

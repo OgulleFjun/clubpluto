@@ -74,7 +74,7 @@ export function Layout() {
           ) : null}
         </nav>
         ) : (
-          <NavLink to="/personal" className="personal-link">Personal</NavLink>
+          <NavLink to="/personal" className="personal-link">Inlogg personal</NavLink>
         )}
         {user && (
           <button
