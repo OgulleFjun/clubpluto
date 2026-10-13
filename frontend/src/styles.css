@@ -99,14 +99,47 @@ main { flex: 1; width: min(1080px, calc(100% - 2rem)); margin: 0 auto; padding-b
   padding: 4.2rem 1.2rem 2.5rem;
   background: #000;
 }
-.gate-logo {
+.gate-mark {
+  position: relative;
   width: min(420px, 86vw);
+}
+.gate-logo {
+  width: 100%;
   height: auto;
   display: block;
   user-select: none;
+  position: relative;
+  z-index: 1;
+  transform: scale(calc(1 + var(--pulse, 0) * 0.035));
+}
+.gate-glow,
+.gate-ring {
+  position: absolute;
+  left: 50%;
+  top: 33%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.gate-glow {
+  width: 42%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgba(176, 28, 42, calc(0.12 + var(--pulse, 0) * 0.72)) 0%, transparent 68%);
+  transform: scale(calc(0.86 + var(--pulse, 0) * 0.34));
+}
+.gate-ring {
+  width: 56%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(228, 188, 115, calc(0.18 + var(--pulse, 0) * 0.75));
+  transform: rotate(var(--spin, 0deg));
+}
+.gate-ring.far {
+  width: 70%;
+  border-style: dashed;
+  transform: rotate(calc(var(--spin, 0deg) * -0.65));
 }
 .gate.compact { justify-content: flex-start; padding-top: 3.4rem; }
-.gate.compact .gate-logo { width: min(220px, 52vw); }
+.gate.compact .gate-mark { width: min(220px, 52vw); }
 .gate-kicker, .gate-note {
   margin: 0.15rem 0 0.7rem;
   text-align: center;
@@ -267,17 +300,25 @@ footer {
   inset: 0;
   z-index: 30;
   display: grid;
-  justify-items: center;
-  align-items: end;
-  padding-bottom: 9vh;
-  background: rgba(0, 0, 0, 0.45);
+  place-items: center;
+  padding-bottom: 16vh;
+  background: rgba(0, 0, 0, 0.28);
 }
 .music-card {
   width: min(340px, 90vw);
   padding: 1.35rem 1.2rem 1.15rem;
-  border: 1px solid rgba(228, 188, 115, 0.55);
-  background: #000;
+  border: 1px solid rgba(228, 188, 115, 0.9);
+  background: rgba(0, 0, 0, 0.82);
   text-align: center;
+  animation: music-blink 1.05s ease-in-out infinite;
+}
+@keyframes music-blink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 24px rgba(228, 188, 115, 0.28); }
+  46% { opacity: 0.38; box-shadow: 0 0 0 rgba(228, 188, 115, 0); }
+  70% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .music-card { animation: none; }
 }
 .music-card p {
   margin: 0 0 1rem;
