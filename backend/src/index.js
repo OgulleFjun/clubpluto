@@ -13,18 +13,17 @@ import photosRouter from './routes/photos.js';
 const app = express();
 app.set('trust proxy', 1);
 
-const allowedOrigins = new Set([env.frontendUrl, 'http://localhost:5174']);
-if (env.frontendUrl.includes('://www.')) {
-  allowedOrigins.add(env.frontendUrl.replace('://www.', '://'));
-} else if (env.frontendUrl.startsWith('http')) {
-  allowedOrigins.add(env.frontendUrl.replace('://', '://www.'));
-}
+const allowedOrigins = new Set(
+  [env.frontendUrl, 'http://localhost:5174', 'https://clubpluto.eu', 'https://www.clubpluto.eu']
+    .filter(Boolean)
+    .map((origin) => origin.replace(/\/$/, ''))
+);
 
 app.use(
   cors({
     origin(origin, callback) {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.has(origin)) return callback(null, true);
+      if (allowedOrigins.has(origin.replace(/\/$/, ''))) return callback(null, true);
       if (env.nodeEnv !== 'production' && /^http:\/\/localhost:\d+$/.test(origin)) {
         return callback(null, true);
       }

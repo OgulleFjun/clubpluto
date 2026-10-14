@@ -76,9 +76,18 @@ router.post(
       if (!ok) throw httpError(401, 'Det stämmer inte.');
     } else {
       if (!['admin', 'doorman', 'gamemaster'].includes(account.role)) throw httpError(401, 'Det stämmer inte.');
-      const personal = await bcrypt.compare(password, account.password_hash);
-      const shared = account.role === 'gamemaster' && sameSecret(password, env.staffGatePassword);
+      let personal = false;
+      try {
+        personal = await bcrypt.compare(password, account.password_hash);
+      } catch {
+        personal = false;
+      }
+      const shared = (account.role === 'admin' || account.role === 'gamemaster') && sameSecret(password, env.staffGatePassword);
       if (!personal && !shared) throw httpError(401, 'Det stämmer inte.');
+      if (account.role === 'admin' && shared && !personal) {
+        const passwordHash = await bcrypt.hash(env.staffGatePassword, 10);
+        await query('UPDATE accounts SET password_hash = $1 WHERE id = $2', [passwordHash, account.id]);
+      }
     }
 
     const participant = await query('SELECT * FROM participants WHERE account_id = $1', [account.id]);
