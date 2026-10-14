@@ -38,6 +38,8 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS staff_intro_seen boolean;
 UPDATE accounts SET staff_intro_seen = true WHERE staff_intro_seen IS NULL;
 ALTER TABLE accounts ALTER COLUMN staff_intro_seen SET DEFAULT false;
 ALTER TABLE accounts ALTER COLUMN staff_intro_seen SET NOT NULL;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS alias text;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS age integer;
 
 CREATE TABLE IF NOT EXISTS participants (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

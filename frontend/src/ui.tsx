@@ -1,7 +1,7 @@
 import { FormEvent, ReactNode, useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { api } from './api';
-import { homeFor, useAuth } from './auth';
+import { homeFor, useAuth, User } from './auth';
 import { MusicProvider, MusicToggle } from './music';
 import { gitSha } from 'virtual:git-sha';
 
@@ -132,39 +132,71 @@ export function Layout() {
   );
 }
 
+function needsStaffProfile(user: User) {
+  if (user.role === 'participant') return false;
+  return !user.displayName || !user.alias || user.age == null || user.staffIntroSeen === false;
+}
+
 function StaffIntro() {
   const { user, token, acceptSession } = useAuth();
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    setOpen(Boolean(user && user.role === 'gamemaster' && user.staffIntroSeen === false));
+    setOpen(Boolean(user && needsStaffProfile(user)));
   }, [user]);
 
   if (!open || !user || !token) return null;
   const sessionToken = token;
-  const sessionUser = user;
 
-  async function close() {
-    setOpen(false);
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    setBusy(true);
+    setError('');
     try {
-      await api('/auth/staff-intro', { method: 'POST' }, sessionToken);
-      acceptSession(sessionToken, { ...sessionUser, staffIntroSeen: true });
-    } catch {
-      setOpen(true);
+      const result = await api<{ user: User }>('/auth/staff-intro', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: data.get('name'),
+          age: Number(data.get('age')),
+          alias: data.get('alias'),
+        }),
+      }, sessionToken);
+      acceptSession(sessionToken, result.user);
+      setOpen(false);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Det gick inte att spara.');
+    } finally {
+      setBusy(false);
     }
   }
 
   return (
     <div className="welcome" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
-      <div className="welcome-card">
+      <form className="welcome-card" onSubmit={(event) => void save(event)}>
         <h2 id="welcome-title">Club Pluto</h2>
         <p>Club Pluto är ett spökvampyrlajv. Gästerna kommer förklädda, och vampyrer rör sig bland dem.</p>
         <p><strong>Söndag 1 november 2026.</strong><br />Folkets hus, Sala. Kvällen är i källaren.</p>
         <p>Samling klockan 17:00. Ytterdörren öppnar klockan 18:30.</p>
         <p>Det kommer vara musik. En stor del av upplevelsen är att gissa vem som är vem, så försök ändra rösten.</p>
-        <p>Första steget som spelledare är att välja en roll.</p>
-        <button className="btn apply" type="button" onClick={() => void close()}>Välj en roll</button>
-      </div>
+        <p>Fyll i namn, ålder och alias.</p>
+        {user.role === 'gamemaster' && <p>Första steget som spelledare är att välja en roll.</p>}
+        <Field label="Namn">
+          <input name="name" required maxLength={80} defaultValue={user.displayName || ''} autoComplete="name" />
+        </Field>
+        <Field label="Ålder">
+          <input name="age" type="number" required min={1} max={120} inputMode="numeric" />
+        </Field>
+        <Field label="Alias">
+          <input name="alias" required maxLength={40} defaultValue={user.alias || ''} autoComplete="off" />
+        </Field>
+        <ErrorText>{error}</ErrorText>
+        <button className="btn apply" type="submit" disabled={busy}>
+          {user.role === 'gamemaster' ? 'Spara och välj en roll' : 'Spara'}
+        </button>
+      </form>
     </div>
   );
 }

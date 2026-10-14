@@ -18,6 +18,9 @@ export interface User {
   email: string;
   role: Role;
   staffIntroSeen: boolean;
+  displayName: string | null;
+  alias: string | null;
+  age: number | null;
   participant: ParticipantBrief | null;
 }
 

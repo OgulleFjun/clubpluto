@@ -43,9 +43,22 @@ router.post(
   authenticate,
   loadAccount,
   asyncRoute(async (req, res) => {
-    if (req.account.role !== 'gamemaster') throw httpError(403, 'Den här delen är stängd för ditt konto.');
-    await query('UPDATE accounts SET staff_intro_seen = true WHERE id = $1', [req.account.id]);
-    res.json({ ok: true });
+    if (!['admin', 'doorman', 'gamemaster'].includes(req.account.role)) {
+      throw httpError(403, 'Den här delen är stängd för ditt konto.');
+    }
+    const name = cleanName(req.body.name);
+    const alias = String(req.body.alias || '').trim();
+    const age = Number(req.body.age);
+    if (!alias || alias.length > 40) throw httpError(400, 'Ange ett alias.');
+    if (!Number.isInteger(age) || age < 1 || age > 120) throw httpError(400, 'Ange en ålder.');
+    const updated = await query(
+      `UPDATE accounts
+       SET display_name = $1, alias = $2, age = $3, staff_intro_seen = true
+       WHERE id = $4
+       RETURNING *`,
+      [name, alias, age, req.account.id]
+    );
+    res.json({ user: publicAccount(updated.rows[0], req.participant) });
   })
 );
 

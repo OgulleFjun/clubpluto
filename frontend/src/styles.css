@@ -447,6 +447,8 @@ body:has(.shell.staff) { background: #000; }
 }
 .welcome-card {
   width: min(36rem, 100%);
+  max-height: calc(100vh - 2.4rem);
+  overflow: auto;
   padding: 1.4rem 1.3rem 1.3rem;
   border: 1px solid var(--gold);
   background: #000;

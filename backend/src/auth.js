@@ -34,7 +34,7 @@ export function requireRoles(...roles) {
 export async function loadAccount(req, _res, next) {
   try {
     const { rows } = await query(
-      'SELECT id, email, role, active, staff_intro_seen FROM accounts WHERE id = $1',
+      'SELECT id, email, role, active, staff_intro_seen, display_name, alias, age FROM accounts WHERE id = $1',
       [req.user.id]
     );
     const account = rows[0];
@@ -54,6 +54,9 @@ export function publicAccount(account, participant) {
     email: account.email,
     role: account.role,
     staffIntroSeen: account.staff_intro_seen === true,
+    displayName: account.display_name || null,
+    alias: account.alias || null,
+    age: account.age == null ? null : Number(account.age),
     participant: participant
       ? {
           id: participant.id,

@@ -5,7 +5,6 @@ export interface StaffPostCopy {
   later?: boolean;
   croupier?: boolean;
   plats: string;
-  allmän: string[];
   kväll: string[];
   uppgift: string[];
   spel: string[];
@@ -14,7 +13,7 @@ export interface StaffPostCopy {
 export const whenWhere = {
   date: 'Söndag 1 november 2026.',
   place: 'Folkets hus, Sala.',
-  time: 'Samling klockan 17:00, utklädd. Ytterdörren öppnar klockan 18:30.',
+  time: 'Samling klockan 17:00. Ytterdörren öppnar klockan 18:30.',
 };
 
 export const vampireRules = [
@@ -28,34 +27,33 @@ export const vampireRules = [
 ];
 
 export const prizeRules = [
-  'Alla gäster startar med 100 basmarker och 0 prismarker. Managern ger ut startmarkerna i källaren.',
+  'Alla gäster startar med 100 basmarker och 0 prismarker. Managern ger ut startmarkerna.',
   'Basmarker spelas om vid borden. De kan inte växlas mot priser. Hemsidan räknar inte varje hand.',
-  'Prismarker delas ut när någon vinner ett spel, normalt 1 styck, och när någon blir vampyr, 1 styck. Croupieren skriver upp prismarket direkt.',
-  'Bara prismarker köper priser. Minsta priset kostar 2 prismarker. Prize Master i Banken tar emot markerna och lämnar ut priset.',
-  'Skriv upp namn, pris och antal. Prislistan kan ändras av arrangören.',
+  'När någon vinner ett spel delas normalt 1 prismark ut. Croupieren skriver upp det direkt. En förvandling ger också prismark. Hur det går till står under Vampyr.',
+  'Bara prismarker köper priser. Minsta priset kostar 2 prismarker. Prize Master i Banken tar emot markerna och lämnar ut priset. Skriv upp namn, pris och antal.',
+  'Prislistan kan ändras av arrangören.',
   'Den som har slut på basmarker kan göra en kort utmaning hos Prize Master och få påfyllning. Vilka utmaningar som gäller sägs klockan 17:00.',
-  'Överlevnadspriset lämnas inte ut vid disken under kvällen. Det går till den människa som har högst poäng när tävlingen stänger.',
+  'Överlevnadspriset lämnas inte ut vid disken under kvällen.',
 ];
 
-export const maskRule =
-  'Du måste vara utklädd till oigenkännlighet. Masken stannar på hela kvällen. Ingen, inte ens de andra i personalen, ska kunna se vem du är.';
-
-export const atmosphere =
-  'Det kommer vara musik under kvällen. En stor del av upplevelsen är att gissa vem som är vem. Försök ändra rösten, så att ingen känner igen dig på hur du låter.';
+export function welcomeCopy(croupier: boolean) {
+  return [
+    'Tack för att du ställer upp. Club Pluto blir till för att du är här.',
+    'Det är ett spökvampyrlajv. Gästerna kommer förklädda, det spelas musik, och en stor del av upplevelsen är att gissa vem som är vem. Masken stannar på hela kvällen. Försök ändra rösten, så att ingen känner igen dig på hur du låter. Inte ens de andra i personalen ska kunna se vem du är.',
+    'Rutan ovan visar datum, tid och var just du står.',
+    croupier
+      ? 'Läs de andra flikarna innan du ansöker. Kvällen är ordningen. Uppgift är vad du gör. Ditt spel är reglerna vid ditt bord. Vampyr förklarar de röda korten. Priser förklarar markerna.'
+      : 'Läs de andra flikarna innan du ansöker. Kvällen är ordningen. Uppgift är vad du gör. Spel är borden. Vampyr förklarar de röda korten. Priser förklarar markerna.',
+  ];
+}
 
 export const primaryPostKeys = ['manager', 'holdem', 'sjalpoker', 'ride-the-bus'];
 
-const flow = [
-  'Samling klockan 17:00 i Folkets hus. Då går ni igenom kvällen och gör i ordning era platser. Var där, utklädd.',
+const evening = [
+  'Samling klockan 17:00 i Folkets hus. Då går ni igenom kvällen och gör i ordning era platser.',
   'Klockan 18:30 öppnas ytterdörren. Bouncern släpper in en gäst i taget. Den som kan lösenordet får gå ner i källaren. Den som inte kan det stannar utanför.',
-  'I källaren registrerar gästen sig hos Managern och får 100 basmarker. Sedan går gästen ut och spelar.',
-  'Kvällen är söndag 1 november 2026. Tre spel pågår: Texas Hold’em, Själ-poker och Ride the Bus. Banken sköter priser, påfyllning och vampyrer.',
-];
-
-const night = [
-  'Alla gäster startar med 100 basmarker och 0 prismarker. Basmarker spelas om vid borden. Bara prismarker kan växlas mot priser, minst 2 stycken.',
-  'Den Förste är en slumpad gäst med två röda kort. Den som tackar ja till ett kort går till Banken, blir vampyr och får 20 basmarker och 1 prismark. Det går bara en gång.',
-  'På hemsidan paras riktiga namn ihop med de förklädda gästerna, och man gissar vilka som är vampyrer. Rätt ger +1, fel ger −1. Bara den som fortfarande är människa kan vinna överlevnadspriset.',
+  'Hos Managern registreras gästen och får sina startmarker. Sedan går gästen ut och spelar.',
+  'Tre spel pågår: Texas Hold’em, Själ-poker och Ride the Bus. Banken tar emot vampyrer och priser.',
 ];
 
 export const staffPosts: StaffPostCopy[] = [
@@ -64,25 +62,19 @@ export const staffPosts: StaffPostCopy[] = [
     title: 'Manager',
     image: '/posts/manager.jpg',
     plats: 'Registreringen i källaren.',
-    allmän: [
-      'Du står i källaren. Hit kommer gästerna efter att Bouncern släppt ner dem. Du registrerar dem och ger dem marker. Du spelar inte själv.',
-      'Dräkten är en anka i hög hatt, frack och käpp. Ansiktet är täckt.',
-      'Du är den de andra frågar när ett bord står stilla, en gäst vill ta av sig masken, eller ett uppdrag saknar personal.',
-    ],
-    kväll: [...flow, ...night],
+    kväll: evening,
     uppgift: [
-      '17:00: var på plats. Gå igenom kvällen med personalen och ställ i ordning registreringen i källaren.',
-      'Kontrollera att de tre croupiererna har varsitt bord. Prize Master och Bouncer tillsätts när de fyra viktigaste rollerna är tagna.',
-      '18:30: stanna i källaren. Bouncern skickar ner en gäst i taget. Du tar emot, prickar av registreringen och ger 100 basmarker.',
-      'Skicka sedan gästen vidare till spelen. Du delar inte ut marker vid ytterdörren.',
-      'Under kvällen håller du maskerna på och ser till att borden rullar. Croupieren bestämmer vid sitt bord.',
-      'Vid slutet stämmer du av prismarker och priser med Prize Master.',
+      '17:00: var på plats. Gå igenom kvällen med personalen och ställ i ordning registreringen.',
+      'Dräkten är en anka i hög hatt, frack och käpp. Ansiktet är täckt.',
+      'Kontrollera att de tre croupiererna har varsitt bord.',
+      '18:30: ta emot gästerna som Bouncern skickar ner. Pricka av registreringen och ge startmarkerna.',
+      'Skicka gästen vidare till borden. Du ger inga marker vid ytterdörren.',
+      'Du är den de andra frågar när ett bord står stilla eller någon vill ta av sig masken. Croupieren bestämmer vid sitt eget bord.',
+      'Vid slutet stämmer du av med Prize Master.',
     ],
     spel: [
-      'Du har inget eget bord. Du kan spelen tillräckligt för att hjälpa en croupier som kör fast. Detaljerna låses på genomgången klockan 17:00.',
-      'Texas Hold’em: gästerna kan gå in och ut mellan händer. Vinnaren får potten i basmarker och 1 prismark vid en godkänd vinst.',
-      'Själ-poker: gästerna letar efter gömda kort och bygger en pokerhand. Vinnaren får 1 prismark och eventuella basmarker.',
-      'Ride the Bus: en gäst gissar på fyra kort i rad. Fel gissning kostar basmarker. Den som klarar hela raden får potten och 1 prismark.',
+      'Du har inget eget bord. Du kan borden tillräckligt för att hjälpa en croupier som kör fast.',
+      'Reglerna står hos den croupier som håller spelet. Det som ännu är öppet låses klockan 17:00.',
     ],
   },
   {
@@ -91,29 +83,20 @@ export const staffPosts: StaffPostCopy[] = [
     image: '/posts/holdem.jpg',
     croupier: true,
     plats: 'Texas Hold’em-bordet i källaren.',
-    allmän: [
-      'Du står vid Texas Hold’em-bordet i källaren. Du delar. Du spelar inte med och du säger inte hur en gäst ska satsa.',
-      'Du är utklädd så att ingen känner igen dig. Västen och masken sitter på tills kvällen är slut.',
-    ],
-    kväll: [
-      ...flow,
-      'Ditt bord tar emot gäster efter att de fått sina 100 basmarker av Managern. De kan gå in och ut mellan händer.',
-      ...night,
-    ],
+    kväll: evening,
     uppgift: [
-      '17:00: var på plats, klädd, och dukar bordet under genomgången. Kortlek, marker och en plats där kön kan stå.',
-      '18:30: var vid bordet när de första gästerna kommer ner. Förklara i stora drag: två dolda kort, gemensamma kort på bordet, bäst hand vinner potten.',
-      'Håll givarna korta så att nya gäster kan sätta sig mellan händerna.',
-      'Vid en godkänd vinst får vinnaren potten i basmarker och 1 prismark. Skriv upp prismarket innan nästa giv.',
-      'Vad som räknas som en godkänd vinst bestäms på genomgången. Fram till dess delar du inga prismarker på eget bevåg.',
-      'Blir det osämja: korten ligger kvar, du säger vad som gäller. Hämta Managern om det inte räcker.',
+      '17:00: var på plats och duka bordet. Kortlek, marker och en plats där kön kan stå.',
+      '18:30: var vid bordet. Förklara spelet som det står under Ditt spel. Du spelar inte med och du säger inte hur en gäst ska satsa.',
+      'Håll givarna korta, så att nya gäster hinner sätta sig mellan händerna.',
+      'Skriv upp prismarket innan nästa giv. Innan genomgången har sagt vad en godkänd vinst är delar du inga prismarker på eget bevåg.',
+      'Blir det osämja: korten ligger kvar och du säger vad som gäller. Hämta Managern om det inte räcker.',
     ],
     spel: [
-      'Texas Hold’em är poker. Varje spelare får två dolda kort. På bordet läggs gemensamma kort, först tre, sedan ett, sedan ett.',
-      'Spelarna satsar basmarker mellan korten. Den som har bäst hand av sina två kort och bordets kort vinner potten. Den som är ensam kvar vinner också.',
+      'Varje spelare får två dolda kort. På bordet läggs gemensamma kort, först tre, sedan ett, sedan ett.',
+      'Spelarna satsar basmarker mellan korten. Bäst hand av de egna korten och bordets kort vinner potten. Den som är ensam kvar vinner också.',
       'Gäster får lämna bordet mellan händer och komma tillbaka senare.',
-      'En godkänd vinst ger dessutom 1 prismark, utöver basmarkerna i potten. Exakt gräns för en godkänd vinst sägs på genomgången klockan 17:00.',
-      'Basmarkerna stannar på bordet. Hemsidan räknar inte varje hand, bara prismarket du skriver upp.',
+      'En godkänd vinst ger dessutom 1 prismark. Vad som räknas som godkänd vinst sägs klockan 17:00.',
+      'Basmarkerna stannar på bordet. Hemsidan räknar bara prismarket du skriver upp.',
     ],
   },
   {
@@ -122,28 +105,19 @@ export const staffPosts: StaffPostCopy[] = [
     image: '/posts/hitta.jpg',
     croupier: true,
     plats: 'Själ-poker i källaren.',
-    allmän: [
-      'Du håller i Själ-poker. Gästerna letar efter gömda kort och bygger en pokerhand. Du spelar inte med.',
-      'Du är utklädd till oigenkännlighet. Ditt bord, eller din bana med gömställen, är i källaren.',
-    ],
-    kväll: [
-      ...flow,
-      'Gästerna kommer till dig efter att Managern gett dem marker. En omgång ska gå att förstå på en minut.',
-      ...night,
-    ],
+    kväll: evening,
     uppgift: [
-      '17:00: var på plats. På genomgången bestäms var korten göms, hur lång tid en omgång tar och hur banan ställs tillbaka.',
-      'Gör i ordning gömställena innan ytterdörren öppnar klockan 18:30.',
-      'När en gäst kommer: förklara att de ska hitta kort och bygga en pokerhand. Starta tiden och håll ordning på vilka kort som är hittade.',
-      'När tiden är slut jämför du händerna. Vinnaren får 1 prismark och de basmarker som hör till omgången.',
-      'Skriv upp prismarket, göm korten igen och ta nästa gäst eller lag.',
-      'Hittar ni inte på reglerna under genomgången: spela inte skarpt förrän Managern sagt att omgången är godkänd.',
+      '17:00: var på plats. Då bestäms var korten göms, hur lång tid en omgång tar och hur banan ställs tillbaka.',
+      'Gör i ordning gömställena innan klockan 18:30.',
+      'Förklara omgången som den står under Ditt spel. Du spelar inte med. Starta tiden och håll ordning på hittade kort.',
+      'När tiden är slut jämför du händerna, skriver upp prismarket, gömmer korten igen och tar nästa.',
+      'Håll tempot. En omgång som drar ut stoppar kön till de andra borden.',
+      'Är reglerna inte låsta efter genomgången: spela inte skarpt förrän Managern sagt ja.',
     ],
     spel: [
-      'I stora drag: kort ligger gömda. Spelarna letar och bygger en pokerhand av det de hittar.',
-      'Bäst hand vinner. Vinnaren får 1 prismark och eventuella basmarker.',
-      'Var korten ligger, hur många man får leta efter, tidsgräns och hur banan nollställs bestäms klockan 17:00. Det är de reglerna du dömer efter under kvällen.',
-      'Håll tempot. En omgång som drar ut stoppar kön till de andra borden.',
+      'Kort ligger gömda. Spelarna letar och bygger en pokerhand av det de hittar.',
+      'Bäst hand vinner och får 1 prismark och de basmarker som hör till omgången.',
+      'Var korten ligger, hur många man får leta efter, tidsgräns och hur banan nollställs bestäms klockan 17:00. Det är de reglerna du dömer efter.',
     ],
   },
   {
@@ -152,22 +126,12 @@ export const staffPosts: StaffPostCopy[] = [
     image: '/posts/ride.jpg',
     croupier: true,
     plats: 'Ride the Bus-bordet i källaren.',
-    allmän: [
-      'Du kör Ride the Bus. En gäst i taget gissar på fyra kort. Du vänder korten och håller potten. Du spelar inte själv.',
-      'Du står i källaren, utklädd så att ingen känner igen dig. Spelet går på basmarker, inte på att dricka.',
-    ],
-    kväll: [
-      ...flow,
-      'Gästerna kommer en och en efter att Managern gett dem marker. En resa tar ungefär en minut.',
-      ...night,
-    ],
+    kväll: evening,
     uppgift: [
-      '17:00: var på plats och lägg fram en kortlek och en pott för basmarker.',
-      '18:30: när gästerna kommer ner, förklara de fyra stoppen högt innan första kortet vänds.',
-      'Lägg fyra kort med baksidan upp. Gästen gissar innan du vänder varje kort.',
-      'Rätt gissning: gå vidare. Fel gissning: gästen lägger 5 basmarker i potten och resan är slut.',
-      'Fyra rätt: gästen tar potten och får 1 prismark. Skriv upp prismarket innan nästa gäst sätter sig.',
-      'Blanda tillbaka korten och lägg en ny rad. Potten ligger kvar när någon missar, så den kan växa.',
+      '17:00: var på plats. Lägg fram en kortlek och en pott.',
+      'Förklara stoppen som de står under Ditt spel, innan första kortet vänds. Du spelar inte själv. Spelet går på basmarker, inte på att dricka.',
+      'En gäst i taget. Vänd ett kort först när gästen har gissat.',
+      'Skriv upp prismarket innan nästa gäst sätter sig. Blanda och lägg en ny rad. Potten ligger kvar när någon missar.',
     ],
     spel: [
       'Fyra kort på rad, baksidan upp. En gäst gissar ett stopp i taget, innan kortet vänds.',
@@ -184,24 +148,16 @@ export const staffPosts: StaffPostCopy[] = [
     image: '/posts/prize.jpg',
     later: true,
     plats: 'Banken i källaren.',
-    allmän: [
-      'Du sköter Banken i källaren. Hos dig fyller gäster på basmarker, registreras som vampyrer och växlar prismarker mot priser.',
-      'Du är utklädd till oigenkännlighet. Du tar inte emot gäster vid ytterdörren och du ger inte ut startmarkerna. Det gör Managern.',
-    ],
-    kväll: [...flow, ...night],
+    kväll: evening,
     uppgift: [
-      'Rollen öppnas när Manager och de tre croupiererna är tillsatta. 17:00 är du ändå med på genomgången om du redan är vald.',
-      'Ställ i ordning Banken före 18:30: priser, skylt och en plats för röda vampyrkort.',
-      'Basmarker växlas aldrig mot priser. Den som har slut på basmarker kan göra en kort utmaning hos dig och få påfyllning. Vilka utmaningar som gäller sägs klockan 17:00.',
-      'Rött kort: registrera vampyren, ge 20 basmarker och 1 prismark, en gång per person. Säg inte högt vem det var.',
-      'Prismarker löses in mot priser. Minsta priset kostar 2. Skriv upp namn, pris och antal.',
-      'Överlevnadspriset delas inte ut vid disken under kvällen.',
+      'Om du redan är vald: var med på genomgången klockan 17:00.',
+      'Ställ i ordning Banken före 18:30. Priser, skylt och en plats för röda kort.',
+      'Du tar inte emot gäster vid ytterdörren och du ger inte ut startmarkerna.',
+      'Rött kort: följ fliken Vampyr.',
+      'Inlösen och påfyllning av basmarker: följ fliken Priser.',
     ],
     spel: [
-      'Banken är inget av de tre spelen. Spelen ger prismarkerna, du tar emot dem.',
-      'Texas Hold’em, Själ-poker och Ride the Bus ger normalt 1 prismark till vinnaren, utöver basmarkerna vid bordet.',
-      'Den Förste har två röda kort från start. Om den personen också får 20 basmarker och 1 prismark redan från början avgörs på genomgången. Fråga Managern innan du betalar ut det.',
-      'Vampyrer kan inte vinna överlevnadspriset, även om de har flest poäng på hemsidan.',
+      'Banken är inget av de tre borden. Du tar emot det croupiererna redan har delat ut.',
     ],
   },
   {
@@ -210,25 +166,17 @@ export const staffPosts: StaffPostCopy[] = [
     image: '/posts/bouncer.jpg',
     later: true,
     plats: 'Ytterdörren.',
-    allmän: [
-      'Du står vid ytterdörren. Du släpper in en gäst i taget, tar emot lösenordet och skickar ner den som kan det. Sedan håller du ordning.',
-      'Du registrerar inte gästen och du ger inte ut marker. Det sker hos Managern i källaren.',
-      'Du är utklädd till oigenkännlighet. Masken sitter på även när du står i dörren.',
-    ],
-    kväll: [...flow, ...night],
+    kväll: evening,
     uppgift: [
-      'Rollen öppnas när Manager och de tre croupiererna är tillsatta. 17:00 är du med på genomgången och lär dig lösenordet.',
-      'Ställ dig vid ytterdörren innan 18:30. Ingen kö får rinna in av sig själv.',
-      '18:30: öppna. Ta en gäst. Be om lösenordet. Kan gästen det, släpp ner personen i källaren till Managern. Annars stannar gästen utanför.',
-      'En i taget. Nästa får vänta tills den förra är på väg ner.',
-      'När dörren är igång håller du ordning i entrén och i trappan. Masker på. Ingen tränger sig ner utan att ha sagt lösenordet till dig.',
+      'Om du redan är vald: var med klockan 17:00 och lär dig lösenordet. Skriv inte upp det där gäster kan se det.',
+      'Stå vid ytterdörren innan 18:30. Ingen kö får rinna in av sig själv.',
+      '18:30: en gäst i taget. Be om lösenordet. Kan gästen det, skicka ner personen till Managern. Annars stannar gästen utanför.',
+      'Du registrerar inte gästen och du ger inte ut marker.',
+      'Håll ordning i entrén och i trappan. Ingen går ner utan att ha sagt lösenordet till dig.',
       'Bråk eller någon som vägrar förklädnaden: håll personen vid dörren och hämta Managern. Lämna inte ytterdörren obevakad.',
     ],
     spel: [
-      'Du spelar inte. Du behöver ändå veta vad gästerna går till, så att du kan visa vägen.',
-      'Efter Managern går gästen till ett av tre spel: Texas Hold’em, Själ-poker eller Ride the Bus.',
-      'Banken är Prize Masters disk, inte din. Startmarkerna är 100 basmarker och delas ut i källaren.',
-      'Lösenordet sägs på genomgången klockan 17:00. Skriv inte upp det där gäster kan se det.',
+      'Du spelar inte. Efter Managern går gästen till ett av de tre borden. Du behöver bara kunna visa vägen.',
     ],
   },
 ];
