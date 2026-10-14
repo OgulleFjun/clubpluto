@@ -121,17 +121,16 @@ export default function Gate({ kind }: { kind: DoorKind }) {
 
   return (
     <section className={needsProfile ? 'gate compact' : 'gate'}>
-      <div className="gate-mark" ref={kind === 'player' ? markRef : undefined}>
-        {kind === 'player' && (
-          <>
-            <span className="gate-glow" aria-hidden />
-            <span className="gate-ring" aria-hidden />
-            <span className="gate-ring far" aria-hidden />
-          </>
-        )}
-        <img className="gate-logo" src="/mark.webp" alt="Club Pluto" />
-      </div>
-      {kind === 'staff' && <p className="gate-kicker">Inlogg personal</p>}
+      {kind === 'player' ? (
+        <div className="gate-mark" ref={markRef}>
+          <span className="gate-glow" aria-hidden />
+          <span className="gate-ring" aria-hidden />
+          <span className="gate-ring far" aria-hidden />
+          <img className="gate-logo" src="/mark.webp" alt="Club Pluto" />
+        </div>
+      ) : (
+        <h1 className="gate-title">Inlogg personal</h1>
+      )}
       <form onSubmit={onSubmit(submit)}>
         <Field label={text.email}>
           <input
