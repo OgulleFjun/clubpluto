@@ -68,6 +68,30 @@ CREATE TABLE IF NOT EXISTS participants (
 
 CREATE INDEX IF NOT EXISTS participants_name_idx ON participants (lower(name));
 
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS costume_path text;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS costume_token text;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS costume_at timestamptz;
+CREATE UNIQUE INDEX IF NOT EXISTS participants_costume_token_idx ON participants (costume_token) WHERE costume_token IS NOT NULL;
+
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS conversion_chips integer NOT NULL DEFAULT 0;
+ALTER TABLE participants ADD COLUMN IF NOT EXISTS sire_paid boolean NOT NULL DEFAULT false;
+
+INSERT INTO participants (account_id, name, alias, email, photo_token, name_token, door_code, membership, can_invite)
+SELECT
+  a.id,
+  a.display_name,
+  a.alias,
+  a.email,
+  encode(gen_random_bytes(18), 'hex'),
+  encode(gen_random_bytes(18), 'hex'),
+  upper(substr(encode(gen_random_bytes(6), 'hex'), 1, 8)),
+  'staff',
+  false
+FROM accounts a
+WHERE a.role IN ('admin', 'doorman', 'gamemaster')
+  AND a.display_name IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM participants p WHERE p.account_id = a.id);
+
 CREATE TABLE IF NOT EXISTS invitations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   token text NOT NULL UNIQUE,
@@ -336,11 +360,47 @@ UPDATE games SET
   rules = 'Lilla blind är 1 spelmark och stora blind är 2. Spelmarkerna kan tas med till ett annat bord. Den som vinner handen tar potten. En vunnen hand ger inga vinstmarker. Gäster får lämna bordet mellan händer.'
 WHERE key = 'holdem';
 
+UPDATE prizes
+SET name = 'Tier 1',
+    description = 'Nivå 1 av 5.',
+    cost = 2,
+    sort_order = 1
+WHERE name = 'Litet pris';
+
 INSERT INTO prizes (name, description, cost, stock, sort_order)
-SELECT
-  'Litet pris',
-  'Första prisnivån kostar 2 prismarker. Byt namn, beskrivning, bild och antal i kontrollpanelen.',
-  2,
-  0,
-  1
-WHERE NOT EXISTS (SELECT 1 FROM prizes);
+SELECT v.name, v.description, v.cost, 0, v.sort_order
+FROM (VALUES
+  ('Tier 1', 'Nivå 1 av 5.', 2, 1),
+  ('Tier 2', 'Nivå 2 av 5.', 4, 2),
+  ('Tier 3', 'Nivå 3 av 5.', 6, 3),
+  ('Tier 4', 'Nivå 4 av 5.', 9, 4),
+  ('Tier 5', 'Nivå 5 av 5.', 12, 5)
+) AS v(name, description, cost, sort_order)
+WHERE NOT EXISTS (SELECT 1 FROM prizes p WHERE p.name = v.name);
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Vinnaren är den som fortfarande är människa och har högst totalpoäng.',
+  'Överlevnadspriset delas ut klockan 20:30. Vinnaren är den som fortfarande är människa och har högst poäng på gissningarna om vampyrer och vem som är vem.'
+)
+WHERE id = 1 AND rules_text LIKE '%Vinnaren är den som fortfarande är människa och har högst totalpoäng.%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Kortet kan sedan förvandla ytterligare en person.',
+  'Den som förvandlar någon annan får 1 vinstmark, högst två. Kortet kan sedan förvandla ytterligare en person.'
+)
+WHERE id = 1
+  AND rules_text LIKE '%Kortet kan sedan förvandla ytterligare en person.%'
+  AND rules_text NOT LIKE '%högst två%';
+
+UPDATE event_settings
+SET door_password_hash = crypt($door$123ABC!$door$, gen_salt('bf', 10)),
+    updated_at = now()
+WHERE id = 1
+  AND (
+    door_password_hash IS NULL
+    OR door_password_hash IS DISTINCT FROM crypt($door$123ABC!$door$, door_password_hash)
+  );

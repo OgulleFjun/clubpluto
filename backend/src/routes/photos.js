@@ -7,13 +7,16 @@ export default function photosRouter(app) {
   app.get(
     '/api/photos/:token',
     authenticate,
-    requireRoles('admin', 'doorman', 'participant'),
+    requireRoles('admin', 'doorman', 'gamemaster', 'participant'),
     asyncRoute(async (req, res) => {
       const { rows } = await query(
-        'SELECT photo_path FROM participants WHERE photo_token = $1',
+        `SELECT photo_path AS path FROM participants WHERE photo_token = $1 AND photo_path IS NOT NULL
+         UNION ALL
+         SELECT costume_path FROM participants WHERE costume_token = $1 AND costume_path IS NOT NULL
+         LIMIT 1`,
         [param(req.params.token)]
       );
-      const filePath = rows[0]?.photo_path;
+      const filePath = rows[0]?.path;
       if (!filePath || !fs.existsSync(filePath)) throw httpError(404, 'Porträttet saknas.');
       res.setHeader('Content-Type', 'image/jpeg');
       res.setHeader('Cache-Control', 'private, max-age=3600');

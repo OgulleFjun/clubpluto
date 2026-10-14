@@ -18,10 +18,11 @@ interface Person {
   checkedInAt: string | null;
   baseChipsIssued: boolean;
   photoToken: string | null;
+  inMystery: boolean;
   invitedBy: string | null;
 }
 
-const roles = ['admin', 'doorman'];
+const roles = ['admin', 'doorman', 'gamemaster'];
 
 export default function Door() {
   return (
@@ -71,6 +72,19 @@ function DoorInner() {
     }
   }
 
+  async function addCostume(event: FormEvent<HTMLFormElement>, id: string) {
+    setError('');
+    setMessage('');
+    try {
+      await api(`/door/costume/${id}`, { method: 'POST', body: new FormData(event.currentTarget) }, token);
+      event.currentTarget.reset();
+      setMessage('Bilden ligger i mysteriet.');
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Bilden sparades inte.');
+    }
+  }
+
   async function walkIn(event: FormEvent<HTMLFormElement>) {
     setError('');
     try {
@@ -107,7 +121,13 @@ function DoorInner() {
             <div>
               <h2>{person.name}</h2>
               <p className="meta">{person.alias ? `${person.alias} · ` : ''}{person.email} · {person.doorCode}</p>
-              <p className="meta">{person.invitedBy ? `Inbjuden av ${person.invitedBy}. ` : ''}{person.checkedInAt ? 'Inne.' : 'Inte anländ.'} {person.baseChipsIssued ? 'Marker utlämnade.' : ''}</p>
+              <p className="meta">{person.invitedBy ? `Inbjuden av ${person.invitedBy}. ` : ''}{person.checkedInAt ? 'Inne.' : 'Inte anländ.'} {person.baseChipsIssued ? 'Marker utlämnade.' : ''} {person.inMystery ? 'Syns i mysteriet.' : ''}</p>
+              <form onSubmit={onSubmit((event) => addCostume(event, person.id))}>
+                <Field label="Bild i förklädnad">
+                  <input name="costume" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required />
+                </Field>
+                <button className="btn small" type="submit">{person.inMystery ? 'Byt bilden i mysteriet' : 'Lägg i mysteriet'}</button>
+              </form>
               {!person.checkedInAt && (
                 <form onSubmit={onSubmit((event) => checkIn(event, person.id))}>
                   <Field label="Entrélösenord som gästen säger"><input name="doorPassword" /></Field>

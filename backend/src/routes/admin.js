@@ -13,6 +13,7 @@ import {
 import { asyncRoute, httpError, param } from '../http.js';
 import { doorCode, randomToken } from '../tokens.js';
 import { vampireBonusDecision } from '../scoring.js';
+import { creditConversion } from '../conversions.js';
 import { removeFile, saveImage, upload } from '../uploads.js';
 import { env } from '../config.js';
 
@@ -41,6 +42,68 @@ router.get(
       firstVampire: first.rows[0]?.name || null,
       settings: presentSettings(settings, { includeSecrets: true }),
     });
+  })
+);
+
+router.get(
+  '/register-search',
+  asyncRoute(async (req, res) => {
+    const q = String(req.query.q || '').trim();
+    if (q.length < 2) throw httpError(400, 'Skriv minst två tecken.');
+    const { rows } = await query(
+      `SELECT id, name, alias, email,
+              (checked_in_at IS NOT NULL AND costume_path IS NOT NULL) AS registered
+       FROM participants
+       WHERE membership <> 'staff'
+         AND (name ILIKE $1 OR alias ILIKE $1 OR email ILIKE $1)
+       ORDER BY name
+       LIMIT 12`,
+      [`%${q}%`]
+    );
+    res.json({
+      people: rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        alias: row.alias,
+        email: row.email,
+        registered: row.registered,
+      })),
+    });
+  })
+);
+
+router.post(
+  '/register-guest/:id',
+  upload.single('costume'),
+  asyncRoute(async (req, res) => {
+    if (!req.file) throw httpError(400, 'Ta ett foto med masken på.');
+    const { rows } = await query('SELECT * FROM participants WHERE id = $1', [param(req.params.id)]);
+    const participant = rows[0];
+    if (!participant) throw httpError(404, 'Deltagaren finns inte.');
+    if (participant.membership === 'staff') throw httpError(400, 'Personal registreras inte här.');
+    const costumeToken = participant.costume_token || randomToken();
+    const dest = await saveImage(req.file, env.portraitDir, `costume-${costumeToken}.jpg`);
+    try {
+      await query(
+        `UPDATE participants SET
+           costume_path = $2,
+           costume_token = $3,
+           costume_at = now(),
+           checked_in_at = COALESCE(checked_in_at, now()),
+           base_chips = CASE WHEN base_chips_issued THEN base_chips ELSE base_chips + 100 END,
+           base_chips_issued = true
+         WHERE id = $1`,
+        [participant.id, dest, costumeToken]
+      );
+    } catch (error) {
+      removeFile(dest);
+      throw error;
+    }
+    const settings = await getSettings();
+    if (!settings.competition_closed_at && !settings.identity_open) {
+      await query('UPDATE event_settings SET identity_open = true, updated_at = now() WHERE id = 1');
+    }
+    res.json({ ok: true, name: participant.name });
   })
 );
 
@@ -78,8 +141,11 @@ function presentParticipant(row, balances) {
     vampireAt: row.vampire_at,
     turnedBy: row.turned_by_name || null,
     vampireBonusGranted: row.vampire_bonus_granted,
+    conversionChips: row.conversion_chips || 0,
+    sirePaid: row.sire_paid,
     doorCode: row.door_code,
     photoToken: row.photo_path ? row.photo_token : null,
+    costumeToken: row.costume_path ? row.costume_token : null,
     invitedBy: row.invited_by || null,
     notes: row.notes,
     createdAt: row.created_at,
@@ -151,6 +217,7 @@ router.delete(
       if (current.account_id) await client.query('DELETE FROM accounts WHERE id = $1', [current.account_id]);
     });
     removeFile(current.photo_path);
+    removeFile(current.costume_path);
     res.json({ ok: true });
   })
 );
@@ -466,6 +533,14 @@ router.post(
     });
     await applyVampire(person.id, turnedById, false, bonus);
     res.json({ ok: true, bonusGranted: Boolean(bonus) });
+  })
+);
+
+router.post(
+  '/vampires/:id/credit',
+  asyncRoute(async (req, res) => {
+    const result = await creditConversion(param(req.params.id), String(req.body.sireId || ''));
+    res.json(result);
   })
 );
 

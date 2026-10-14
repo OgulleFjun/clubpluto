@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { query, withTransaction } from '../db.js';
 import { authenticate, loadAccount, requireRoles } from '../auth.js';
+import { currentLeaderboard } from '../competition.js';
+import { creditConversion } from '../conversions.js';
 import { asyncRoute, httpError, param } from '../http.js';
 
 const router = Router();
@@ -43,6 +45,81 @@ router.get(
         mine: row.account_id === req.account.id,
       })),
     });
+  })
+);
+
+router.get(
+  '/manager/scores',
+  asyncRoute(async (req, res) => {
+    if (req.account.role !== 'admin') {
+      const post = await query(
+        `SELECT 1 FROM staff_posts WHERE key = 'manager' AND account_id = $1`,
+        [req.account.id]
+      );
+      if (!post.rows[0]) throw httpError(403, 'Poängen visas för Managern.');
+    }
+    const { board } = await currentLeaderboard();
+    const people = await query('SELECT id, membership FROM participants');
+    const membership = new Map(people.rows.map((row) => [row.id, row.membership]));
+    res.json({
+      rows: board
+        .filter((row) => membership.get(row.id) !== 'staff')
+        .map((row) => ({
+          id: row.id,
+          name: row.name,
+          total: row.total,
+          identityPoints: row.identityPoints,
+          vampirePoints: row.vampirePoints,
+          identityCorrect: row.identityCorrect,
+          identityWrong: row.identityWrong,
+          vampireCorrect: row.vampireCorrect,
+          vampireWrong: row.vampireWrong,
+        })),
+    });
+  })
+);
+
+async function requireManager(req) {
+  if (req.account.role === 'admin') return;
+  const post = await query(
+    `SELECT 1 FROM staff_posts WHERE key = 'manager' AND account_id = $1`,
+    [req.account.id]
+  );
+  if (!post.rows[0]) throw httpError(403, 'Det här gör Managern.');
+}
+
+router.get(
+  '/manager/vampires',
+  asyncRoute(async (req, res) => {
+    await requireManager(req);
+    const { rows } = await query(
+      `SELECT id, name, is_first, vampire_at, conversion_chips, sire_paid,
+              photo_path, photo_token, costume_path, costume_token
+       FROM participants
+       WHERE is_vampire AND membership <> 'staff'
+       ORDER BY vampire_at DESC NULLS LAST, name`
+    );
+    const vampires = rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      isFirst: row.is_first,
+      vampireAt: row.vampire_at,
+      conversionChips: row.conversion_chips || 0,
+      sirePaid: row.sire_paid,
+      imageToken: row.costume_path ? row.costume_token : row.photo_path ? row.photo_token : null,
+    }));
+    const newbie = vampires.find((person) => !person.isFirst && !person.sirePaid) || null;
+    const pictures = vampires.filter((person) => person.id !== newbie?.id).slice(0, 2);
+    res.json({ newbie, pictures, vampires });
+  })
+);
+
+router.post(
+  '/manager/vampires/credit',
+  asyncRoute(async (req, res) => {
+    await requireManager(req);
+    const result = await creditConversion(String(req.body.newbieId || ''), String(req.body.sireId || ''));
+    res.json(result);
   })
 );
 

@@ -42,6 +42,7 @@ router.post(
   '/staff-intro',
   authenticate,
   loadAccount,
+  upload.single('photo'),
   asyncRoute(async (req, res) => {
     if (!['admin', 'doorman', 'gamemaster'].includes(req.account.role)) {
       throw httpError(403, 'Den här delen är stängd för ditt konto.');
@@ -58,7 +59,14 @@ router.post(
        RETURNING *`,
       [name, alias, age, req.account.id]
     );
-    res.json({ user: publicAccount(updated.rows[0], req.participant) });
+    const account = updated.rows[0];
+    let participant = await ensureStaffParticipant(account, req.participant);
+    if (req.file) {
+      const dest = await saveImage(req.file, env.portraitDir, `${participant.photo_token}.jpg`);
+      const saved = await query('UPDATE participants SET photo_path = $2 WHERE id = $1 RETURNING *', [participant.id, dest]);
+      participant = saved.rows[0];
+    }
+    res.json({ user: publicAccount(account, participant) });
   })
 );
 
@@ -67,6 +75,30 @@ function sameSecret(input, expected) {
   const right = Buffer.from(String(expected));
   if (left.length !== right.length) return false;
   return crypto.timingSafeEqual(left, right);
+}
+
+async function ensureStaffParticipant(account, current) {
+  if (current) {
+    const { rows } = await query(
+      `UPDATE participants SET name = $2, alias = $3, email = $4 WHERE id = $1 RETURNING *`,
+      [current.id, account.display_name, account.alias, account.email]
+    );
+    return rows[0];
+  }
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      const { rows } = await query(
+        `INSERT INTO participants (
+          account_id, name, alias, email, photo_token, name_token, door_code, membership, can_invite
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,'staff', false) RETURNING *`,
+        [account.id, account.display_name, account.alias, account.email, randomToken(), randomToken(), doorCode()]
+      );
+      return rows[0];
+    } catch (error) {
+      if (error.code !== '23505') throw error;
+    }
+  }
+  throw httpError(500, 'Personalen kunde inte läggas i mysteriet.');
 }
 
 function cleanName(value) {

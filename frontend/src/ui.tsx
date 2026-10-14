@@ -158,11 +158,7 @@ function StaffIntro() {
     try {
       const result = await api<{ user: User }>('/auth/staff-intro', {
         method: 'POST',
-        body: JSON.stringify({
-          name: data.get('name'),
-          age: Number(data.get('age')),
-          alias: data.get('alias'),
-        }),
+        body: data,
       }, sessionToken);
       acceptSession(sessionToken, result.user);
       setOpen(false);
@@ -192,6 +188,10 @@ function StaffIntro() {
         <Field label="Alias">
           <input name="alias" required maxLength={40} defaultValue={user.alias || ''} autoComplete="off" />
         </Field>
+        <Field label="Porträtt, utan mask">
+          <input name="photo" type="file" accept="image/jpeg,image/png,image/webp" />
+        </Field>
+        <p>Porträttet syns när någon matchar i mysteriet. Det är valfritt här, men behövs om du ska kunna bli igenkänd.</p>
         <ErrorText>{error}</ErrorText>
         <button className="btn apply" type="submit" disabled={busy}>
           {user.role === 'gamemaster' ? 'Spara och välj en roll' : 'Spara'}

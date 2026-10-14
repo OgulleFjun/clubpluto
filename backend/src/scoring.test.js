@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { annotateWinners, buildLeaderboard, scoreGuesser, vampireBonusDecision } from './scoring.js';
+import { annotateWinners, buildLeaderboard, conversionCredit, scoreGuesser, vampireBonusDecision } from './scoring.js';
 
 describe('scoreGuesser', () => {
   it('ger plus för rätt och minus för fel, och hoppar över tomma gissningar', () => {
@@ -91,6 +91,20 @@ describe('överlevnad', () => {
     );
     expect(rows.every((row) => !row.isWinner)).toBe(true);
     expect(rows.every((row) => row.tiedForLead)).toBe(true);
+  });
+});
+
+describe('förvandlingsmark', () => {
+  it('ger en vinstmark och stoppar vid två', () => {
+    expect(conversionCredit({
+      newbieIsVampire: true, sireIsVampire: true, alreadyPaid: false, sireChips: 1,
+    }).nextChips).toBe(2);
+    expect(conversionCredit({
+      newbieIsVampire: true, sireIsVampire: true, alreadyPaid: false, sireChips: 2,
+    }).ok).toBe(false);
+    expect(conversionCredit({
+      newbieIsVampire: true, sireIsVampire: true, alreadyPaid: true, sireChips: 0,
+    }).ok).toBe(false);
   });
 });
 

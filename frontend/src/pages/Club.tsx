@@ -17,7 +17,6 @@ interface HomeData {
     hasPhoto: boolean;
     membership: string;
   };
-  balances: { baseChips: number; prizeChips: number };
   counts: { identityGuesses: number; vampireGuesses: number };
   phases: { identityOpen: boolean; resultsRevealed: boolean; useAliases: boolean };
   score: { total: number; isWinner: boolean } | null;
@@ -36,6 +35,7 @@ function ClubInner() {
   const [data, setData] = useState<HomeData | null>(null);
   const [error, setError] = useState('');
   const [passwordMessage, setPasswordMessage] = useState('');
+  const [passwordOpen, setPasswordOpen] = useState(false);
 
   useEffect(() => {
     api<HomeData>('/club/home', {}, token).then(setData).catch((reason: Error) => setError(reason.message));
@@ -64,34 +64,37 @@ function ClubInner() {
   if (!data) return <Page title="Din klubb">{error || 'Hämtar din sida…'}</Page>;
   const person = data.participant;
   return (
-    <Page title={person.name} lede={data.phases.useAliases && person.alias ? `Kallas ${person.alias} inne på klubben.` : 'Din sida i medlemsregistret.'}>
-      <div className="split">
-        <article className="card">
-          {person.hasPhoto && <Portrait token={person.photoToken} alt="Ditt porträtt" />}
-          <p>Dörrkod: <strong>{person.doorCode}</strong></p>
-          <p>{person.checkedIn ? 'Du är incheckad.' : 'Du är inte incheckad ännu.'}</p>
-          <p>{person.baseChipsIssued ? 'Spelmarkerna, värda 100, är markerade som utlämnade.' : 'Spelmarkerna lämnas ut hos Managern.'}</p>
-          <p>Spelmarkerna kan tas med mellan borden och kan inte bytas mot priser. Bara prismarker köper priser.</p>
-          <p>Registrerade spelmarker: {data.balances.baseChips}. Registrerade prismarker: {data.balances.prizeChips}.</p>
-          <p className="meta">Pokerhänder och markhögar vid borden räknas på de fysiska markerna, inte här.</p>
-          {person.isVampire && (
-            <p>Du är vampyr. Du har fördelarna, och du kan inte vinna överlevnadspriset. Det syns inte för de andra.</p>
-          )}
-          <p>Identitetsgissningar: {data.counts.identityGuesses}. Vampyrgissningar: {data.counts.vampireGuesses}.</p>
-          {data.score && <p>Din slutpoäng: {data.score.total}{data.score.isWinner ? ' · du vann överlevnadspriset' : ''}</p>}
-          <div className="actions">
-            <Link className="btn" to="/mysteriet">{data.phases.identityOpen ? 'Till mysteriet' : 'Mysteriet'}</Link>
-            {person.canInvite && <Link className="btn ghost" to="/inbjudningar">Bjud in gäster</Link>}
-          </div>
-        </article>
-        <form className="card" onSubmit={onSubmit(changePassword)}>
-          <h2>Byt lösenord</h2>
-          <Field label="Nuvarande"><input name="currentPassword" type="password" required /></Field>
-          <Field label="Nytt, minst 8 tecken"><input name="newPassword" type="password" minLength={8} required /></Field>
-          <ErrorText>{error}</ErrorText>
-          {passwordMessage && <p className="ok">{passwordMessage}</p>}
-          <button className="btn" type="submit">Spara</button>
-        </form>
+    <Page title={person.name} lede={data.phases.useAliases && person.alias ? `Kallas ${person.alias} inne på klubben.` : 'Din sida.'}>
+      <div className="member">
+        {person.hasPhoto && <Portrait token={person.photoToken} alt="Ditt porträtt" />}
+        <p className="member-code">Dörrkod <strong>{person.doorCode}</strong></p>
+        <p>{person.checkedIn ? 'Du är incheckad.' : 'Du är inte incheckad ännu.'}</p>
+        <p>{person.baseChipsIssued ? 'Spelmarkerna är utlämnade.' : 'Spelmarkerna lämnas ut hos Managern.'}</p>
+        <p>De kan tas med mellan borden. Bara prismarker köper priser.</p>
+        {person.isVampire && <p>Du är vampyr. Det syns inte för de andra.</p>}
+        <p className="meta">
+          {data.counts.identityGuesses} matchningar · {data.counts.vampireGuesses} vampyrgissningar
+          {data.score ? ` · ${data.score.total} poäng${data.score.isWinner ? ' · överlevnadspriset' : ''}` : ''}
+        </p>
+        <div className="member-actions">
+          <Link className="btn" to="/mysteriet">Mysteriet</Link>
+          <Link className="btn ghost" to="/priser">Priser</Link>
+          <Link className="btn ghost" to="/spel">Spel</Link>
+          <Link className="btn ghost" to="/regler">Regler</Link>
+          {person.canInvite && <Link className="btn ghost" to="/inbjudningar">Bjud in gäster</Link>}
+        </div>
+        <button className="btn ghost" type="button" onClick={() => setPasswordOpen((open) => !open)}>
+          Byt lösenord
+        </button>
+        {passwordOpen && (
+          <form onSubmit={onSubmit(changePassword)}>
+            <Field label="Nuvarande"><input name="currentPassword" type="password" required autoComplete="current-password" /></Field>
+            <Field label="Nytt, minst 8 tecken"><input name="newPassword" type="password" minLength={8} required autoComplete="new-password" /></Field>
+            {passwordMessage && <p className="ok">{passwordMessage}</p>}
+            <button className="btn" type="submit">Spara</button>
+          </form>
+        )}
+        <ErrorText>{error}</ErrorText>
       </div>
     </Page>
   );

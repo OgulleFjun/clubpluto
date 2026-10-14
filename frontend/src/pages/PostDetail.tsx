@@ -3,9 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { postCopy, primaryPostKeys, prizeRules, staffPosts, vampireRules, welcomeCopy, whenWhere } from '../posts';
-import { ErrorText, Guard } from '../ui';
+import { ErrorText, Guard, Portrait } from '../ui';
 
-type Tab = 'allmant' | 'kvall' | 'uppgift' | 'spel' | 'vampyr' | 'priser';
+type Tab = 'allmant' | 'kvall' | 'uppgift' | 'spel' | 'vampyr' | 'priser' | 'poang';
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'allmant', label: 'Allmänt' },
@@ -21,6 +21,90 @@ interface Board {
   posts: { key: string; taken: boolean; mine: boolean }[];
 }
 
+function VampireDesk({ token }: { token: string | null }) {
+  const [desk, setDesk] = useState<{
+    newbie: { id: string; name: string } | null;
+    pictures: { id: string; name: string; imageToken: string | null; conversionChips: number }[];
+    vampires: { id: string; name: string; conversionChips: number; isFirst: boolean }[];
+  } | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  function load() {
+    return api<NonNullable<typeof desk>>('/posts/manager/vampires', {}, token).then((next) => {
+      setDesk(next);
+      setPicked(null);
+    });
+  }
+
+  useEffect(() => {
+    load().catch((reason: Error) => setError(reason.message));
+  }, [token]);
+
+  async function pay() {
+    if (!desk?.newbie || !picked) return;
+    setBusy(true);
+    setError('');
+    setMessage('');
+    try {
+      const result = await api<{ sireName: string; conversionChips: number }>('/posts/manager/vampires/credit', {
+        method: 'POST',
+        body: JSON.stringify({ newbieId: desk.newbie.id, sireId: picked }),
+      }, token);
+      setMessage(`${result.sireName} har nu ${result.conversionChips} vinstmarker från förvandlingar.`);
+      await load();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Vinstmarken gavs inte.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!desk) return <p>{error || 'Hämtar vampyrerna…'}</p>;
+  return (
+    <div className="list" style={{ marginBottom: '1rem' }}>
+      <article className="card">
+        <h2>De två senaste</h2>
+        {desk.newbie ? (
+          <p>{desk.newbie.name} är ny vampyr. Be personen peka på vem som förvandlade den.</p>
+        ) : (
+          <p>Ingen ny vampyr väntar på att peka ut sin förvandlare.</p>
+        )}
+        <div className="sire-row">
+          {desk.pictures.map((person) => (
+            <button
+              key={person.id}
+              type="button"
+              className={`sire-card${picked === person.id ? ' picked' : ''}`}
+              onClick={() => setPicked(person.id)}
+            >
+              {person.imageToken ? <Portrait token={person.imageToken} alt={person.name} /> : <div className="portrait empty" />}
+              <span>{person.name}</span>
+              <small>{person.conversionChips} / 2 vinstmarker</small>
+            </button>
+          ))}
+        </div>
+        {desk.pictures.length === 0 && <p className="meta">Det finns inga tidigare vampyrer att peka på ännu.</p>}
+        <button className="btn" type="button" disabled={!desk.newbie || !picked || busy} onClick={pay}>
+          Ge den gamla vampyren en vinstmark
+        </button>
+        {message && <p className="ok">{message}</p>}
+        <ErrorText>{error}</ErrorText>
+      </article>
+      {desk.vampires.length > 0 && (
+        <article className="card">
+          <h2>Vinstmarker från förvandling</h2>
+          {desk.vampires.map((person) => (
+            <p key={person.id}>{person.name}{person.isFirst ? ', Den Förste' : ''}: {person.conversionChips} av 2</p>
+          ))}
+        </article>
+      )}
+    </div>
+  );
+}
+
 export default function PostDetail() {
   return (
     <Guard roles={['admin', 'doorman', 'gamemaster']}>
@@ -32,11 +116,12 @@ export default function PostDetail() {
 function Detail() {
   const { key = '' } = useParams();
   const copy = postCopy(key);
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [board, setBoard] = useState<Board | null>(null);
   const [tab, setTab] = useState<Tab>('allmant');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [scores, setScores] = useState<{ name: string; total: number; identityCorrect: number; identityWrong: number; vampireCorrect: number; vampireWrong: number }[] | null>(null);
 
   function load() {
     return api<Board>('/posts', {}, token).then(setBoard);
@@ -45,6 +130,13 @@ function Detail() {
   useEffect(() => {
     load().catch((reason: Error) => setError(reason.message));
   }, [token, key]);
+
+  useEffect(() => {
+    if (tab !== 'poang') return;
+    api<{ rows: NonNullable<typeof scores> }>('/posts/manager/scores', {}, token)
+      .then((data) => setScores(data.rows))
+      .catch((reason: Error) => setError(reason.message));
+  }, [tab, token]);
 
   if (!copy) {
     return (
@@ -73,6 +165,9 @@ function Detail() {
   const roleTabs = tabs.map((item) => (
     item.id === 'spel' && post.croupier ? { ...item, label: 'Ditt spel' } : item
   ));
+  if (post.key === 'manager' && (mine || user?.role === 'admin')) {
+    roleTabs.push({ id: 'poang', label: 'Poäng' });
+  }
 
   async function claim() {
     setBusy(true);
@@ -105,12 +200,30 @@ function Detail() {
           <p><strong>Tid.</strong> {whenWhere.time}</p>
         </div>
       )}
-      {steps ? (
+      {tab === 'vampyr' && post.key === 'manager' && (mine || user?.role === 'admin') && (
+        <VampireDesk token={token} />
+      )}
+      {tab === 'poang' ? (
+        <div className="list">
+          {scores?.map((row) => (
+            <article className="card" key={row.name}>
+              <h2>{row.name}</h2>
+              <p><strong>{row.total} poäng</strong></p>
+              <p className="meta">Matchningar: {row.identityCorrect} rätt, {row.identityWrong} fel. Vampyrer: {row.vampireCorrect} rätt, {row.vampireWrong} fel.</p>
+            </article>
+          ))}
+          {scores && scores.length === 0 && <p>Inga poäng ännu.</p>}
+          {!scores && <p>Hämtar poängen…</p>}
+        </div>
+      ) : steps ? (
         <ol>
           {paragraphs.map((line) => <li key={line}>{line}</li>)}
         </ol>
       ) : (
         paragraphs.map((line) => <p key={line}>{line}</p>)
+      )}
+      {post.key === 'manager' && (mine || user?.role === 'admin') && (
+        <p><Link to="/dorren">Registrera gäster och lägg bilder i mysteriet</Link></p>
       )}
       <ErrorText>{error}</ErrorText>
       {mine && <p className="ok">Det här uppdraget är ditt.</p>}

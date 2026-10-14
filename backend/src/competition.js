@@ -33,6 +33,7 @@ const chipSelect = `
   ), 0) AS base_balance,
   (
     CASE WHEN p.vampire_bonus_granted THEN 1 ELSE 0 END
+    + COALESCE(p.conversion_chips, 0)
     + COALESCE((
       SELECT SUM(prize_chips) FROM game_results r
       WHERE r.participant_id = p.id AND NOT r.voided

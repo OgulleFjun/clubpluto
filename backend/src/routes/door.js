@@ -10,7 +10,26 @@ import { env } from '../config.js';
 
 const router = Router();
 
-router.use(authenticate, loadAccount, requireRoles('admin', 'doorman'));
+router.use(authenticate, loadAccount, requireRoles('admin', 'doorman', 'gamemaster'));
+
+async function allowDoor(req, _res, next) {
+  try {
+    if (req.account.role === 'admin' || req.account.role === 'doorman') {
+      next();
+      return;
+    }
+    const { rows } = await query(
+      `SELECT 1 FROM staff_posts WHERE key = 'manager' AND account_id = $1`,
+      [req.account.id]
+    );
+    if (!rows[0]) throw httpError(403, 'Bara Managern registrerar gäster.');
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+router.use(allowDoor);
 
 router.get(
   '/overview',
@@ -46,10 +65,11 @@ router.get(
     const { rows } = await query(
       `SELECT p.id, p.name, p.alias, p.email, p.door_code, p.membership, p.checked_in_at,
               p.base_chips_issued, p.photo_token, p.photo_path IS NOT NULL AS has_photo,
+              p.costume_path IS NOT NULL AS in_mystery,
               inv.name AS invited_by
        FROM participants p
        LEFT JOIN participants inv ON inv.id = p.invited_by_id
-       WHERE ${where}
+       WHERE ${where} AND p.membership <> 'staff'
        ORDER BY p.checked_in_at NULLS FIRST, p.name
        LIMIT 80`,
       params
@@ -65,6 +85,7 @@ router.get(
         checkedInAt: row.checked_in_at,
         baseChipsIssued: row.base_chips_issued,
         photoToken: row.has_photo ? row.photo_token : null,
+        inMystery: row.in_mystery,
         invitedBy: row.invited_by,
       })),
     });
@@ -98,6 +119,30 @@ router.post(
     );
     const balances = await chipBalances(participant.id);
     res.json({ participant: updated.rows[0], balances });
+  })
+);
+
+router.post(
+  '/costume/:id',
+  upload.single('costume'),
+  asyncRoute(async (req, res) => {
+    if (!req.file) throw httpError(400, 'Ta en bild av gästen i förklädnad.');
+    const { rows } = await query('SELECT * FROM participants WHERE id = $1', [param(req.params.id)]);
+    const participant = rows[0];
+    if (!participant) throw httpError(404, 'Deltagaren finns inte.');
+    const costumeToken = participant.costume_token || randomToken();
+    const dest = await saveImage(req.file, env.portraitDir, `costume-${costumeToken}.jpg`);
+    await query(
+      `UPDATE participants
+       SET costume_path = $2, costume_token = $3, costume_at = now()
+       WHERE id = $1`,
+      [participant.id, dest, costumeToken]
+    );
+    const settings = await getSettings();
+    if (!settings.competition_closed_at && !settings.identity_open) {
+      await query('UPDATE event_settings SET identity_open = true, updated_at = now() WHERE id = 1');
+    }
+    res.json({ ok: true, costumeToken });
   })
 );
 

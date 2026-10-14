@@ -86,17 +86,10 @@ router.get(
     const participant = requireParticipant(req);
     const settings = await getSettings();
     const people = await query(
-      `SELECT id, name, alias, photo_token, name_token, photo_path, is_vampire
+      `SELECT id, name, alias, membership, photo_token, name_token, photo_path,
+              costume_token, costume_path, costume_at, is_vampire
        FROM participants ORDER BY name`
     );
-    const open = settings.identity_open || settings.results_revealed;
-    if (!open) {
-      return res.json({
-        locked: true,
-        message: 'Mysteriet öppnar när klubben gör det. Arrangören slår på det i kontrollpanelen.',
-        revealed: false,
-      });
-    }
     const mineIdentity = await query(
       `SELECT g.photo_participant_id, g.guessed_participant_id
        FROM identity_guesses g WHERE g.guesser_id = $1`,
@@ -107,20 +100,20 @@ router.get(
       [participant.id]
     );
     const byId = new Map(people.rows.map((row) => [row.id, row]));
-    const photos = people.rows
-      .filter((row) => row.photo_path)
+    const costumes = people.rows
+      .filter((row) => row.costume_path && row.costume_token)
+      .sort((a, b) => new Date(a.costume_at || 0) - new Date(b.costume_at || 0) || a.name.localeCompare(b.name, 'sv'))
       .map((row) => ({
-        photoToken: row.photo_token,
-        ...(settings.results_revealed
-          ? { name: row.name, nameToken: row.name_token, isVampire: row.is_vampire }
-          : {}),
-      }))
-      .sort((a, b) => a.photoToken.localeCompare(b.photoToken));
-    const names = people.rows
+        costumeToken: row.costume_token,
+        ...(settings.results_revealed ? { name: row.name, isVampire: row.is_vampire } : {}),
+      }));
+    const identities = people.rows
+      .filter((row) => row.photo_path || row.membership === 'staff')
       .map((row) => ({
         nameToken: row.name_token,
         name: row.name,
-        ...(settings.results_revealed ? { isVampire: row.is_vampire, photoToken: row.photo_token } : {}),
+        photoToken: row.photo_path ? row.photo_token : null,
+        ...(settings.results_revealed ? { isVampire: row.is_vampire } : {}),
       }))
       .sort((a, b) => a.name.localeCompare(b.name, 'sv'));
 
@@ -149,26 +142,26 @@ router.get(
       locked: false,
       revealed: settings.results_revealed,
       canGuess: settings.identity_open,
-      photos,
-      names,
+      costumes,
+      identities,
       identityGuesses: mineIdentity.rows.map((row) => {
         const photo = byId.get(row.photo_participant_id);
         const guessed = byId.get(row.guessed_participant_id);
         return {
-          photoToken: photo?.photo_token,
+          costumeToken: photo?.costume_token,
           nameToken: guessed?.name_token,
           name: guessed?.name,
           ...(settings.results_revealed ? { correct: row.photo_participant_id === row.guessed_participant_id } : {}),
         };
-      }),
+      }).filter((row) => row.costumeToken),
       vampireGuesses: mineVampire.rows.map((row) => {
         const subject = byId.get(row.subject_id);
         return {
-          nameToken: subject?.name_token,
+          costumeToken: subject?.costume_token,
           suspects: row.suspects,
-          ...(settings.results_revealed ? { correct: row.suspects === subject?.is_vampire } : {}),
+          ...(settings.results_revealed ? { correct: row.suspects === Boolean(subject?.is_vampire) } : {}),
         };
-      }),
+      }).filter((row) => row.costumeToken),
       score,
       leaderboard,
     });
@@ -181,10 +174,13 @@ router.put(
     const participant = requireParticipant(req);
     const settings = await getSettings();
     if (!settings.identity_open) throw httpError(403, 'Identitetsmysteriet är stängt.');
-    const photoToken = String(req.body.photoToken || '');
+    const costumeToken = String(req.body.costumeToken || '');
     const nameToken = req.body.nameToken ? String(req.body.nameToken) : null;
-    const photo = await query('SELECT id FROM participants WHERE photo_token = $1', [photoToken]);
-    if (!photo.rows[0]) throw httpError(404, 'Porträttet finns inte.');
+    const photo = await query(
+      'SELECT id FROM participants WHERE costume_token = $1 AND costume_path IS NOT NULL',
+      [costumeToken]
+    );
+    if (!photo.rows[0]) throw httpError(404, 'Förklädnaden finns inte i mysteriet.');
     const photoId = photo.rows[0].id;
     if (!nameToken) {
       await query(
@@ -220,24 +216,22 @@ router.put(
     const participant = requireParticipant(req);
     const settings = await getSettings();
     if (!settings.identity_open) throw httpError(403, 'Vampyrgissningarna är stängda.');
-    const nameToken = String(req.body.nameToken || '');
-    const subject = await query('SELECT id FROM participants WHERE name_token = $1', [nameToken]);
-    if (!subject.rows[0]) throw httpError(404, 'Personen finns inte.');
+    const costumeToken = String(req.body.costumeToken || '');
+    const subject = await query(
+      'SELECT id FROM participants WHERE costume_token = $1 AND costume_path IS NOT NULL',
+      [costumeToken]
+    );
+    if (!subject.rows[0]) throw httpError(404, 'Förklädnaden finns inte i mysteriet.');
     const subjectId = subject.rows[0].id;
-    if (req.body.suspects === null || req.body.suspects === undefined || req.body.suspects === '') {
-      await query('DELETE FROM vampire_guesses WHERE guesser_id = $1 AND subject_id = $2', [
-        participant.id,
-        subjectId,
-      ]);
-      return res.json({ ok: true });
-    }
-    const suspects = Boolean(req.body.suspects);
+    const existing = await query(
+      'SELECT 1 FROM vampire_guesses WHERE guesser_id = $1 AND subject_id = $2',
+      [participant.id, subjectId]
+    );
+    if (existing.rows[0]) throw httpError(409, 'Det går inte att ändra vampyrgissningen.');
     await query(
       `INSERT INTO vampire_guesses (guesser_id, subject_id, suspects)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (guesser_id, subject_id)
-       DO UPDATE SET suspects = EXCLUDED.suspects, updated_at = now()`,
-      [participant.id, subjectId, suspects]
+       VALUES ($1, $2, true)`,
+      [participant.id, subjectId]
     );
     res.json({ ok: true });
   })
