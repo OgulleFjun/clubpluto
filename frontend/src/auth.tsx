@@ -17,6 +17,7 @@ export interface User {
   id: string;
   email: string;
   role: Role;
+  staffIntroSeen: boolean;
   participant: ParticipantBrief | null;
 }
 

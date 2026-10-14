@@ -38,6 +38,17 @@ router.get(
   })
 );
 
+router.post(
+  '/staff-intro',
+  authenticate,
+  loadAccount,
+  asyncRoute(async (req, res) => {
+    if (req.account.role !== 'gamemaster') throw httpError(403, 'Den här delen är stängd för ditt konto.');
+    await query('UPDATE accounts SET staff_intro_seen = true WHERE id = $1', [req.account.id]);
+    res.json({ ok: true });
+  })
+);
+
 function sameSecret(input, expected) {
   const left = Buffer.from(String(input));
   const right = Buffer.from(String(expected));

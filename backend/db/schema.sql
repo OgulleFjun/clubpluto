@@ -34,6 +34,10 @@ CREATE TABLE IF NOT EXISTS accounts (
 );
 
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS display_name text;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS staff_intro_seen boolean;
+UPDATE accounts SET staff_intro_seen = true WHERE staff_intro_seen IS NULL;
+ALTER TABLE accounts ALTER COLUMN staff_intro_seen SET DEFAULT false;
+ALTER TABLE accounts ALTER COLUMN staff_intro_seen SET NOT NULL;
 
 CREATE TABLE IF NOT EXISTS participants (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -260,20 +264,31 @@ ON CONFLICT (key) DO NOTHING;
 
 UPDATE staff_posts SET title = 'Manager', sort_order = 1 WHERE key = 'manager';
 UPDATE staff_posts SET title = 'Croupier Texas Hold''em', sort_order = 2 WHERE key = 'holdem';
-UPDATE staff_posts SET title = 'Croupier Hitta kort-poker', sort_order = 3 WHERE key = 'sjalpoker';
-UPDATE staff_posts SET title = 'Croupier Duellen', sort_order = 4 WHERE key = 'ride-the-bus';
+UPDATE staff_posts SET title = 'Croupier Själ-poker', sort_order = 3 WHERE key = 'sjalpoker';
+UPDATE staff_posts SET title = 'Croupier Ride the Bus', sort_order = 4 WHERE key = 'ride-the-bus';
 UPDATE staff_posts SET title = 'Prize Master', sort_order = 5 WHERE key = 'prize-master';
 
+UPDATE event_settings
+SET rules_text = replace(rules_text, 'Själpoker', 'Själ-poker')
+WHERE id = 1 AND rules_text LIKE '%Själpoker%';
+
 UPDATE games SET
-  name = 'Hitta kort-poker',
+  name = 'Själ-poker',
   summary = 'Leta efter gömda kort och bygg en pokerhand.',
   rules = 'Vinnaren får 1 prismark och eventuella basmarker. Var korten göms, tidsgräns och återställning bestäms på genomgången klockan 17:00.'
 WHERE key = 'sjalpoker';
 
 UPDATE games SET
-  name = 'Duellen',
-  summary = 'Två spelare möts i ett kort minispel.',
-  rules = 'Vinnaren får satsade basmarker och 1 prismark. Vilka minispel som ingår och hur stora insatserna är bestäms på genomgången klockan 17:00.'
+  name = 'Ride the Bus',
+  summary = 'En gäst gissar på fyra dolda kort i rad.',
+  rules = $bus$Fyra kort läggs med baksidan upp. Gästen gissar innan varje kort vänds.
+
+Stopp 1: rött eller svart.
+Stopp 2: högre eller lägre än kortet innan. Ess är högst. Lika valör räknas som fel.
+Stopp 3: innanför eller utanför de två kort som redan ligger. Lika som något av dem räknas som fel.
+Stopp 4: vilken färg kortet har, hjärter, ruter, spader eller klöver.
+
+Fel gissning kostar 5 basmarker till potten och resan tar slut. Den som klarar alla fyra stopp får potten och 1 prismark. Potten ligger kvar när någon missar.$bus$
 WHERE key = 'ride-the-bus';
 
 UPDATE games SET

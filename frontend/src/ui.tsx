@@ -126,8 +126,46 @@ export function Layout() {
           <span>Sala Analoga Spelförening och SUS</span>
         </footer>
       )}
+      <StaffIntro />
     </div>
     </MusicProvider>
+  );
+}
+
+function StaffIntro() {
+  const { user, token, acceptSession } = useAuth();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(Boolean(user && user.role === 'gamemaster' && user.staffIntroSeen === false));
+  }, [user]);
+
+  if (!open || !user || !token) return null;
+  const sessionToken = token;
+  const sessionUser = user;
+
+  async function close() {
+    setOpen(false);
+    try {
+      await api('/auth/staff-intro', { method: 'POST' }, sessionToken);
+      acceptSession(sessionToken, { ...sessionUser, staffIntroSeen: true });
+    } catch {
+      setOpen(true);
+    }
+  }
+
+  return (
+    <div className="welcome" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+      <div className="welcome-card">
+        <h2 id="welcome-title">Club Pluto</h2>
+        <p>Club Pluto är ett spökvampyrlajv. Gästerna kommer förklädda, och vampyrer rör sig bland dem.</p>
+        <p><strong>Söndag 1 november 2026.</strong><br />Folkets hus, Sala. Kvällen är i källaren.</p>
+        <p>Samling klockan 17:00. Ytterdörren öppnar klockan 18:30.</p>
+        <p>Det kommer vara musik. En stor del av upplevelsen är att gissa vem som är vem, så försök ändra rösten.</p>
+        <p>Första steget som spelledare är att välja en roll.</p>
+        <button className="btn apply" type="button" onClick={() => void close()}>Välj en roll</button>
+      </div>
+    </div>
   );
 }
 

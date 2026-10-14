@@ -436,6 +436,30 @@ body:has(.shell.staff) { background: #000; }
 .hire-later { margin-top: 1.4rem; }
 .brief p, .brief li { font-size: 1.05rem; line-height: 1.55; }
 .brief .tabs { flex-wrap: wrap; }
+.welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1.2rem;
+  background: rgba(0, 0, 0, 0.78);
+}
+.welcome-card {
+  width: min(36rem, 100%);
+  padding: 1.4rem 1.3rem 1.3rem;
+  border: 1px solid var(--gold);
+  background: #000;
+}
+.welcome-card h2 { margin: 0 0 0.7rem; font-size: 2rem; }
+.welcome-card p { margin: 0.55rem 0; font-size: 1.15rem; line-height: 1.45; }
+.welcome-card .btn { width: 100%; margin-top: 0.9rem; }
+.facts {
+  border: 1px solid var(--gold);
+  padding: 0.9rem 1.1rem;
+  margin: 0 0 1.1rem;
+}
+.facts p { margin: 0.15rem 0; font-size: 1.35rem; line-height: 1.35; }
 .callout {
   border-left: 3px solid var(--gold);
   padding: 0.15rem 0 0.15rem 0.9rem;
@@ -447,6 +471,7 @@ body:has(.shell.staff) { background: #000; }
   margin-top: 1.2rem;
   font-size: 1.2rem;
 }
+.welcome-card .btn.apply { width: 100%; }
 @media (min-width: 900px) {
   .hire-row {
     grid-auto-flow: row;

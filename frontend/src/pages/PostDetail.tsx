@@ -2,16 +2,18 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { maskRule, postCopy, primaryPostKeys, staffPosts } from '../posts';
+import { atmosphere, maskRule, postCopy, primaryPostKeys, prizeRules, staffPosts, vampireRules, whenWhere } from '../posts';
 import { ErrorText, Guard } from '../ui';
 
-type Tab = 'allmant' | 'kvall' | 'uppgift' | 'spel';
+type Tab = 'allmant' | 'kvall' | 'uppgift' | 'spel' | 'vampyr' | 'priser';
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'allmant', label: 'Allmänt' },
   { id: 'kvall', label: 'Kvällen' },
   { id: 'uppgift', label: 'Uppgift' },
   { id: 'spel', label: 'Spel' },
+  { id: 'vampyr', label: 'Vampyr' },
+  { id: 'priser', label: 'Priser' },
 ];
 
 interface Board {
@@ -58,8 +60,14 @@ function Detail() {
   const mine = Boolean(state?.mine);
   const taken = Boolean(state?.taken && !mine);
   const other = board?.mine && board.mine !== post.key ? staffPosts.find((item) => item.key === board.mine) : null;
-  const paragraphs = tab === 'allmant' ? post.allmän : tab === 'kvall' ? post.kväll : tab === 'uppgift' ? post.uppgift : post.spel;
-  const steps = tab === 'uppgift' || tab === 'spel';
+  const paragraphs =
+    tab === 'allmant' ? post.allmän :
+    tab === 'kvall' ? post.kväll :
+    tab === 'uppgift' ? post.uppgift :
+    tab === 'spel' ? post.spel :
+    tab === 'vampyr' ? vampireRules :
+    prizeRules;
+  const steps = tab === 'uppgift' || tab === 'spel' || tab === 'vampyr' || tab === 'priser';
   const primaryOpen = primaryPostKeys.every((item) => board?.posts.find((row) => row.key === item)?.taken);
   const waiting = Boolean(post.later && board && !primaryOpen && !mine);
   const roleTabs = tabs.map((item) => (
@@ -90,7 +98,15 @@ function Detail() {
           </button>
         ))}
       </div>
+      {tab === 'allmant' && (
+        <div className="facts">
+          <p>{whenWhere.date}</p>
+          <p><strong>Plats.</strong> {whenWhere.place} {post.plats}</p>
+          <p><strong>Tid.</strong> {whenWhere.time}</p>
+        </div>
+      )}
       {(tab === 'allmant' || tab === 'kvall') && <p className="callout">{maskRule}</p>}
+      {tab === 'allmant' && <p className="callout">{atmosphere}</p>}
       {steps ? (
         <ol>
           {paragraphs.map((line) => <li key={line}>{line}</li>)}
