@@ -70,8 +70,9 @@ function ClubInner() {
           {person.hasPhoto && <Portrait token={person.photoToken} alt="Ditt porträtt" />}
           <p>Dörrkod: <strong>{person.doorCode}</strong></p>
           <p>{person.checkedIn ? 'Du är incheckad.' : 'Du är inte incheckad ännu.'}</p>
-          <p>{person.baseChipsIssued ? 'De 100 basmarkerna är markerade som utlämnade.' : 'Basmarkerna lämnas ut i dörren.'}</p>
-          <p>Registrerade basmarker: {data.balances.baseChips}. Registrerade prismarker: {data.balances.prizeChips}.</p>
+          <p>{person.baseChipsIssued ? 'Spelmarkerna, värda 100, är markerade som utlämnade.' : 'Spelmarkerna lämnas ut hos Managern.'}</p>
+          <p>Spelmarkerna kan tas med mellan borden och kan inte bytas mot priser. Bara prismarker köper priser.</p>
+          <p>Registrerade spelmarker: {data.balances.baseChips}. Registrerade prismarker: {data.balances.prizeChips}.</p>
           <p className="meta">Pokerhänder och markhögar vid borden räknas på de fysiska markerna, inte här.</p>
           {person.isVampire && (
             <p>Du är vampyr. Du har fördelarna, och du kan inte vinna överlevnadspriset. Det syns inte för de andra.</p>

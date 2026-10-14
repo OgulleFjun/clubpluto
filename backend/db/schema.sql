@@ -274,10 +274,46 @@ UPDATE event_settings
 SET rules_text = replace(rules_text, 'Själpoker', 'Själ-poker')
 WHERE id = 1 AND rules_text LIKE '%Själpoker%';
 
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Basmarker är spelvaluta. De finns fysiskt vid borden. Hemsidan registrerar de 100 du får i dörren, vampyrbonus och eventuella rättningar, men inte varje pokerhand.',
+  'Hemsidan registrerar de 100 spelmarkerna du får hos Managern, vampyrbonus och eventuella rättningar, men inte varje hand vid borden.'
+)
+WHERE id = 1 AND rules_text LIKE '%100 du får i dörren%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'När du är incheckad får du 100 basmarker.',
+  'När du är incheckad får du spelmarker till ett värde av 100 hos Managern.'
+)
+WHERE id = 1 AND rules_text LIKE '%får du 100 basmarker%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Spelmarker är basmarkerna vid borden. Vinstmarker är prismarkerna som köper priser. Texas Hold''em ger spelmarker till den som vinner handen. Själ-poker ger 1 vinstmark till vinnaren. Ride the Bus ger 1 vinstmark efter tre rätt stopp och 3 om alla fyra klaras. Nivåerna kostar 2, 4, 6, 9 och 12 vinstmarker.',
+  'Varje gäst börjar med spelmarker till ett värde av 100. De kan tas med mellan borden och kan inte bytas mot priser. Bara prismarker köper priser. Texas Hold''em ger spelmarker till den som vinner handen. Själ-poker ger 1 vinstmark till vinnaren. Ride the Bus ger 1 vinstmark efter tre rätt stopp och 3 om alla fyra klaras. Nivåerna kostar 2, 4, 6, 9 och 12 vinstmarker. Den som har slut på spelmarker får 50 nya genom att dansa framför Prize Master, eller byter 1 prismark mot 100 spelmarker.'
+)
+WHERE id = 1 AND rules_text LIKE '%Spelmarker är basmarkerna vid borden%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'I Banken kan du få nya basmarker genom en utmaning om du har slut, registrera en förvandling med rött kort, och växla in prismarker mot priser.',
+  'I Banken kan du dansa framför Prize Master och få 50 spelmarker om du har slut, eller byta 1 prismark mot 100 spelmarker. Där registreras en förvandling med rött kort, och prismarker växlas mot priser.'
+)
+WHERE id = 1 AND rules_text LIKE '%utmaning om du har slut%';
+
 UPDATE games SET
   name = 'Själ-poker',
-  summary = 'Leta efter gömda kort och bygg en pokerhand.',
-  rules = 'Vinnaren får 1 prismark och eventuella basmarker. Var korten göms, tidsgräns och återställning bestäms på genomgången klockan 17:00.'
+  summary = 'Leta kort, betta, och låt bäst hand vinna en vinstmark.',
+  rules = $sjal$Spelarna letar efter kort och bygger en hand. Alla kort som hittats och spelats lämnas till croupiern, som kan blanda in dem i leken.
+
+Har en spelare inga kort får den fem kort av croupiern. Har den färre än fem kan den få nya kort.
+
+Det kostar 5 spelmarker att vara med. Sedan bettas det. Bäst hand vinner och får 1 vinstmark.$sjal$
 WHERE key = 'sjalpoker';
 
 UPDATE games SET
@@ -290,12 +326,14 @@ Stopp 2: högre eller lägre än kortet innan. Ess är högst. Lika valör räkn
 Stopp 3: innanför eller utanför de två kort som redan ligger. Lika som något av dem räknas som fel.
 Stopp 4: vilken färg kortet har, hjärter, ruter, spader eller klöver.
 
-Fel gissning kostar 5 basmarker till potten och resan tar slut. Den som klarar alla fyra stopp får potten och 1 prismark. Potten ligger kvar när någon missar.$bus$
+Gästen bestämmer själv hur många spelmarker som satsas innan korten vänds. Fel gissning: insatsen går i potten och resan tar slut. Potten ligger kvar när någon missar.
+
+Tre rätt stopp ger 1 vinstmark. Den behålls även om stopp 4 blir fel. Alla fyra stopp ger 3 vinstmarker och potten i spelmarker.$bus$
 WHERE key = 'ride-the-bus';
 
 UPDATE games SET
-  summary = 'Man kan gå in och ut mellan händer.',
-  rules = 'Vinnaren får potten i basmarker samt 1 prismark vid en godkänd vinst. Vad som räknas som en godkänd vinst bestäms på genomgången klockan 17:00.'
+  summary = 'Vinnaren av en hand tar spelmarkerna i potten.',
+  rules = 'Lilla blind är 1 spelmark och stora blind är 2. Spelmarkerna kan tas med till ett annat bord. Den som vinner handen tar potten. En vunnen hand ger inga vinstmarker. Gäster får lämna bordet mellan händer.'
 WHERE key = 'holdem';
 
 INSERT INTO prizes (name, description, cost, stock, sort_order)

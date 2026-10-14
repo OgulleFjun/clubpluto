@@ -18,32 +18,30 @@ export const whenWhere = {
 
 export const vampireRules = [
   'En slumpad gäst är Den Förste och börjar med två röda kort.',
-  'Den Förste kan erbjuda ett rött kort till en annan gäst. Den som tackar ja går till Banken, blir registrerad som vampyr och får 20 basmarker och 1 prismark. Det går bara en gång per person.',
+  'Den Förste kan erbjuda ett rött kort till en annan gäst. Den som tackar ja går till Banken, blir registrerad som vampyr och får 20 spelmarker och 1 vinstmark. Det går bara en gång per person.',
   'Kortet kan sedan förvandla ytterligare en person. Det finns bara två kort, men vampyrerna kan bli fler.',
   'Säg inte högt vem som blev vampyr. Ingen offentlig notis går ut.',
   'På hemsidan gissar gästerna vilka som är vampyrer, och vilket namn som hör till vilket porträtt. Rätt ger +1, fel ger −1, tomt ger 0.',
   'Vampyrer kan inte vinna överlevnadspriset, även om de har flest poäng. Priset går till den som fortfarande är människa.',
-  'Om Den Förste också får 20 basmarker och 1 prismark redan från start bestäms på genomgången klockan 17:00. Fråga Managern innan det betalas ut.',
+  'Om Den Förste också får 20 spelmarker och 1 vinstmark redan från start bestäms på genomgången klockan 17:00. Fråga Managern innan det betalas ut.',
 ];
 
 export const prizeRules = [
-  'Alla gäster startar med 100 basmarker och 0 prismarker. Managern ger ut startmarkerna.',
-  'Basmarker spelas om vid borden. De kan inte växlas mot priser. Hemsidan räknar inte varje hand.',
-  'När någon vinner ett spel delas normalt 1 prismark ut. Croupieren skriver upp det direkt. En förvandling ger också prismark. Hur det går till står under Vampyr.',
-  'Bara prismarker köper priser. Minsta priset kostar 2 prismarker. Prize Master i Banken tar emot markerna och lämnar ut priset. Skriv upp namn, pris och antal.',
-  'Prislistan kan ändras av arrangören.',
-  'Den som har slut på basmarker kan göra en kort utmaning hos Prize Master och få påfyllning. Vilka utmaningar som gäller sägs klockan 17:00.',
+  'Varje gäst börjar med spelmarker till ett värde av 100. De kan tas med mellan borden. De kan inte bytas mot priser.',
+  'Bara prismarker köper priser. Croupieren skriver upp dem direkt. Hemsidan räknar inte spelmarkerna.',
+  'Texas Hold’em ger spelmarker till den som vinner handen, inga vinstmarker. Själ-poker ger 1 vinstmark till vinnaren. Ride the Bus ger 1 vinstmark efter tre rätt stopp och 3 om alla fyra klaras.',
+  'En förvandling ger också 1 vinstmark. Hur det går till står under Vampyr.',
+  'Fem nivåer: 2, 4, 6, 9 och 12 vinstmarker. Prize Master tar emot markerna och lämnar ut priset. Skriv upp namn, nivå och antal.',
+  'Den som har slut på spelmarker får 50 nya om den dansar framför Prize Master. En prismark kan i stället bytas mot 100 spelmarker.',
   'Överlevnadspriset lämnas inte ut vid disken under kvällen.',
 ];
 
-export function welcomeCopy(croupier: boolean) {
+export function welcomeCopy() {
   return [
     'Tack för att du ställer upp. Club Pluto blir till för att du är här.',
     'Det är ett spökvampyrlajv. Gästerna kommer förklädda, det spelas musik, och en stor del av upplevelsen är att gissa vem som är vem. Masken stannar på hela kvällen. Försök ändra rösten, så att ingen känner igen dig på hur du låter. Inte ens de andra i personalen ska kunna se vem du är.',
     'Rutan ovan visar datum, tid och var just du står.',
-    croupier
-      ? 'Läs de andra flikarna innan du ansöker. Kvällen är ordningen. Uppgift är vad du gör. Ditt spel är reglerna vid ditt bord. Vampyr förklarar de röda korten. Priser förklarar markerna.'
-      : 'Läs de andra flikarna innan du ansöker. Kvällen är ordningen. Uppgift är vad du gör. Spel är borden. Vampyr förklarar de röda korten. Priser förklarar markerna.',
+    'Läs de andra flikarna innan du ansöker.',
   ];
 }
 
@@ -67,7 +65,7 @@ export const staffPosts: StaffPostCopy[] = [
       '17:00: var på plats. Gå igenom kvällen med personalen och ställ i ordning registreringen.',
       'Dräkten är en anka i hög hatt, frack och käpp. Ansiktet är täckt.',
       'Kontrollera att de tre croupiererna har varsitt bord.',
-      '18:30: ta emot gästerna som Bouncern skickar ner. Pricka av registreringen och ge startmarkerna.',
+      '18:30: ta emot gästerna som Bouncern skickar ner. Pricka av registreringen och ge spelmarker till ett värde av 100.',
       'Skicka gästen vidare till borden. Du ger inga marker vid ytterdörren.',
       'Du är den de andra frågar när ett bord står stilla eller någon vill ta av sig masken. Croupieren bestämmer vid sitt eget bord.',
       'Vid slutet stämmer du av med Prize Master.',
@@ -88,15 +86,14 @@ export const staffPosts: StaffPostCopy[] = [
       '17:00: var på plats och duka bordet. Kortlek, marker och en plats där kön kan stå.',
       '18:30: var vid bordet. Förklara spelet som det står under Ditt spel. Du spelar inte med och du säger inte hur en gäst ska satsa.',
       'Håll givarna korta, så att nya gäster hinner sätta sig mellan händerna.',
-      'Skriv upp prismarket innan nästa giv. Innan genomgången har sagt vad en godkänd vinst är delar du inga prismarker på eget bevåg.',
+      'Vinnaren får spelmarkerna i potten. Skriv inte upp någon vinstmark.',
       'Blir det osämja: korten ligger kvar och du säger vad som gäller. Hämta Managern om det inte räcker.',
     ],
     spel: [
       'Varje spelare får två dolda kort. På bordet läggs gemensamma kort, först tre, sedan ett, sedan ett.',
-      'Spelarna satsar basmarker mellan korten. Bäst hand av de egna korten och bordets kort vinner potten. Den som är ensam kvar vinner också.',
+      'Lilla blind är 1 spelmark. Stora blind är 2. Spelarna satsar spelmarker mellan korten. Den som vinner handen tar potten. Den som är ensam kvar vinner också.',
       'Gäster får lämna bordet mellan händer och komma tillbaka senare.',
-      'En godkänd vinst ger dessutom 1 prismark. Vad som räknas som godkänd vinst sägs klockan 17:00.',
-      'Basmarkerna stannar på bordet. Hemsidan räknar bara prismarket du skriver upp.',
+      'En vunnen hand ger inga vinstmarker. Spelmarkerna stannar på bordet.',
     ],
   },
   {
@@ -109,15 +106,17 @@ export const staffPosts: StaffPostCopy[] = [
     uppgift: [
       '17:00: var på plats. Då bestäms var korten göms, hur lång tid en omgång tar och hur banan ställs tillbaka.',
       'Gör i ordning gömställena innan klockan 18:30.',
-      'Förklara omgången som den står under Ditt spel. Du spelar inte med. Starta tiden och håll ordning på hittade kort.',
-      'När tiden är slut jämför du händerna, skriver upp prismarket, gömmer korten igen och tar nästa.',
+      'Förklara omgången som den står under Ditt spel. Du spelar inte med.',
+      'Ta emot korten som hittats och spelats, och blanda in dem i leken. Den som saknar kort får fem. Den som har färre än fem kan få nya av dig.',
+      'Det kostar 5 spelmarker att vara med. Efter bettningen vinner bäst hand. Skriv upp 1 vinstmark och ta nästa.',
       'Håll tempot. En omgång som drar ut stoppar kön till de andra borden.',
       'Är reglerna inte låsta efter genomgången: spela inte skarpt förrän Managern sagt ja.',
     ],
     spel: [
-      'Kort ligger gömda. Spelarna letar och bygger en pokerhand av det de hittar.',
-      'Bäst hand vinner och får 1 prismark och de basmarker som hör till omgången.',
-      'Var korten ligger, hur många man får leta efter, tidsgräns och hur banan nollställs bestäms klockan 17:00. Det är de reglerna du dömer efter.',
+      'Spelarna letar efter kort och bygger en hand.',
+      'Alla kort som hittats och spelats lämnas till dig. Du kan blanda in dem i leken.',
+      'Har en spelare inga kort får den fem kort av dig. Har den färre än fem kan den få nya kort av dig.',
+      'Det kostar 5 spelmarker att vara med. Sedan bettas det. Bäst hand vinner och får 1 vinstmark.',
     ],
   },
   {
@@ -129,9 +128,9 @@ export const staffPosts: StaffPostCopy[] = [
     kväll: evening,
     uppgift: [
       '17:00: var på plats. Lägg fram en kortlek och en pott.',
-      'Förklara stoppen som de står under Ditt spel, innan första kortet vänds. Du spelar inte själv. Spelet går på basmarker, inte på att dricka.',
+      'Förklara stoppen som de står under Ditt spel, innan första kortet vänds. Du spelar inte själv. Gästen väljer själv hur många spelmarker som satsas.',
       'En gäst i taget. Vänd ett kort först när gästen har gissat.',
-      'Skriv upp prismarket innan nästa gäst sätter sig. Blanda och lägg en ny rad. Potten ligger kvar när någon missar.',
+      'Skriv upp vinstmarken innan nästa gäst sätter sig: 1 efter tre rätt stopp, 3 om alla fyra klaras. Blanda och lägg en ny rad. Potten ligger kvar när någon missar.',
     ],
     spel: [
       'Fyra kort på rad, baksidan upp. En gäst gissar ett stopp i taget, innan kortet vänds.',
@@ -139,7 +138,9 @@ export const staffPosts: StaffPostCopy[] = [
       'Stopp 2: högre eller lägre än kortet innan. Ess är högst. Lika valör räknas som fel.',
       'Stopp 3: innanför eller utanför de två kort som redan ligger. Lika som något av dem räknas som fel.',
       'Stopp 4: vilken färg kortet har, hjärter, ruter, spader eller klöver.',
-      'Fel gissning kostar 5 basmarker till potten och resan tar slut. Den som klarar alla fyra stopp får potten och 1 prismark.',
+      'Gästen bestämmer själv hur många spelmarker som satsas innan korten vänds. Fel gissning: insatsen går i potten och resan tar slut.',
+      'Tre rätt stopp ger 1 vinstmark. Den behålls även om stopp 4 blir fel.',
+      'Alla fyra stopp ger 3 vinstmarker och potten i spelmarker.',
     ],
   },
   {
@@ -153,8 +154,10 @@ export const staffPosts: StaffPostCopy[] = [
       'Om du redan är vald: var med på genomgången klockan 17:00.',
       'Ställ i ordning Banken före 18:30. Priser, skylt och en plats för röda kort.',
       'Du tar inte emot gäster vid ytterdörren och du ger inte ut startmarkerna.',
+      'Den som dansar framför dig och har slut på spelmarker får 50 nya. En prismark kan bytas mot 100 spelmarker.',
+      'Du kan få ta hand om en liten bar.',
       'Rött kort: följ fliken Vampyr.',
-      'Inlösen och påfyllning av basmarker: följ fliken Priser.',
+      'Inlösen av priser: följ fliken Priser.',
     ],
     spel: [
       'Banken är inget av de tre borden. Du tar emot det croupiererna redan har delat ut.',

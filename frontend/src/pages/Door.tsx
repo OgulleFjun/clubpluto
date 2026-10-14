@@ -64,7 +64,7 @@ function DoorInner() {
           skipPassword: form.get('skipPassword') === 'on',
         }),
       }, token);
-      setMessage('Incheckad. 100 basmarker är markerade.');
+      setMessage('Incheckad. Spelmarker till ett värde av 100 är markerade.');
       await refresh();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Incheckningen misslyckades.');
@@ -84,7 +84,7 @@ function DoorInner() {
   }
 
   return (
-    <Page title="Dörren" lede="Sök fram gästen, be om lösenordet och lämna ut 100 basmarker.">
+    <Page title="Dörren" lede="Sök fram gästen och be om lösenordet. Spelmarkerna, värda 100, lämnas hos Managern.">
       {overview && (
         <p>{overview.registered} registrerade · {overview.arrived} inne · {overview.remaining} kvar
           {!overview.doorPasswordSet ? ' · entrélösenord saknas' : ''}
@@ -114,7 +114,7 @@ function DoorInner() {
                   {user?.role === 'admin' && (
                     <label className="meta"><input type="checkbox" name="skipPassword" /> Hoppa över lösenordet den här gången</label>
                   )}
-                  <button className="btn small" type="submit">Checka in och ge 100 basmarker</button>
+                  <button className="btn small" type="submit">Checka in</button>
                 </form>
               )}
             </div>

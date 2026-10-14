@@ -643,7 +643,7 @@ function Settings() {
       <label className="meta"><input type="checkbox" name="identityOpen" defaultChecked={s.identityOpen} /> Mysteriet och gissningarna öppna</label>
       <label className="meta"><input type="checkbox" name="vampireConversionsOpen" defaultChecked={s.vampireConversionsOpen} /> Banken tar emot förvandlingar</label>
       <label className="meta"><input type="checkbox" name="useAliases" defaultChecked={s.useAliases} /> Alias visas på den egna sidan</label>
-      <label className="meta"><input type="checkbox" name="firstVampireGetsBonus" defaultChecked={s.firstVampireGetsBonus} /> Den Förste får 20 basmarker och 1 prismark direkt</label>
+      <label className="meta"><input type="checkbox" name="firstVampireGetsBonus" defaultChecked={s.firstVampireGetsBonus} /> Den Förste får 20 spelmarker och 1 prismark direkt</label>
       <Field label="Lika poäng">
         <select name="tieBreak" defaultValue={s.tieBreak}>
           <option value="shared">Dela priset</option>

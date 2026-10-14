@@ -61,7 +61,7 @@ function Detail() {
   const taken = Boolean(state?.taken && !mine);
   const other = board?.mine && board.mine !== post.key ? staffPosts.find((item) => item.key === board.mine) : null;
   const paragraphs =
-    tab === 'allmant' ? welcomeCopy(Boolean(post.croupier)) :
+    tab === 'allmant' ? welcomeCopy() :
     tab === 'kvall' ? post.kväll :
     tab === 'uppgift' ? post.uppgift :
     tab === 'spel' ? post.spel :
@@ -115,7 +115,6 @@ function Detail() {
       <ErrorText>{error}</ErrorText>
       {mine && <p className="ok">Det här uppdraget är ditt.</p>}
       {taken && <p>Någon annan hann före. Uppdraget är taget.</p>}
-      {other && <p>Du har redan {other.title}. En administratör kan flytta dig.</p>}
       {waiting && <p>Manager och de tre croupiererna ska väljas först.</p>}
       {!mine && !taken && !other && !waiting && (
         <button className="btn apply" type="button" disabled={busy || !board} onClick={claim}>
