@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { api } from './api';
 import { homeFor, useAuth } from './auth';
 import { MusicProvider, MusicToggle } from './music';
+import { gitSha } from 'virtual:git-sha';
 
 export interface PublicEvent {
   clubName: string;
@@ -87,7 +88,7 @@ export function Layout() {
             Logga ut
           </button>
         )}
-        <span className="git-sha">{__GIT_SHA__}</span>
+        <span className="git-sha">{gitSha}</span>
         <MusicToggle />
         </div>
       </header>

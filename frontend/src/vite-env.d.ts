@@ -1,3 +1,5 @@
 /// <reference types="vite/client" />
 
-declare const __GIT_SHA__: string;
+declare module 'virtual:git-sha' {
+  export const gitSha: string;
+}
