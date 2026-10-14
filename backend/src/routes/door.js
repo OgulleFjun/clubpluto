@@ -114,6 +114,8 @@ router.post(
       : 'guest';
     const canInvite = req.body.canInvite === 'true' || req.body.canInvite === true;
     if (!name || name.length > 80) throw httpError(400, 'Ange ett namn.');
+    if (!alias || alias.length > 40) throw httpError(400, 'Ange ett alias.');
+    if (!req.file) throw httpError(400, 'Ladda upp ett äkta porträtt, utan mask eller förklädnad.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw httpError(400, 'Ange en giltig e-postadress.');
     if (password.length < 8) throw httpError(400, 'Lösenordet behöver minst 8 tecken.');
 
@@ -138,7 +140,7 @@ router.post(
           [
             account.rows[0].id,
             name,
-            alias || null,
+            alias,
             email,
             photoPath || null,
             photoToken,

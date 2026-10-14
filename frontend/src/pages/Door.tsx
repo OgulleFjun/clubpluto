@@ -124,7 +124,7 @@ function DoorInner() {
       <form className="card" style={{ marginTop: '1rem' }} onSubmit={onSubmit(walkIn)}>
         <h2>Registrera i dörren</h2>
         <Field label="Namn"><input name="name" required /></Field>
-        <Field label="Alias"><input name="alias" /></Field>
+        <Field label="Alias"><input name="alias" required maxLength={40} /></Field>
         <Field label="E-post"><input name="email" type="email" required /></Field>
         <Field label="Tillfälligt lösenord"><input name="password" type="password" minLength={8} required /></Field>
         <Field label="Medlemskap">
@@ -136,7 +136,10 @@ function DoorInner() {
           </select>
         </Field>
         <label className="meta"><input type="checkbox" name="canInvite" value="true" /> Får bjuda in två gäster (inte för vanliga gäster)</label>
-        <Field label="Porträtt"><input name="photo" type="file" accept="image/jpeg,image/png,image/webp" /></Field>
+        <Field label="Porträtt">
+          <input name="photo" type="file" accept="image/jpeg,image/png,image/webp" required />
+        </Field>
+        <p className="meta">Ett äkta porträtt av ansiktet, utan mask eller förklädnad.</p>
         <button className="btn" type="submit">Spara registrering</button>
       </form>
     </Page>

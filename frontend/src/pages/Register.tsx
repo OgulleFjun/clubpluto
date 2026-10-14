@@ -52,14 +52,14 @@ export default function Register() {
       {info?.valid && (
         <form className="card" onSubmit={onSubmit(submit)}>
           <Field label="Namn"><input name="name" required maxLength={80} /></Field>
-          <Field label="Alias, om du vill ha ett"><input name="alias" maxLength={40} /></Field>
+          <Field label="Alias"><input name="alias" required maxLength={40} /></Field>
           <Field label="E-post, bara för inloggning"><input name="email" type="email" required /></Field>
           <Field label="Lösenord, minst 8 tecken"><input name="password" type="password" minLength={8} required /></Field>
-          <Field label="Porträtt utan mask eller förklädnad">
+          <Field label="Porträtt">
             <input name="photo" type="file" accept="image/jpeg,image/png,image/webp" required />
           </Field>
           <p className="meta">
-            Bilden syns för inloggade deltagare och arrangörer, aldrig på den öppna sidan.
+            Bilden ska vara ett äkta porträtt av ditt ansikte, utan mask eller förklädnad. Den syns för inloggade deltagare och arrangörer, aldrig på den öppna sidan.
             {info.grantsInvite ? ' Den här inbjudan ger dig rätt att bjuda in två gäster.' : ''}
           </p>
           <ErrorText>{error}</ErrorText>

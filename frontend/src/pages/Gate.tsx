@@ -179,7 +179,7 @@ export default function Gate({ kind }: { kind: DoorKind }) {
             {kind === 'player' && (
               <>
                 <Field label={text.alias}>
-                  <input name="alias" maxLength={40} autoComplete="off" />
+                  <input name="alias" required maxLength={40} autoComplete="off" />
                 </Field>
                 <Field label={text.portrait}>
                   <div className="file-pick">{fileName || text.choose}</div>
@@ -191,6 +191,7 @@ export default function Gate({ kind }: { kind: DoorKind }) {
                     required
                     onChange={(event) => setFileName(event.target.files?.[0]?.name || '')}
                   />
+                  <p className="gate-hint">Ett äkta porträtt av ditt ansikte, utan mask eller förklädnad.</p>
                 </Field>
               </>
             )}

@@ -113,7 +113,8 @@ router.post(
 
     const settings = await getSettings();
     if (!settings.registration_open) throw httpError(403, 'Stängt.');
-    if (door === 'player' && !req.file) throw httpError(400, 'Ladda upp ett porträtt.');
+    if (door === 'player' && !alias) throw httpError(400, 'Ange ett alias.');
+    if (door === 'player' && !req.file) throw httpError(400, 'Ladda upp ett äkta porträtt, utan mask eller förklädnad.');
 
     const photoToken = randomToken();
     let photoPath = '';
@@ -144,7 +145,7 @@ router.post(
           [
             account.rows[0].id,
             name,
-            alias || null,
+            alias,
             email,
             photoPath,
             photoToken,

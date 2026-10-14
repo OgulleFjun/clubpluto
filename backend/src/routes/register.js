@@ -61,13 +61,12 @@ router.post(
     const settings = await getSettings();
     if (!settings.registration_open) throw httpError(403, 'Registreringen är stängd.');
     const name = cleanName(req.body.name, 'Namn', 80);
-    const alias = String(req.body.alias || '').trim();
-    if (alias.length > 40) throw httpError(400, 'Alias får vara högst 40 tecken.');
+    const alias = cleanName(req.body.alias, 'Alias', 40);
     const email = String(req.body.email || '').trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw httpError(400, 'Ange en giltig e-postadress.');
     const password = String(req.body.password || '');
     if (password.length < 8) throw httpError(400, 'Lösenordet behöver minst 8 tecken.');
-    if (!req.file) throw httpError(400, 'Ladda upp ett porträtt utan förklädnad.');
+    if (!req.file) throw httpError(400, 'Ladda upp ett äkta porträtt, utan mask eller förklädnad.');
 
     const photoToken = randomToken();
     let photoPath = '';
@@ -96,7 +95,7 @@ router.post(
           [
             account.rows[0].id,
             name,
-            alias || null,
+            alias,
             email,
             photoPath,
             photoToken,
