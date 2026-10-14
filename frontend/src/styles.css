@@ -432,6 +432,8 @@ body:has(.shell.staff) { background: #000; }
 .hire-card span { color: var(--gold); font-size: 0.85rem; }
 .hire-card.taken img { filter: grayscale(1) brightness(0.42); }
 .hire-card.mine img { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.hire-wait { text-align: center; color: var(--gold); margin-top: 1.2rem; }
+.hire-later { margin-top: 1.4rem; }
 .brief p, .brief li { font-size: 1.05rem; line-height: 1.55; }
 .brief .tabs { flex-wrap: wrap; }
 .callout {
@@ -448,9 +450,10 @@ body:has(.shell.staff) { background: #000; }
 @media (min-width: 900px) {
   .hire-row {
     grid-auto-flow: row;
-    grid-template-columns: repeat(5, 1fr);
     overflow: visible;
   }
+  .hire-primary { grid-template-columns: repeat(4, 1fr); }
+  .hire-later { grid-template-columns: repeat(2, minmax(180px, 280px)); justify-content: center; }
 }
 .mobile-logout { color: var(--gold); }
 @media (min-width: 800px) {

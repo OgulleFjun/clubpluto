@@ -254,6 +254,33 @@ INSERT INTO staff_posts (key, title, sort_order) VALUES
   ('prize-master', 'Prize Master', 5)
 ON CONFLICT (key) DO NOTHING;
 
+INSERT INTO staff_posts (key, title, sort_order) VALUES
+  ('bouncer', 'Bouncer', 6)
+ON CONFLICT (key) DO NOTHING;
+
+UPDATE staff_posts SET title = 'Manager', sort_order = 1 WHERE key = 'manager';
+UPDATE staff_posts SET title = 'Croupier Texas Hold''em', sort_order = 2 WHERE key = 'holdem';
+UPDATE staff_posts SET title = 'Croupier Hitta kort-poker', sort_order = 3 WHERE key = 'sjalpoker';
+UPDATE staff_posts SET title = 'Croupier Duellen', sort_order = 4 WHERE key = 'ride-the-bus';
+UPDATE staff_posts SET title = 'Prize Master', sort_order = 5 WHERE key = 'prize-master';
+
+UPDATE games SET
+  name = 'Hitta kort-poker',
+  summary = 'Leta efter gömda kort och bygg en pokerhand.',
+  rules = 'Vinnaren får 1 prismark och eventuella basmarker. Var korten göms, tidsgräns och återställning bestäms på genomgången klockan 17:00.'
+WHERE key = 'sjalpoker';
+
+UPDATE games SET
+  name = 'Duellen',
+  summary = 'Två spelare möts i ett kort minispel.',
+  rules = 'Vinnaren får satsade basmarker och 1 prismark. Vilka minispel som ingår och hur stora insatserna är bestäms på genomgången klockan 17:00.'
+WHERE key = 'ride-the-bus';
+
+UPDATE games SET
+  summary = 'Man kan gå in och ut mellan händer.',
+  rules = 'Vinnaren får potten i basmarker samt 1 prismark vid en godkänd vinst. Vad som räknas som en godkänd vinst bestäms på genomgången klockan 17:00.'
+WHERE key = 'holdem';
+
 INSERT INTO prizes (name, description, cost, stock, sort_order)
 SELECT
   'Litet pris',

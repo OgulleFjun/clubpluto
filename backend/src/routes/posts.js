@@ -10,6 +10,8 @@ const gameForPost = {
   sjalpoker: 'sjalpoker',
   'ride-the-bus': 'ride-the-bus',
 };
+const primaryPostKeys = ['manager', 'holdem', 'sjalpoker', 'ride-the-bus'];
+const laterPostKeys = ['prize-master', 'bouncer'];
 
 router.use(authenticate, loadAccount, requireRoles(...staffRoles));
 
@@ -54,6 +56,15 @@ router.post(
         if (!post.rows[0]) throw httpError(404, 'Uppdraget finns inte.');
         if (post.rows[0].account_id === req.account.id) return;
         if (post.rows[0].account_id) throw httpError(409, 'Uppdraget är redan taget.');
+        if (laterPostKeys.includes(key)) {
+          const primaries = await client.query(
+            'SELECT account_id FROM staff_posts WHERE key = ANY($1::text[]) FOR UPDATE',
+            [primaryPostKeys]
+          );
+          if (primaries.rows.some((row) => !row.account_id)) {
+            throw httpError(409, 'Manager och de tre croupiererna ska väljas först.');
+          }
+        }
         const mine = await client.query('SELECT key FROM staff_posts WHERE account_id = $1 FOR UPDATE', [req.account.id]);
         if (mine.rows[0]) throw httpError(409, 'Du har redan ett uppdrag.');
         await client.query(

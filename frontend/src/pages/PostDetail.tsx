@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { maskRule, postCopy, staffPosts } from '../posts';
+import { maskRule, postCopy, primaryPostKeys, staffPosts } from '../posts';
 import { ErrorText, Guard } from '../ui';
 
 type Tab = 'allmant' | 'kvall' | 'uppgift' | 'spel';
@@ -60,6 +60,11 @@ function Detail() {
   const other = board?.mine && board.mine !== post.key ? staffPosts.find((item) => item.key === board.mine) : null;
   const paragraphs = tab === 'allmant' ? post.allmän : tab === 'kvall' ? post.kväll : tab === 'uppgift' ? post.uppgift : post.spel;
   const steps = tab === 'uppgift' || tab === 'spel';
+  const primaryOpen = primaryPostKeys.every((item) => board?.posts.find((row) => row.key === item)?.taken);
+  const waiting = Boolean(post.later && board && !primaryOpen && !mine);
+  const roleTabs = tabs.map((item) => (
+    item.id === 'spel' && post.croupier ? { ...item, label: 'Ditt spel' } : item
+  ));
 
   async function claim() {
     setBusy(true);
@@ -79,7 +84,7 @@ function Detail() {
       <p><Link to="/uppdrag">Alla uppdrag</Link></p>
       <h1>{post.title}</h1>
       <div className="tabs">
-        {tabs.map((item) => (
+        {roleTabs.map((item) => (
           <button key={item.id} type="button" className={`btn small${tab === item.id ? '' : ' ghost'}`} onClick={() => setTab(item.id)}>
             {item.label}
           </button>
@@ -97,7 +102,8 @@ function Detail() {
       {mine && <p className="ok">Det här uppdraget är ditt.</p>}
       {taken && <p>Någon annan hann före. Uppdraget är taget.</p>}
       {other && <p>Du har redan {other.title}. En administratör kan flytta dig.</p>}
-      {!mine && !taken && !other && (
+      {waiting && <p>Manager och de tre croupiererna ska väljas först.</p>}
+      {!mine && !taken && !other && !waiting && (
         <button className="btn apply" type="button" disabled={busy || !board} onClick={claim}>
           Ansök
         </button>
