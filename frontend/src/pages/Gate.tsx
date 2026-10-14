@@ -57,7 +57,23 @@ export default function Gate({ kind }: { kind: DoorKind }) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [fileName, setFileName] = useState('');
-  const text = copy[kind];
+  const door = copy[kind];
+  const text =
+    needsProfile && kind === 'player'
+      ? {
+          ...door,
+          email: 'E-post',
+          password: 'Lösenord',
+          first: 'Första gången.',
+          name: 'Namn',
+          alias: 'Alias',
+          portrait: 'Porträtt',
+          choose: 'Välj bild',
+          next: 'Fortsätt',
+          back: 'Tillbaka',
+          fail: 'Det stämmer inte.',
+        }
+      : door;
   const markRef = useRef<HTMLDivElement>(null);
   const { beatPulse } = useMusic();
 
@@ -113,14 +129,14 @@ export default function Gate({ kind }: { kind: DoorKind }) {
       navigate(homeFor(result.user.role));
     } catch (reason) {
       const message = reason instanceof Error ? reason.message : text.fail;
-      setError(kind === 'player' ? german[message] || text.fail : message);
+      setError(kind === 'player' && !needsProfile ? german[message] || door.fail : message);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <section className={needsProfile ? 'gate compact' : 'gate'}>
+    <section className="gate">
       {kind === 'player' ? (
         <div className="gate-mark" ref={markRef}>
           <span className="gate-glow" aria-hidden />

@@ -95,7 +95,8 @@ main { flex: 1; width: min(1080px, calc(100% - 2rem)); margin: 0 auto; padding-b
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
+  min-height: 100vh;
   padding: 4.2rem 1.2rem 2.5rem;
   background: #000;
 }
@@ -139,8 +140,6 @@ main { flex: 1; width: min(1080px, calc(100% - 2rem)); margin: 0 auto; padding-b
   border-style: dashed;
   transform: rotate(calc(var(--spin, 0deg) * -0.65));
 }
-.gate.compact { justify-content: flex-start; padding-top: 3.4rem; }
-.gate.compact .gate-mark { width: min(220px, 52vw); }
 .gate-title {
   margin: 0 0 1.8rem;
   text-align: center;
@@ -187,6 +186,14 @@ body:has(.shell.quiet) { background: #000; }
   text-align: center;
 }
 .gate input:focus { outline: none; border-bottom-color: var(--gold); }
+.gate input:-webkit-autofill,
+.gate input:-webkit-autofill:hover,
+.gate input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f7f0e6;
+  caret-color: #f7f0e6;
+  box-shadow: 0 0 0 1000px #000 inset;
+  transition: background-color 9999s ease-out;
+}
 .gate .file-input {
   position: absolute;
   width: 1px;
@@ -197,8 +204,10 @@ body:has(.shell.quiet) { background: #000; }
 .gate .file-pick {
   text-align: center;
   color: var(--ink);
+  font: inherit;
+  font-weight: 400;
   border-bottom: 1px solid rgba(228, 188, 115, 0.45);
-  padding: 0.4rem 0 0.45rem;
+  padding: 0.4rem 0.15rem 0.45rem;
 }
 .gate .btn {
   margin-top: 0.35rem;
@@ -354,6 +363,134 @@ footer {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.shell.staff main {
+  flex-direction: column;
+  align-items: center;
+  padding: 4.2rem 1.2rem 2.5rem;
+}
+.staff-head {
+  width: min(420px, 86vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+}
+.staff-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.05rem;
+  width: min(720px, 92vw);
+}
+.staff-nav a,
+.staff-nav button {
+  color: var(--gold);
+  text-decoration: none;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-family: Cinzel, serif;
+  font-size: 0.68rem;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.staff-nav a.active { color: var(--ink); }
+.shell.staff .page {
+  width: min(720px, 100%);
+  padding: 1.6rem 0 3rem;
+}
+.shell.staff h1,
+.shell.staff h2,
+.shell.staff h3 {
+  font-family: Cinzel, serif;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.shell.staff h1 {
+  font-size: clamp(1.35rem, 4.6vw, 2rem);
+  color: rgba(228, 188, 115, 0.95);
+}
+.shell.staff h2 { font-size: 1rem; }
+.shell.staff .lede,
+.shell.staff .page > p,
+.shell.staff .card,
+.shell.staff .card p,
+.shell.staff .meta {
+  text-align: center;
+}
+.shell.staff .lede {
+  margin-inline: auto;
+  font-family: Cinzel, serif;
+  letter-spacing: 0.04em;
+  font-size: 0.82rem;
+  color: rgba(228, 188, 115, 0.7);
+}
+.shell.staff .card {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(228, 188, 115, 0.28);
+  padding: 1rem 0;
+}
+.shell.staff .field span {
+  display: block;
+  text-align: center;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-family: Cinzel, serif;
+  font-size: 0.62rem;
+  color: rgba(228, 188, 115, 0.78);
+}
+.shell.staff input,
+.shell.staff textarea,
+.shell.staff select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(228, 188, 115, 0.45);
+  border-radius: 0;
+  text-align: center;
+  padding: 0.4rem 0.15rem 0.45rem;
+}
+.shell.staff input:focus,
+.shell.staff textarea:focus,
+.shell.staff select:focus { outline: none; border-bottom-color: var(--gold); }
+.shell.staff input[type="checkbox"],
+.shell.staff input[type="file"] { width: auto; border: 0; }
+.shell.staff input:-webkit-autofill,
+.shell.staff input:-webkit-autofill:hover,
+.shell.staff input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f7f0e6;
+  caret-color: #f7f0e6;
+  box-shadow: 0 0 0 1000px #000 inset;
+  transition: background-color 9999s ease-out;
+}
+.shell.staff .btn,
+.shell.staff button.btn {
+  background: transparent;
+  color: var(--gold);
+  border-color: rgba(228, 188, 115, 0.55);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family: Cinzel, serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+.shell.staff .btn:hover { background: rgba(228, 188, 115, 0.08); }
+.shell.staff .tabs {
+  flex-wrap: wrap;
+  overflow: visible;
+  justify-content: center;
+}
+.shell.staff .tabs .btn:not(.ghost) {
+  background: rgba(228, 188, 115, 0.16);
+  color: var(--ink);
+}
+.shell.staff .error,
+.shell.staff .ok { text-align: center; }
 .mobile-logout { color: var(--gold); }
 @media (min-width: 800px) {
   .mobile-logout { display: none; }

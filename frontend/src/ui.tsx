@@ -29,17 +29,23 @@ export function usePublicEvent() {
   return { event, error };
 }
 
+function isStaff(role: string) {
+  return role === 'admin' || role === 'doorman' || role === 'gamemaster';
+}
+
 export function Layout() {
   const { user, logout } = useAuth();
   const { event } = usePublicEvent();
   const navigate = useNavigate();
   const name = event?.clubName || 'Club Pluto';
+  const staff = !!user && isStaff(user.role);
+  const player = !!user && !staff;
 
   return (
     <MusicProvider>
-    <div className={user ? 'shell' : 'shell quiet'}>
+    <div className={player ? 'shell' : staff ? 'shell quiet staff' : 'shell quiet'}>
       <header className="topbar">
-        {user ? (
+        {player ? (
           <NavLink to={homeFor(user.role)} className="brand">
             <span className="seal">CP</span>
             <span>
@@ -51,33 +57,26 @@ export function Layout() {
           <span />
         )}
         <div className="topbar-right">
-        {user ? (
+        {player ? (
         <nav className="desktop-nav">
           <NavLink to="/regler">Regler</NavLink>
           <NavLink to="/priser">Priser</NavLink>
-          {user?.role === 'participant' && <NavLink to="/klubben">Klubben</NavLink>}
-          {user?.role === 'participant' && <NavLink to="/mysteriet">Mysteriet</NavLink>}
-          {user?.role === 'admin' && <NavLink to="/admin">Kontrollpanel</NavLink>}
-          {user && (user.role === 'admin' || user.role === 'doorman') && <NavLink to="/dorren">Dörren</NavLink>}
-          {user && (user.role === 'admin' || user.role === 'gamemaster') && (
-            <NavLink to="/spelledare">Spelledare</NavLink>
-          )}
-          {user ? (
-            <button
-              className="text-button"
-              onClick={() => {
-                logout();
-                navigate('/');
-              }}
-            >
-              Logga ut
-            </button>
-          ) : null}
+          <NavLink to="/klubben">Klubben</NavLink>
+          <NavLink to="/mysteriet">Mysteriet</NavLink>
+          <button
+            className="text-button"
+            onClick={() => {
+              logout();
+              navigate('/');
+            }}
+          >
+            Logga ut
+          </button>
         </nav>
-        ) : (
+        ) : staff ? null : (
           <NavLink to="/personal" className="personal-link">Inlogg personal</NavLink>
         )}
-        {user && (
+        {player && (
           <button
             className="text-button mobile-logout"
             onClick={() => {
@@ -93,6 +92,32 @@ export function Layout() {
         </div>
       </header>
       <main>
+        {staff && (
+          <div className="staff-head">
+            <div className="gate-mark">
+              <span className="gate-glow" />
+              <span className="gate-ring" />
+              <span className="gate-ring far" />
+              <img className="gate-logo" src="/mark.webp" alt="Club Pluto" />
+            </div>
+            <nav className="staff-nav">
+              <NavLink to="/regler">Regler</NavLink>
+              <NavLink to="/priser">Priser</NavLink>
+              {user.role === 'admin' && <NavLink to="/admin">Kontrollpanel</NavLink>}
+              {(user.role === 'admin' || user.role === 'doorman') && <NavLink to="/dorren">Dörren</NavLink>}
+              {(user.role === 'admin' || user.role === 'gamemaster') && <NavLink to="/spelledare">Spelledare</NavLink>}
+              <button
+                type="button"
+                onClick={() => {
+                  logout();
+                  navigate('/');
+                }}
+              >
+                Logga ut
+              </button>
+            </nav>
+          </div>
+        )}
         <Outlet />
       </main>
       {user?.role === 'participant' && (
@@ -105,7 +130,7 @@ export function Layout() {
           </NavLink>
         </nav>
       )}
-      {user && (
+      {player && (
         <footer>
           <span>{name}</span>
           <span>Sala Analoga Spelförening och SUS</span>
