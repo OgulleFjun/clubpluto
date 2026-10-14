@@ -8,6 +8,7 @@ import clubRoutes from './routes/club.js';
 import doorRoutes from './routes/door.js';
 import gmRoutes from './routes/gm.js';
 import adminRoutes from './routes/admin.js';
+import postRoutes from './routes/posts.js';
 import photosRouter from './routes/photos.js';
 
 const app = express();
@@ -44,6 +45,7 @@ app.use('/api/club', clubRoutes);
 app.use('/api/door', doorRoutes);
 app.use('/api/gm', gmRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/posts', postRoutes);
 photosRouter(app);
 
 app.use((error, _req, res, _next) => {

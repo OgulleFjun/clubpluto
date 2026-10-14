@@ -43,9 +43,11 @@ export function Layout() {
 
   return (
     <MusicProvider>
-    <div className={player ? 'shell' : staff ? 'shell quiet staff' : 'shell quiet'}>
+    <div className={player ? 'shell' : staff ? 'shell staff' : 'shell quiet'}>
       <header className="topbar">
-        {player ? (
+        {staff && user ? (
+          <NavLink to="/uppdrag" className="staff-brand">Club Pluto</NavLink>
+        ) : player ? (
           <NavLink to={homeFor(user.role)} className="brand">
             <span className="seal">CP</span>
             <span>
@@ -57,7 +59,21 @@ export function Layout() {
           <span />
         )}
         <div className="topbar-right">
-        {player ? (
+        {staff && user ? (
+          <nav className="staff-nav">
+            <NavLink to="/uppdrag" end>Uppdrag</NavLink>
+            {user.role === 'admin' && <NavLink to="/uppdrag/kontroll">Kontroll</NavLink>}
+            <button
+              type="button"
+              onClick={() => {
+                logout();
+                navigate('/');
+              }}
+            >
+              Logga ut
+            </button>
+          </nav>
+        ) : player ? (
         <nav className="desktop-nav">
           <NavLink to="/regler">Regler</NavLink>
           <NavLink to="/priser">Priser</NavLink>
@@ -73,7 +89,7 @@ export function Layout() {
             Logga ut
           </button>
         </nav>
-        ) : staff ? null : (
+        ) : (
           <NavLink to="/personal" className="personal-link">Inlogg personal</NavLink>
         )}
         {player && (
@@ -92,32 +108,6 @@ export function Layout() {
         </div>
       </header>
       <main>
-        {staff && (
-          <div className="staff-head">
-            <div className="gate-mark">
-              <span className="gate-glow" />
-              <span className="gate-ring" />
-              <span className="gate-ring far" />
-              <img className="gate-logo" src="/mark.webp" alt="Club Pluto" />
-            </div>
-            <nav className="staff-nav">
-              <NavLink to="/regler">Regler</NavLink>
-              <NavLink to="/priser">Priser</NavLink>
-              {user.role === 'admin' && <NavLink to="/admin">Kontrollpanel</NavLink>}
-              {(user.role === 'admin' || user.role === 'doorman') && <NavLink to="/dorren">Dörren</NavLink>}
-              {(user.role === 'admin' || user.role === 'gamemaster') && <NavLink to="/spelledare">Spelledare</NavLink>}
-              <button
-                type="button"
-                onClick={() => {
-                  logout();
-                  navigate('/');
-                }}
-              >
-                Logga ut
-              </button>
-            </nav>
-          </div>
-        )}
         <Outlet />
       </main>
       {user?.role === 'participant' && (

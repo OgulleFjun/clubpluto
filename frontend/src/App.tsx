@@ -14,6 +14,9 @@ import Results from './pages/Results';
 import Door from './pages/Door';
 import Gm from './pages/Gm';
 import Admin from './pages/Admin';
+import Posts from './pages/Posts';
+import PostDetail from './pages/PostDetail';
+import PostControl from './pages/PostControl';
 
 export default function App() {
   const { ready } = useAuth();
@@ -35,6 +38,9 @@ export default function App() {
         <Route path="/dorren" element={<Door />} />
         <Route path="/spelledare" element={<Gm />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/uppdrag" element={<Posts />} />
+        <Route path="/uppdrag/kontroll" element={<PostControl />} />
+        <Route path="/uppdrag/:key" element={<PostDetail />} />
         <Route path="*" element={<Missing />} />
       </Route>
     </Routes>

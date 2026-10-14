@@ -101,8 +101,6 @@ export function useAuth() {
 }
 
 export function homeFor(role: Role) {
-  if (role === 'admin') return '/admin';
-  if (role === 'doorman') return '/dorren';
-  if (role === 'gamemaster') return '/spelledare';
+  if (role === 'admin' || role === 'doorman' || role === 'gamemaster') return '/uppdrag';
   return '/klubben';
 }

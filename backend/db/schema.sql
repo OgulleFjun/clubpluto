@@ -238,6 +238,22 @@ INSERT INTO games (key, name, summary, rules, sort_order) VALUES
 )
 ON CONFLICT (key) DO NOTHING;
 
+CREATE TABLE IF NOT EXISTS staff_posts (
+  key text PRIMARY KEY,
+  title text NOT NULL,
+  sort_order integer NOT NULL DEFAULT 0,
+  account_id uuid UNIQUE REFERENCES accounts(id) ON DELETE SET NULL,
+  claimed_at timestamptz
+);
+
+INSERT INTO staff_posts (key, title, sort_order) VALUES
+  ('manager', 'Manager', 1),
+  ('holdem', 'Croupier Texas Hold''em', 2),
+  ('sjalpoker', 'Croupier Själpoker', 3),
+  ('ride-the-bus', 'Croupier Ride the Bus', 4),
+  ('prize-master', 'Prize Master', 5)
+ON CONFLICT (key) DO NOTHING;
+
 INSERT INTO prizes (name, description, cost, stock, sort_order)
 SELECT
   'Litet pris',
