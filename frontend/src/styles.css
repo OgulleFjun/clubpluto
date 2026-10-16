@@ -564,6 +564,14 @@ body:has(.shell.staff) { background: #000; }
 .welcome-card h2 { margin: 0 0 0.7rem; font-size: 2rem; }
 .welcome-card p { margin: 0.55rem 0; font-size: 1.15rem; line-height: 1.45; }
 .welcome-card .btn { width: 100%; margin-top: 0.9rem; }
+.marker-pair { display: grid; gap: 0.8rem; }
+.marker-card h2 { text-align: center; margin-top: 0.2rem; }
+.marker-card ul { margin: 0.4rem 0 0; padding-left: 1.1rem; }
+.marker-card li { color: var(--muted); }
+.chip-face { width: 7.5rem; height: 7.5rem; display: block; margin: 0 auto; }
+@media (min-width: 720px) {
+  .marker-pair { grid-template-columns: 1fr 1fr; }
+}
 .facts {
   border: 1px solid var(--gold);
   padding: 0.9rem 1.1rem;

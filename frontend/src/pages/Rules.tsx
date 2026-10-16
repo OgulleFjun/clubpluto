@@ -1,4 +1,4 @@
-import { Page, usePublicEvent } from '../ui';
+import { LinkedText, Page, usePublicEvent } from '../ui';
 
 export default function Rules() {
   const { event, error } = usePublicEvent();
@@ -11,7 +11,7 @@ export default function Rules() {
           <article className="card" key={game.key}>
             <h2>{game.name}</h2>
             <p>{game.summary}</p>
-            <p className="prose">{game.rules}</p>
+            <p className="prose"><LinkedText text={game.rules} /></p>
           </article>
         ))}
       </div>

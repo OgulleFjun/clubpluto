@@ -202,7 +202,7 @@ function People() {
             <strong>{person.name}</strong>
             <div className="meta">
               {person.membership === 'staff' ? 'Personal' : 'Medlem'} · {person.checkedInAt ? 'Inne' : 'Ute'} · {person.isVampire ? 'vampyr' : 'människa'}
-              {person.isVampire ? ` · ${person.conversionChips} vinstmarker från förvandling` : ''}
+              {person.isVampire ? ` · ${person.conversionChips} prismarker från förvandling` : ''}
             </div>
           </button>
         ))}
@@ -234,7 +234,7 @@ function People() {
             <Portrait token={selected.costumeToken || selected.photoToken || ''} alt={selected.name} />
           )}
           <p className="meta">Dörrkod {selected.doorCode}. Inbjuden av {selected.invitedBy || 'arrangören'}. Spelmarker {selected.baseChips}, prismarker {selected.prizeChips}.</p>
-          <p>{selected.isVampire ? `Vampyr${selected.isFirst ? ', Den Förste' : ''}. ${selected.conversionChips} av 2 vinstmarker från förvandlingar.${selected.turnedBy ? ` Förvandlad av ${selected.turnedBy}.` : ''}` : 'Människa.'}</p>
+          <p>{selected.isVampire ? `Vampyr${selected.isFirst ? ', Den Förste' : ''}. ${selected.conversionChips} av 2 prismarker från förvandlingar.${selected.turnedBy ? ` Förvandlad av ${selected.turnedBy}.` : ''}` : 'Människa.'}</p>
           <div className="actions">
             {selected.isVampire ? (
               <button className="btn small ghost" type="button" onClick={async () => {
@@ -284,7 +284,7 @@ function People() {
           {view.message && <p className="ok">{view.message}</p>}
         </form>
         <div className="card">
-          <h3>Rätta marker</h3>
+          <h3>Rätta spelmarker och prismarker</h3>
           <Adjust personId={selected.id} />
           <button className="btn danger" type="button" onClick={async () => {
             const kind = selected.membership === 'staff' ? 'personalen' : 'medlemmen';
@@ -322,7 +322,7 @@ function Adjust({ personId }: { personId: string }) {
         setError(reason instanceof Error ? reason.message : 'Rättningen misslyckades.');
       }
     })}>
-      <Field label="Basmarker, plus eller minus"><input name="baseDelta" type="number" defaultValue={0} /></Field>
+      <Field label="Spelmarker, plus eller minus"><input name="baseDelta" type="number" defaultValue={0} /></Field>
       <Field label="Prismarker, plus eller minus"><input name="prizeDelta" type="number" defaultValue={0} /></Field>
       <Field label="Varför"><input name="reason" required /></Field>
       <button className="btn small ghost" type="submit">Rätta</button>

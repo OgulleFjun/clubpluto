@@ -88,6 +88,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       return;
     }
     sessionStorage.setItem(CHOICE_KEY, 'on');
+    setAccepted(true);
     if (audio.src) {
       audio.volume = VOLUME;
       void audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
@@ -143,7 +144,7 @@ export function useMusic() {
 
 export function MusicToggle() {
   const music = useContext(MusicContext);
-  if (!music?.accepted) return null;
+  if (!music || music.ask) return null;
   const muted = !music.playing;
   return (
     <button

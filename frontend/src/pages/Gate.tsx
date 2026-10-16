@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { homeFor, useAuth, User } from '../auth';
 import { useMusic } from '../music';
@@ -23,7 +23,7 @@ const copy = {
   player: {
     email: 'E-Mail',
     password: 'Passwort',
-    enter: 'Eintreten',
+    enter: 'Logga in',
     first: 'Zum ersten Mal.',
     name: 'Name',
     alias: 'Alias',
@@ -201,6 +201,9 @@ export default function Gate({ kind }: { kind: DoorKind }) {
         <button className="btn" type="submit" disabled={busy}>
           {needsProfile ? text.next : text.enter}
         </button>
+        {kind === 'player' && !needsProfile && (
+          <Link className="btn" to="/personal">Inlogg personal</Link>
+        )}
         {needsProfile && (
           <button
             className="text-button"

@@ -2,19 +2,54 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { postCopy, primaryPostKeys, prizeRules, staffPosts, vampireRules, welcomeCopy, whenWhere } from '../posts';
+import { markerGuide, postCopy, primaryPostKeys, prizeRules, staffPosts, vampireRules, welcomeCopy, whenWhere } from '../posts';
 import { ErrorText, Guard, Portrait } from '../ui';
 
-type Tab = 'allmant' | 'kvall' | 'uppgift' | 'spel' | 'vampyr' | 'priser' | 'poang';
+type Tab = 'allmant' | 'kvall' | 'uppgift' | 'spel' | 'marker' | 'vampyr' | 'priser' | 'poang';
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'allmant', label: 'Allmänt' },
   { id: 'kvall', label: 'Kvällen' },
   { id: 'uppgift', label: 'Uppgift' },
   { id: 'spel', label: 'Spel' },
+  { id: 'marker', label: 'Marker' },
   { id: 'vampyr', label: 'Vampyr' },
   { id: 'priser', label: 'Priser' },
 ];
+
+function ChipFace({ tone }: { tone: 'spel' | 'pris' }) {
+  const rim = tone === 'spel' ? '#e4bc73' : '#a32938';
+  const face = tone === 'spel' ? '#241910' : '#2a1014';
+  return (
+    <svg className="chip-face" viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="56" fill={rim} />
+      <circle cx="60" cy="60" r="46" fill={face} />
+      {Array.from({ length: 8 }, (_, index) => {
+        const turn = index * 45;
+        return <rect key={turn} x="56" y="4" width="8" height="16" rx="2" fill="#f7f0e6" transform={`rotate(${turn} 60 60)`} />;
+      })}
+      <circle cx="60" cy="60" r="40" fill={face} />
+      <circle cx="60" cy="60" r="28" fill="none" stroke={rim} strokeWidth="3" />
+      <circle cx="60" cy="60" r="16" fill={rim} />
+    </svg>
+  );
+}
+
+function MarkerGuide() {
+  return (
+    <div className="marker-pair">
+      {markerGuide.map((kind) => (
+        <article className="card marker-card" key={kind.kind}>
+          <ChipFace tone={kind.kind} />
+          <h2>{kind.title}</h2>
+          <ul>
+            {kind.lines.map((line) => <li key={line}>{line}</li>)}
+          </ul>
+        </article>
+      ))}
+    </div>
+  );
+}
 
 interface Board {
   mine: string | null;
@@ -53,7 +88,7 @@ function VampireDesk({ token }: { token: string | null }) {
         method: 'POST',
         body: JSON.stringify({ newbieId: desk.newbie.id, sireId: picked }),
       }, token);
-      setMessage(`${result.sireName} har nu ${result.conversionChips} vinstmarker från förvandlingar.`);
+      setMessage(`${result.sireName} har nu ${result.conversionChips} prismarker från förvandlingar.`);
       await load();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Vinstmarken gavs inte.');
@@ -82,20 +117,20 @@ function VampireDesk({ token }: { token: string | null }) {
             >
               {person.imageToken ? <Portrait token={person.imageToken} alt={person.name} /> : <div className="portrait empty" />}
               <span>{person.name}</span>
-              <small>{person.conversionChips} / 2 vinstmarker</small>
+              <small>{person.conversionChips} / 2 prismarker</small>
             </button>
           ))}
         </div>
         {desk.pictures.length === 0 && <p className="meta">Det finns inga tidigare vampyrer att peka på ännu.</p>}
         <button className="btn" type="button" disabled={!desk.newbie || !picked || busy} onClick={pay}>
-          Ge den gamla vampyren en vinstmark
+          Ge den gamla vampyren en prismark
         </button>
         {message && <p className="ok">{message}</p>}
         <ErrorText>{error}</ErrorText>
       </article>
       {desk.vampires.length > 0 && (
         <article className="card">
-          <h2>Vinstmarker från förvandling</h2>
+          <h2>Prismarker från förvandling</h2>
           {desk.vampires.map((person) => (
             <p key={person.id}>{person.name}{person.isFirst ? ', Den Förste' : ''}: {person.conversionChips} av 2</p>
           ))}
@@ -203,7 +238,8 @@ function Detail() {
       {tab === 'vampyr' && post.key === 'manager' && (mine || user?.role === 'admin') && (
         <VampireDesk token={token} />
       )}
-      {tab === 'poang' ? (
+      {tab === 'marker' && <MarkerGuide />}
+      {tab === 'poang' && (
         <div className="list">
           {scores?.map((row) => (
             <article className="card" key={row.name}>
@@ -215,12 +251,19 @@ function Detail() {
           {scores && scores.length === 0 && <p>Inga poäng ännu.</p>}
           {!scores && <p>Hämtar poängen…</p>}
         </div>
-      ) : steps ? (
+      )}
+      {tab !== 'marker' && tab !== 'poang' && (steps ? (
         <ol>
           {paragraphs.map((line) => <li key={line}>{line}</li>)}
         </ol>
       ) : (
         paragraphs.map((line) => <p key={line}>{line}</p>)
+      ))}
+      {tab === 'spel' && post.video && (
+        <p>
+          <a href={post.video.href} target="_blank" rel="noreferrer">{post.video.label}</a>
+          {' '}{post.video.note}
+        </p>
       )}
       {post.key === 'manager' && (mine || user?.role === 'admin') && (
         <p><Link to="/dorren">Registrera gäster och lägg bilder i mysteriet</Link></p>

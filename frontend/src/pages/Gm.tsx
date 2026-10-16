@@ -74,7 +74,7 @@ function GmInner() {
   }
 
   return (
-    <Page title="Spelledare" lede="Skriv upp prismarker. Basmarkerna i potten stannar på bordet.">
+    <Page title="Spelledare" lede="Skriv upp prismarker. Spelmarkerna i potten stannar på bordet.">
       {games.length === 0 && <p>Du har inget spel tilldelat ännu. Be administratören koppla ditt konto.</p>}
       <div className="grid">
         {games.map((game) => (

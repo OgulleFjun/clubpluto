@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Page, usePublicEvent } from '../ui';
+import { LinkedText, Page, usePublicEvent } from '../ui';
 
 export default function Games() {
   const { event } = usePublicEvent();
@@ -10,7 +10,7 @@ export default function Games() {
           <article className="card" key={game.key}>
             <h2>{game.name}</h2>
             <p>{game.summary}</p>
-            <p className="prose">{game.rules}</p>
+            <p className="prose"><LinkedText text={game.rules} /></p>
           </article>
         ))}
       </div>

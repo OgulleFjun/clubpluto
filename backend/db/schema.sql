@@ -332,32 +332,48 @@ WHERE id = 1 AND rules_text LIKE '%utmaning om du har slut%';
 
 UPDATE games SET
   name = 'Själ-poker',
-  summary = 'Leta kort, betta, och låt bäst hand vinna en vinstmark.',
-  rules = $sjal$Spelarna letar efter kort och bygger en hand. Alla kort som hittats och spelats lämnas till croupiern, som kan blanda in dem i leken.
+  summary = 'Vanlig poker med korten man hittat. Bäst hand vinner.',
+  rules = $sjal$Korten spelas som vanlig poker. Bäst hand vinner. Handen är spelarens fem bästa kort.
+
+Bäst är färgstege: fem kort i följd och i samma färg. Högst är ess, kung, dam, knekt och tia i samma färg.
+Sedan fyrtal: fyra kort av samma valör.
+Sedan kåk: tre av en valör och två av en annan.
+Sedan färg: fem kort i samma färg, inte i följd.
+Sedan stege: fem kort i följd, inte i samma färg. Ess kan ligga högst, ovanför kungen, eller lägst, under tvåan.
+Sedan triss: tre kort av samma valör.
+Sedan två par.
+Sedan ett par: två kort av samma valör.
+Sist högt kort. Ess är högst, sedan kung, dam, knekt, tia och nedåt.
+Är händerna lika avgör det högsta kortet som skiljer dem. Är allt lika delas potten.
+
+Spelarna letar efter kort och bygger handen av dem. Alla kort som hittats och spelats lämnas till croupiern, som kan blanda in dem i leken.
 
 Har en spelare inga kort får den fem kort av croupiern. Har den färre än fem kan den få nya kort.
 
-Det kostar 5 spelmarker att vara med. Sedan bettas det. Bäst hand vinner och får 1 vinstmark.$sjal$
+Det kostar 5 spelmarker att vara med. Sedan bettas det. Bäst hand vinner potten och får 1 prismark.$sjal$
 WHERE key = 'sjalpoker';
 
 UPDATE games SET
   name = 'Ride the Bus',
-  summary = 'En gäst gissar på fyra dolda kort i rad.',
-  rules = $bus$Fyra kort läggs med baksidan upp. Gästen gissar innan varje kort vänds.
+  summary = 'En gäst gissar på ett kort i taget, fyra kort i rad.',
+  rules = $bus$Fyra kort läggs med baksidan upp. En gäst gissar på ett kort i taget. Kortet vänds först när gästen har sagt sitt.
 
-Stopp 1: rött eller svart.
-Stopp 2: högre eller lägre än kortet innan. Ess är högst. Lika valör räknas som fel.
-Stopp 3: innanför eller utanför de två kort som redan ligger. Lika som något av dem räknas som fel.
-Stopp 4: vilken färg kortet har, hjärter, ruter, spader eller klöver.
+Kort 1: rött eller svart.
+Kort 2: högre eller lägre än kortet innan. Ess är högst. Lika valör räknas som fel.
+Kort 3: innanför eller utanför de två kort som redan ligger. Innanför betyder mellan deras valörer. Utanför betyder högre än båda eller lägre än båda. Lika valör som något av dem räknas som fel.
+Kort 4: vilken färg kortet har, hjärter, ruter, spader eller klöver.
 
-Gästen bestämmer själv hur många spelmarker som satsas innan korten vänds. Fel gissning: insatsen går i potten och resan tar slut. Potten ligger kvar när någon missar.
+Gästen bestämmer själv hur många spelmarker som satsas innan första kortet vänds. Fel gissning: insatsen går i potten och resan tar slut. Potten ligger kvar när någon missar.
 
-Tre rätt stopp ger 1 vinstmark. Den behålls även om stopp 4 blir fel. Alla fyra stopp ger 3 vinstmarker och potten i spelmarker.$bus$
+Tre rätt kort ger 1 prismark. Den behålls även om kort 4 blir fel. Alla fyra kort rätt ger 3 prismarker och potten i spelmarker.
+
+De fyra gissningarna syns i början av den här filmen: https://www.youtube.com/watch?v=wt3NTJr5W2E
+Pyramiden och drycken efteråt spelar vi inte.$bus$
 WHERE key = 'ride-the-bus';
 
 UPDATE games SET
   summary = 'Vinnaren av en hand tar spelmarkerna i potten.',
-  rules = 'Lilla blind är 1 spelmark och stora blind är 2. Spelmarkerna kan tas med till ett annat bord. Den som vinner handen tar potten. En vunnen hand ger inga vinstmarker. Gäster får lämna bordet mellan händer.'
+  rules = 'Lilla blind är 1 spelmark och stora blind är 2. Spelmarkerna kan tas med till ett annat bord. Den som vinner handen tar potten. En vunnen hand ger inga prismarker. Gäster får lämna bordet mellan händer.'
 WHERE key = 'holdem';
 
 UPDATE prizes
@@ -390,11 +406,11 @@ UPDATE event_settings
 SET rules_text = replace(
   rules_text,
   'Kortet kan sedan förvandla ytterligare en person.',
-  'Den som förvandlar någon annan får 1 vinstmark, högst två. Kortet kan sedan förvandla ytterligare en person.'
+  'Den som förvandlar någon annan får 1 prismark, högst två. Kortet kan sedan förvandla ytterligare en person.'
 )
 WHERE id = 1
   AND rules_text LIKE '%Kortet kan sedan förvandla ytterligare en person.%'
-  AND rules_text NOT LIKE '%högst två%';
+  AND rules_text NOT LIKE '%förvandlar någon annan får 1 prismark%';
 
 UPDATE event_settings
 SET door_password_hash = crypt($door$123ABC!$door$, gen_salt('bf', 10)),
@@ -404,3 +420,81 @@ WHERE id = 1
     door_password_hash IS NULL
     OR door_password_hash IS DISTINCT FROM crypt($door$123ABC!$door$, door_password_hash)
   );
+
+UPDATE event_settings
+SET rules_text = replace(rules_text, 'basmarker', 'spelmarker')
+WHERE id = 1 AND rules_text LIKE '%basmarker%';
+
+UPDATE event_settings
+SET rules_text = replace(rules_text, 'vinstmarker', 'prismarker')
+WHERE id = 1 AND rules_text LIKE '%vinstmarker%';
+
+UPDATE event_settings
+SET rules_text = replace(rules_text, 'vinstmark', 'prismark')
+WHERE id = 1 AND rules_text LIKE '%vinstmark%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  E'Om Den Förste får bonus redan från start bestämmer arrangören i kontrollpanelen.\r\n',
+  ''
+)
+WHERE id = 1 AND rules_text LIKE '%bonus redan från start%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  E'Om Den Förste får bonus redan från start bestämmer arrangören i kontrollpanelen.\n',
+  ''
+)
+WHERE id = 1 AND rules_text LIKE '%bonus redan från start%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Rätt namn ger +1 poäng. Fel namn ger −1 poäng. Ett porträtt du lämnar tomt ger 0.',
+  'Rätt namn ger +1 poäng. Fel namn ger −1 poäng. Ett porträtt du lämnar tomt ger 0. Det är poäng, inte marker. Poängen avgör vem som kan vinna överlevnadspriset.'
+)
+WHERE id = 1
+  AND rules_text LIKE '%Ett porträtt du lämnar tomt ger 0.%'
+  AND rules_text NOT LIKE '%Det är poäng, inte marker%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Tomt ger 0 poäng. Rätt ger +1 och fel ger −1.',
+  'Tomt ger 0 poäng. Rätt ger +1 poäng och fel ger −1 poäng. Det är poäng, inte marker.'
+)
+WHERE id = 1 AND rules_text LIKE '%Rätt ger +1 och fel ger −1.%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Hemsidan registrerar de 100 spelmarkerna du får hos Managern, vampyrbonus och eventuella rättningar, men inte varje hand vid borden.',
+  'Det finns två sorters marker: spelmarker och prismarker. Spelmarkerna används vid borden. Prismarkerna köper priser.'
+)
+WHERE id = 1 AND rules_text LIKE '%vampyrbonus%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'får 20 extra spelmarker och 1 prismark. Kortet kan sedan förvandla ytterligare en person.',
+  'får 20 extra spelmarker och 1 prismark. Den som förvandlar någon annan får 1 prismark, högst två. Kortet kan sedan förvandla ytterligare en person.'
+)
+WHERE id = 1
+  AND rules_text LIKE '%20 extra spelmarker och 1 prismark. Kortet kan sedan förvandla ytterligare en person.%'
+  AND rules_text NOT LIKE '%förvandlar någon annan får 1 prismark%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Bara prismarker köper priser.',
+  'Bara prismarker köper priser hos Prize Master. Prismarker kan ges bort. Bara barn och ungdomar kan vinna de priserna.'
+)
+WHERE id = 1
+  AND rules_text LIKE '%Bara prismarker köper priser.%'
+  AND rules_text NOT LIKE '%kan ges bort%';
+
+UPDATE event_settings
+SET rules_text = replace(rules_text, 'tre rätt stopp', 'tre rätt kort')
+WHERE id = 1 AND rules_text LIKE '%tre rätt stopp%';

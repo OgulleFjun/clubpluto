@@ -3,7 +3,7 @@ import { Page, usePublicEvent } from '../ui';
 export default function Prizes() {
   const { event, error } = usePublicEvent();
   return (
-    <Page title="Prisbutiken" lede="5 tiers. Bara prismarker köper priser.">
+    <Page title="Prisbutiken" lede="5 tiers. Bara prismarker köper priser. De kan ges bort. Bara barn och ungdomar kan vinna dem hos Prize Master.">
       {error && <p className="error">{error}</p>}
       <ol className="tiers">
         {event?.prizes.map((prize) => (

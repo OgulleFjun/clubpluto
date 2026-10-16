@@ -177,12 +177,12 @@ function StaffIntro() {
         <p><strong>Söndag 1 november 2026.</strong><br />Folkets hus, Sala. Kvällen är i källaren.</p>
         <p>Samling klockan 17:00. Ytterdörren öppnar klockan 18:30.</p>
         <p>Det kommer vara musik. En stor del av upplevelsen är att gissa vem som är vem, så försök ändra rösten.</p>
-        <p>Fyll i namn, ålder och alias.</p>
+        <p>Fyll i namn, din riktiga ålder och alias.</p>
         {user.role === 'gamemaster' && <p>Första steget som spelledare är att välja en roll.</p>}
         <Field label="Namn">
           <input name="name" required maxLength={80} defaultValue={user.displayName || ''} autoComplete="name" />
         </Field>
-        <Field label="Ålder">
+        <Field label="Din riktiga ålder">
           <input name="age" type="number" required min={1} max={120} inputMode="numeric" />
         </Field>
         <Field label="Alias">
@@ -208,6 +208,19 @@ export function Page({ title, lede, children }: { title: string; lede?: string; 
       {lede && <p className="lede">{lede}</p>}
       {children}
     </section>
+  );
+}
+
+export function LinkedText({ text }: { text: string }) {
+  const parts = text.split(/(https?:\/\/[^\s]+)/);
+  return (
+    <>
+      {parts.map((part, index) =>
+        part.startsWith('http')
+          ? <a key={index} href={part} target="_blank" rel="noreferrer">Se filmen</a>
+          : <span key={index}>{part}</span>
+      )}
+    </>
   );
 }
 
