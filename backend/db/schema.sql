@@ -372,8 +372,8 @@ Pyramiden och drycken efteråt spelar vi inte.$bus$
 WHERE key = 'ride-the-bus';
 
 UPDATE games SET
-  summary = 'Vinnaren av en hand tar spelmarkerna i potten.',
-  rules = 'Lilla blind är 1 spelmark och stora blind är 2. Spelmarkerna kan tas med till ett annat bord. Den som vinner handen tar potten. En vunnen hand ger inga prismarker. Gäster får lämna bordet mellan händer.'
+  summary = 'Vinnaren tar spelmarkerna i potten och får 1 prismark.',
+  rules = 'Lilla blind är värd 1 spelmark och stora blind är värd 2 spelmarker. Spelmarkerna kan tas med till ett annat bord. Den som vinner handen tar spelmarkerna som satsats i potten och får 1 prismark. Den som är ensam kvar vinner också. Gäster får lämna bordet mellan händer.'
 WHERE key = 'holdem';
 
 UPDATE prizes
@@ -498,3 +498,11 @@ WHERE id = 1
 UPDATE event_settings
 SET rules_text = replace(rules_text, 'tre rätt stopp', 'tre rätt kort')
 WHERE id = 1 AND rules_text LIKE '%tre rätt stopp%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Texas Hold''em ger spelmarker till den som vinner handen.',
+  'Texas Hold''em: lilla blind är värd 1 spelmark och stora blind är värd 2. Den som vinner handen får spelmarkerna som satsats i potten och 1 prismark.'
+)
+WHERE id = 1 AND rules_text LIKE '%Texas Hold''em ger spelmarker till den som vinner handen.%';
