@@ -134,7 +134,7 @@ export function Layout() {
 
 function needsStaffProfile(user: User) {
   if (user.role === 'participant') return false;
-  return !user.displayName || !user.alias || user.age == null || user.staffIntroSeen === false;
+  return !user.displayName || !user.alias || user.age == null || user.staffIntroSeen === false || user.email.endsWith('@namn.clubpluto.eu');
 }
 
 function StaffIntro() {
@@ -177,10 +177,13 @@ function StaffIntro() {
         <p><strong>Söndag 1 november 2026.</strong><br />Folkets hus, Sala. Kvällen är i källaren.</p>
         <p>Samling klockan 17:00. Ytterdörren öppnar klockan 18:30.</p>
         <p>Det kommer vara musik. En stor del av upplevelsen är att gissa vem som är vem, så försök ändra rösten.</p>
-        <p>Fyll i namn, din riktiga ålder och alias.</p>
+        <p>Fyll i e-post, din riktiga ålder och alias.</p>
         {user.role === 'gamemaster' && <p>Första steget som spelledare är att välja en roll.</p>}
-        <Field label="Namn">
+        <Field label="Förnamn och efternamn">
           <input name="name" required maxLength={80} defaultValue={user.displayName || ''} autoComplete="name" />
+        </Field>
+        <Field label="E-post">
+          <input name="email" type="email" required autoComplete="email" defaultValue={user.email.endsWith('@namn.clubpluto.eu') ? '' : user.email} />
         </Field>
         <Field label="Din riktiga ålder">
           <input name="age" type="number" required min={1} max={120} inputMode="numeric" />

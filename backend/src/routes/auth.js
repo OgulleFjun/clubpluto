@@ -50,15 +50,25 @@ router.post(
     const name = cleanName(req.body.name);
     const alias = String(req.body.alias || '').trim();
     const age = Number(req.body.age);
+    const email = String(req.body.email || '').trim().toLowerCase();
     if (!alias || alias.length > 40) throw httpError(400, 'Ange ett alias.');
     if (!Number.isInteger(age) || age < 1 || age > 120) throw httpError(400, 'Ange en ålder.');
-    const updated = await query(
-      `UPDATE accounts
-       SET display_name = $1, alias = $2, age = $3, staff_intro_seen = true
-       WHERE id = $4
-       RETURNING *`,
-      [name, alias, age, req.account.id]
-    );
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || isPlaceholderEmail(email)) {
+      throw httpError(400, 'Ange en e-postadress.');
+    }
+    let updated;
+    try {
+      updated = await query(
+        `UPDATE accounts
+         SET display_name = $1, alias = $2, age = $3, email = $4, staff_intro_seen = true
+         WHERE id = $5
+         RETURNING *`,
+        [name, alias, age, email, req.account.id]
+      );
+    } catch (error) {
+      if (error.code === '23505') throw httpError(400, 'Den e-postadressen finns redan.');
+      throw error;
+    }
     const account = updated.rows[0];
     let participant = await ensureStaffParticipant(account, req.participant);
     if (req.file) {
@@ -70,11 +80,46 @@ router.post(
   })
 );
 
-function sameSecret(input, expected) {
-  const left = Buffer.from(String(input));
-  const right = Buffer.from(String(expected));
-  if (left.length !== right.length) return false;
-  return crypto.timingSafeEqual(left, right);
+const NAME_MAIL = '@namn.clubpluto.eu';
+
+function personName(body) {
+  const first = String(body.firstName || '').trim().replace(/\s+/g, ' ');
+  const last = String(body.lastName || '').trim().replace(/\s+/g, ' ');
+  if (!first || !last) throw httpError(400, 'Skriv förnamn och efternamn.');
+  const name = `${first} ${last}`;
+  if (name.length > 80) throw httpError(400, 'Namnet behöver 1–80 tecken.');
+  return name;
+}
+
+function placeholderEmail(name, door) {
+  const hash = crypto.createHash('sha256').update(`${door}\n${name.toLowerCase()}`).digest('hex').slice(0, 16);
+  return `${hash}${NAME_MAIL}`;
+}
+
+function isPlaceholderEmail(email) {
+  return String(email || '').toLowerCase().endsWith(NAME_MAIL);
+}
+
+async function findByName(name, door) {
+  const roles = door === 'staff' ? ['admin', 'doorman', 'gamemaster'] : ['participant'];
+  const { rows } = await query(
+    `SELECT * FROM accounts
+     WHERE lower(regexp_replace(trim(display_name), '[[:space:]]+', ' ', 'g')) = lower($1)
+       AND role = ANY($2::text[])
+       AND active
+     ORDER BY created_at
+     LIMIT 1`,
+    [name, roles]
+  );
+  return rows[0] || null;
+}
+
+async function sessionFor(account) {
+  const participant = await query('SELECT * FROM participants WHERE account_id = $1', [account.id]);
+  return {
+    token: signToken(account),
+    user: publicAccount(account, participant.rows[0]),
+  };
 }
 
 async function ensureStaffParticipant(account, current) {
@@ -102,8 +147,8 @@ async function ensureStaffParticipant(account, current) {
 }
 
 function cleanName(value) {
-  const text = String(value || '').trim();
-  if (!text || text.length > 80) throw httpError(400, 'Namnet behöver 1–80 tecken.');
+  const text = String(value || '').trim().replace(/\s+/g, ' ');
+  if (!text || text.length > 80 || !text.includes(' ')) throw httpError(400, 'Skriv förnamn och efternamn.');
   return text;
 }
 
@@ -111,46 +156,32 @@ router.post(
   '/gate',
   asyncRoute(async (req, res) => {
     const door = req.body.door === 'staff' ? 'staff' : 'player';
-    const email = String(req.body.email || '').trim().toLowerCase();
-    const password = String(req.body.password || '');
-    const gate = door === 'staff' ? env.staffGatePassword : env.playerGatePassword;
-    if (!email.includes('@')) throw httpError(401, 'Det stämmer inte.');
-
-    const { rows } = await query('SELECT * FROM accounts WHERE email = $1', [email]);
-    const account = rows[0];
-    if (!account) {
-      if (!sameSecret(password, gate)) throw httpError(401, 'Det stämmer inte.');
-      const settings = await getSettings();
-      if (!settings.registration_open) throw httpError(403, 'Stängt.');
-      return res.json({ needsProfile: true });
+    const name = personName(req.body);
+    const existing = await findByName(name, door);
+    if (existing) {
+      res.json(await sessionFor(existing));
+      return;
     }
-    if (!account.active) throw httpError(401, 'Det stämmer inte.');
-
+    const settings = await getSettings();
+    if (!settings.registration_open) throw httpError(403, 'Stängt.');
     if (door === 'player') {
-      if (account.role !== 'participant') throw httpError(401, 'Det stämmer inte.');
-      const ok = sameSecret(password, env.playerGatePassword) || await bcrypt.compare(password, account.password_hash);
-      if (!ok) throw httpError(401, 'Det stämmer inte.');
-    } else {
-      if (!['admin', 'doorman', 'gamemaster'].includes(account.role)) throw httpError(401, 'Det stämmer inte.');
-      let personal = false;
-      try {
-        personal = await bcrypt.compare(password, account.password_hash);
-      } catch {
-        personal = false;
-      }
-      const shared = (account.role === 'admin' || account.role === 'gamemaster') && sameSecret(password, env.staffGatePassword);
-      if (!personal && !shared) throw httpError(401, 'Det stämmer inte.');
-      if (account.role === 'admin' && shared && !personal) {
-        const passwordHash = await bcrypt.hash(env.staffGatePassword, 10);
-        await query('UPDATE accounts SET password_hash = $1 WHERE id = $2', [passwordHash, account.id]);
-      }
+      res.json({ needsProfile: true });
+      return;
     }
-
-    const participant = await query('SELECT * FROM participants WHERE account_id = $1', [account.id]);
-    res.json({
-      token: signToken(account),
-      user: publicAccount(account, participant.rows[0]),
-    });
+    const passwordHash = await bcrypt.hash(randomToken(), 10);
+    try {
+      const created = await query(
+        `INSERT INTO accounts (email, password_hash, role, display_name)
+         VALUES ($1, $2, 'gamemaster', $3) RETURNING *`,
+        [placeholderEmail(name, 'staff'), passwordHash, name]
+      );
+      res.status(201).json(await sessionFor(created.rows[0]));
+    } catch (error) {
+      if (error.code !== '23505') throw error;
+      const again = await findByName(name, door);
+      if (!again) throw error;
+      res.json(await sessionFor(again));
+    }
   })
 );
 
@@ -159,13 +190,10 @@ router.post(
   upload.single('photo'),
   asyncRoute(async (req, res) => {
     const door = req.body.door === 'staff' ? 'staff' : 'player';
-    const email = String(req.body.email || '').trim().toLowerCase();
-    const password = String(req.body.password || '');
-    const gate = door === 'staff' ? env.staffGatePassword : env.playerGatePassword;
-    const name = cleanName(req.body.name);
+    const name = personName(req.body);
     const alias = String(req.body.alias || '').trim();
     if (alias.length > 40) throw httpError(400, 'Aliaset får vara högst 40 tecken.');
-    if (!email.includes('@') || !sameSecret(password, gate)) throw httpError(401, 'Det stämmer inte.');
+    if (await findByName(name, door)) throw httpError(400, 'Det namnet finns redan. Logga in med samma namn.');
 
     const settings = await getSettings();
     if (!settings.registration_open) throw httpError(403, 'Stängt.');
@@ -177,9 +205,8 @@ router.post(
     try {
       if (req.file) photoPath = await saveImage(req.file, env.portraitDir, `${photoToken}.jpg`);
       const created = await withTransaction(async (client) => {
-        const existing = await client.query('SELECT id FROM accounts WHERE email = $1', [email]);
-        if (existing.rows[0]) throw httpError(400, 'Den e-postadressen finns redan.');
-        const passwordHash = await bcrypt.hash(gate, 10);
+        const passwordHash = await bcrypt.hash(randomToken(), 10);
+        const email = placeholderEmail(name, door);
         if (door === 'staff') {
           const account = await client.query(
             `INSERT INTO accounts (email, password_hash, role, display_name)
