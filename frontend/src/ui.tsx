@@ -90,7 +90,7 @@ export function Layout() {
           </button>
         </nav>
         ) : (
-          <NavLink to="/personal" className="personal-link">Inlogg personal</NavLink>
+          <NavLink to="/personal" className="personal-link">Byt till inlogg för personal</NavLink>
         )}
         {player && (
           <button

@@ -167,7 +167,7 @@ export default function Gate({ kind }: { kind: DoorKind }) {
           {needsProfile ? text.next : text.enter}
         </button>
         {kind === 'player' && !needsProfile && (
-          <Link className="btn" to="/personal">Inlogg personal</Link>
+          <Link className="btn" to="/personal">Byt till inlogg för personal</Link>
         )}
         {needsProfile && (
           <button
