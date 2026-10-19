@@ -95,7 +95,7 @@ describe('överlevnad', () => {
 });
 
 describe('förvandlingsmark', () => {
-  it('ger en prismark och stoppar vid två', () => {
+  it('ger en blodspeng och stoppar vid två', () => {
     expect(conversionCredit({
       newbieIsVampire: true, sireIsVampire: true, alreadyPaid: false, sireChips: 1,
     }).nextChips).toBe(2);

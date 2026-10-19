@@ -333,7 +333,7 @@ WHERE id = 1 AND rules_text LIKE '%utmaning om du har slut%';
 UPDATE games SET
   name = 'Själ-poker',
   summary = 'Vanlig poker med korten man hittat. Bäst hand vinner.',
-  rules = $sjal$Korten spelas som vanlig poker. Bäst hand vinner. Handen är spelarens fem bästa kort.
+  rules = $sjal$Korten spelas som vanlig poker. Bäst hand vinner. Handen är de 5 kort spelaren använder.
 
 Bäst är färgstege: fem kort i följd och i samma färg. Högst är ess, kung, dam, knekt och tia i samma färg.
 Sedan fyrtal: fyra kort av samma valör.
@@ -346,11 +346,9 @@ Sedan ett par: två kort av samma valör.
 Sist högt kort. Ess är högst, sedan kung, dam, knekt, tia och nedåt.
 Är händerna lika avgör det högsta kortet som skiljer dem. Är allt lika delas potten.
 
-Spelarna letar efter kort och bygger handen av dem. Alla kort som hittats och spelats lämnas till croupiern, som kan blanda in dem i leken.
+En spelare får hitta högst 6 kort och använder 5 av dem i spelet. Har man rört eller manipulerat ett kort på något sätt måste man ta det. Sedan lämnas korten till croupiern.
 
-Har en spelare inga kort får den fem kort av croupiern. Har den färre än fem kan den få nya kort.
-
-Det kostar 5 spelmarker att vara med. Sedan bettas det. Bäst hand vinner potten och får 1 prismark.$sjal$
+Det kostar 5 spelmarker att vara med. Sedan bettas det. Bäst hand vinner potten och får 1 blodspeng.$sjal$
 WHERE key = 'sjalpoker';
 
 UPDATE games SET
@@ -365,15 +363,15 @@ Kort 4: vilken färg kortet har, hjärter, ruter, spader eller klöver.
 
 Gästen bestämmer själv hur många spelmarker som satsas innan första kortet vänds. Fel gissning: insatsen går i potten och resan tar slut. Potten ligger kvar när någon missar.
 
-Tre rätt kort ger 1 prismark. Den behålls även om kort 4 blir fel. Alla fyra kort rätt ger 3 prismarker och potten i spelmarker.
+Tre rätt kort ger 1 blodspeng. Den behålls även om kort 4 blir fel. Alla fyra kort rätt ger 3 blodspengar och potten i spelmarker.
 
 De fyra gissningarna syns i början av den här filmen: https://www.youtube.com/watch?v=wt3NTJr5W2E
 Pyramiden och drycken efteråt spelar vi inte.$bus$
 WHERE key = 'ride-the-bus';
 
 UPDATE games SET
-  summary = 'Vinnaren tar spelmarkerna i potten och får 1 prismark.',
-  rules = 'Lilla blind är värd 1 spelmark och stora blind är värd 2 spelmarker. Spelmarkerna kan tas med till ett annat bord. Den som vinner handen tar spelmarkerna som satsats i potten och får 1 prismark. Den som är ensam kvar vinner också. Gäster får lämna bordet mellan händer.'
+  summary = 'Vinnaren tar spelmarkerna i potten och får 1 blodspeng.',
+  rules = 'Lilla blind är värd 1 spelmark och stora blind är värd 2 spelmarker. Spelmarkerna kan tas med till ett annat bord. Den som vinner handen tar spelmarkerna som satsats i potten och får 1 blodspeng. Den som är ensam kvar vinner också. Gäster får lämna bordet mellan händer.'
 WHERE key = 'holdem';
 
 UPDATE prizes
@@ -506,3 +504,35 @@ SET rules_text = replace(
   'Texas Hold''em: lilla blind är värd 1 spelmark och stora blind är värd 2. Den som vinner handen får spelmarkerna som satsats i potten och 1 prismark.'
 )
 WHERE id = 1 AND rules_text LIKE '%Texas Hold''em ger spelmarker till den som vinner handen.%';
+
+UPDATE event_settings
+SET rules_text = replace(rules_text, 'prismark', 'blodspeng')
+WHERE id = 1 AND rules_text LIKE '%prismark%';
+
+UPDATE event_settings
+SET rules_text = replace(rules_text, 'Prismark', 'Blodspeng')
+WHERE id = 1 AND rules_text LIKE '%Prismark%';
+
+UPDATE event_settings
+SET rules_text = replace(rules_text, 'blodspenger', 'blodspengar')
+WHERE id = 1 AND rules_text LIKE '%blodspenger%';
+
+UPDATE event_settings
+SET rules_text = replace(rules_text, 'Blodspenger', 'Blodspengar')
+WHERE id = 1 AND rules_text LIKE '%Blodspenger%';
+
+UPDATE event_settings
+SET rules_text = replace(
+  rules_text,
+  'Själ-poker ger 1 blodspeng till vinnaren.',
+  'Själ-poker: en spelare får hitta högst 6 kort och använder 5 av dem. Har man rört eller manipulerat ett kort på något sätt måste man ta det. Sedan lämnas korten till croupiern. Vinnaren får 1 blodspeng.'
+)
+WHERE id = 1
+  AND rules_text LIKE '%Själ-poker ger 1 blodspeng till vinnaren.%'
+  AND rules_text NOT LIKE '%högst 6 kort%';
+
+UPDATE games
+SET summary = replace(replace(summary, 'prismark', 'blodspeng'), 'blodspenger', 'blodspengar'),
+    rules = replace(replace(rules, 'prismark', 'blodspeng'), 'blodspenger', 'blodspengar')
+WHERE summary LIKE '%prismark%' OR rules LIKE '%prismark%'
+   OR summary LIKE '%blodspenger%' OR rules LIKE '%blodspenger%';

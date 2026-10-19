@@ -633,7 +633,7 @@ router.post(
     const cost = Number(req.body.cost);
     const stock = Number(req.body.stock);
     if (!name) throw httpError(400, 'Priset behöver ett namn.');
-    if (!Number.isInteger(cost) || cost < 2) throw httpError(400, 'Priset behöver kosta minst 2 prismarker.');
+    if (!Number.isInteger(cost) || cost < 2) throw httpError(400, 'Priset behöver kosta minst 2 blodspengar.');
     if (!Number.isInteger(stock) || stock < 0) throw httpError(400, 'Antalet behöver vara noll eller högre.');
     const { rows } = await query(
       `INSERT INTO prizes (name, description, cost, stock, sort_order)
@@ -652,7 +652,7 @@ router.patch(
     if (!prize) throw httpError(404, 'Priset finns inte.');
     const cost = req.body.cost === undefined ? prize.cost : Number(req.body.cost);
     const stock = req.body.stock === undefined ? prize.stock : Number(req.body.stock);
-    if (!Number.isInteger(cost) || cost < 2) throw httpError(400, 'Priset behöver kosta minst 2 prismarker.');
+    if (!Number.isInteger(cost) || cost < 2) throw httpError(400, 'Priset behöver kosta minst 2 blodspengar.');
     if (!Number.isInteger(stock) || stock < 0) throw httpError(400, 'Antalet behöver vara noll eller högre.');
     await query(
       `UPDATE prizes SET name = $2, description = $3, cost = $4, stock = $5, active = $6, sort_order = $7
@@ -705,7 +705,7 @@ router.post(
       if (!force && balances.prizeChips < cost) {
         throw httpError(
           400,
-          `Registrerade prismarker (${balances.prizeChips}) räcker inte till ${cost}. Kryssa i att utlämningen ändå ska sparas om de fysiska markerna stämmer.`
+          `Registrerade blodspengar (${balances.prizeChips}) räcker inte till ${cost}. Kryssa i att utlämningen ändå ska sparas om de fysiska markerna stämmer.`
         );
       }
       await client.query('UPDATE prizes SET stock = stock - $2 WHERE id = $1', [prizeId, quantity]);

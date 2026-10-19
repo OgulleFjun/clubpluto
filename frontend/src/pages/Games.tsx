@@ -4,7 +4,7 @@ import { LinkedText, Page, usePublicEvent } from '../ui';
 export default function Games() {
   const { event } = usePublicEvent();
   return (
-    <Page title="Spelen" lede="Tre bord. Markerna är riktiga. Spelledaren skriver upp prismarkerna.">
+    <Page title="Spelen" lede="Tre bord. Markerna är riktiga. Spelledaren skriver upp blodspengarna.">
       <div className="grid">
         {event?.games.map((game) => (
           <article className="card" key={game.key}>

@@ -2,7 +2,7 @@
 
 Hemsidan för det maskerade rollspelsevenemanget som Sala Analoga Spelförening och SUS arrangerar i Folkets hus källare, 1 november 2026 kl. 18.30.
 
-Den är klubbens medlemsregister: registrering via inbjudan, incheckning, identitets- och vampyrgissningar, spelledarnas prismarker och arrangörens kontrollpanel. Pokerhänder och fysiska markhögar registreras inte.
+Den är klubbens medlemsregister: registrering via inbjudan, incheckning, identitets- och vampyrgissningar, spelledarnas blodspengar och arrangörens kontrollpanel. Pokerhänder och fysiska markhögar registreras inte.
 
 - **Frontend**: React, Vite, TypeScript (`frontend/`)
 - **Backend**: Node.js, Express, PostgreSQL (`backend/`)
@@ -15,7 +15,7 @@ Den är klubbens medlemsregister: registrering via inbjudan, incheckning, identi
 | Besökare | Läsa om kvällen och registrera sig med en giltig inbjudan |
 | Deltagare | Profil, gissningar, egna poäng efter avslöjandet, två gästinbjudningar om rätten är på |
 | Dörrvakt | Söka, kontrollera entrélösenord, checka in, registrera i dörren. Ser inte vampyrlistan eller facit |
-| Spelledare | Se incheckade namn och registrera prismarker för sina spel. Ser inte porträttgalleriet, vampyrer eller facit |
+| Spelledare | Se incheckade namn och registrera blodspengar för sina spel. Ser inte porträttgalleriet, vampyrer eller facit |
 | Administratör | Allt, inklusive Den Förste, förvandlingar, poäng och prisutlämning |
 
 E-post och lösenord används för att logga in. Specifikationen nämner inte inloggning, men varje deltagare behöver ett eget konto.
@@ -61,4 +61,4 @@ API: http://localhost:3010
 
 ### Sådant som kan ändras utan kod
 
-Klubbnamn, tid, plats, regler, entrélösenord, om registrering och mysterium är öppna, om Den Förste får startbonus, speltexter, prisnivåer från 2 prismarker och hur lika poäng avgörs. Allt det ligger i kontrollpanelen.
+Klubbnamn, tid, plats, regler, entrélösenord, om registrering och mysterium är öppna, om Den Förste får startbonus, speltexter, prisnivåer från 2 blodspengar och hur lika poäng avgörs. Allt det ligger i kontrollpanelen.

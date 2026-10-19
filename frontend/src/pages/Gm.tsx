@@ -61,7 +61,7 @@ function GmInner() {
           note: form.get('note'),
         }),
       }, token);
-      setMessage('Prismarkerna är registrerade.');
+      setMessage('Blodspengarna är registrerade.');
       await loadHome();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Registreringen misslyckades.');
@@ -74,7 +74,7 @@ function GmInner() {
   }
 
   return (
-    <Page title="Spelledare" lede="Skriv upp prismarker. Spelmarkerna i potten stannar på bordet.">
+    <Page title="Spelledare" lede="Skriv upp blodspengar. Spelmarkerna i potten stannar på bordet.">
       {games.length === 0 && <p>Du har inget spel tilldelat ännu. Be administratören koppla ditt konto.</p>}
       <div className="grid">
         {games.map((game) => (
@@ -94,14 +94,14 @@ function GmInner() {
         {people.map((person) => (
           <article className="card" key={person.id}>
             <h2>{person.name}</h2>
-            <p className="meta">{person.checkedInAt ? 'Incheckad' : 'Inte incheckad'} · {person.prizeChips} registrerade prismarker · {person.doorCode}</p>
+            <p className="meta">{person.checkedInAt ? 'Incheckad' : 'Inte incheckad'} · {person.prizeChips} registrerade blodspengar · {person.doorCode}</p>
             <form onSubmit={onSubmit((event) => record(event, person.id))}>
               <Field label="Spel">
                 <select name="gameKey" required>
                   {games.map((game) => <option key={game.key} value={game.key}>{game.name}</option>)}
                 </select>
               </Field>
-              <Field label="Prismarker"><input name="prizeChips" type="number" min={0} max={50} defaultValue={1} required /></Field>
+              <Field label="Blodspengar"><input name="prizeChips" type="number" min={0} max={50} defaultValue={1} required /></Field>
               <Field label="Anteckning"><input name="note" /></Field>
               <button className="btn small" type="submit">Registrera</button>
             </form>
@@ -112,7 +112,7 @@ function GmInner() {
       <div className="list">
         {results.map((result) => (
           <article className="card" key={result.id}>
-            <strong>{result.participant_name}</strong> · {result.game_name} · {result.prize_chips} prismarker
+            <strong>{result.participant_name}</strong> · {result.game_name} · {result.prize_chips} blodspengar
             {result.voided ? ' · makulerad' : ''}
             <p className="meta">{result.note}</p>
             {!result.voided && <button className="btn small danger" type="button" onClick={() => voidResult(result.id)}>Makulera</button>}

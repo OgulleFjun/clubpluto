@@ -88,10 +88,10 @@ function VampireDesk({ token }: { token: string | null }) {
         method: 'POST',
         body: JSON.stringify({ newbieId: desk.newbie.id, sireId: picked }),
       }, token);
-      setMessage(`${result.sireName} har nu ${result.conversionChips} prismarker från förvandlingar.`);
+      setMessage(`${result.sireName} har nu ${result.conversionChips} blodspengar från förvandlingar.`);
       await load();
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Vinstmarken gavs inte.');
+      setError(reason instanceof Error ? reason.message : 'Blodspengen gavs inte.');
     } finally {
       setBusy(false);
     }
@@ -117,20 +117,20 @@ function VampireDesk({ token }: { token: string | null }) {
             >
               {person.imageToken ? <Portrait token={person.imageToken} alt={person.name} /> : <div className="portrait empty" />}
               <span>{person.name}</span>
-              <small>{person.conversionChips} / 2 prismarker</small>
+              <small>{person.conversionChips} / 2 blodspengar</small>
             </button>
           ))}
         </div>
         {desk.pictures.length === 0 && <p className="meta">Det finns inga tidigare vampyrer att peka på ännu.</p>}
         <button className="btn" type="button" disabled={!desk.newbie || !picked || busy} onClick={pay}>
-          Ge den gamla vampyren en prismark
+          Ge den gamla vampyren en blodspeng
         </button>
         {message && <p className="ok">{message}</p>}
         <ErrorText>{error}</ErrorText>
       </article>
       {desk.vampires.length > 0 && (
         <article className="card">
-          <h2>Prismarker från förvandling</h2>
+          <h2>Blodspengar från förvandling</h2>
           {desk.vampires.map((person) => (
             <p key={person.id}>{person.name}{person.isFirst ? ', Den Förste' : ''}: {person.conversionChips} av 2</p>
           ))}
@@ -237,6 +237,14 @@ function Detail() {
       )}
       {tab === 'vampyr' && post.key === 'manager' && (mine || user?.role === 'admin') && (
         <VampireDesk token={token} />
+      )}
+      {tab === 'uppgift' && post.shopping && (
+        <>
+          <h2>Inköpslista</h2>
+          <ul>
+            {post.shopping.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </>
       )}
       {tab === 'marker' && <MarkerGuide />}
       {tab === 'poang' && (

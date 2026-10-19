@@ -48,7 +48,7 @@ function ClubInner() {
         <p className="member-code">Dörrkod <strong>{person.doorCode}</strong></p>
         <p>{person.checkedIn ? 'Du är incheckad.' : 'Du är inte incheckad ännu.'}</p>
         <p>{person.baseChipsIssued ? 'Spelmarkerna är utlämnade.' : 'Spelmarkerna lämnas ut hos Managern.'}</p>
-        <p>De kan tas med mellan borden. Prismarker kan ges bort. Bara barn och ungdomar kan vinna priser hos Prize Master.</p>
+        <p>De kan tas med mellan borden. Blodspengar kan ges bort. Bara barn och ungdomar kan vinna priser hos Prize Master.</p>
         {person.isVampire && <p>Du är vampyr. Det syns inte för de andra.</p>}
         <p className="meta">
           {data.counts.identityGuesses} matchningar · {data.counts.vampireGuesses} vampyrgissningar

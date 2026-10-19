@@ -8,6 +8,7 @@ export interface StaffPostCopy {
   kväll: string[];
   uppgift: string[];
   spel: string[];
+  shopping?: string[];
   video?: { href: string; label: string; note: string };
 }
 
@@ -19,8 +20,8 @@ export const whenWhere = {
 
 export const vampireRules = [
   'En slumpad gäst är Den Förste och börjar med två röda kort.',
-  'Den Förste kan erbjuda ett rött kort till en annan gäst. Den som tackar ja går till Banken, blir registrerad som vampyr och får 20 spelmarker och 1 prismark. Det går bara en gång per person.',
-  'Den som får någon annan att bli vampyr får själv 1 prismark. Det går att tjäna högst två, en för varje person man förvandlar.',
+  'Den Förste kan erbjuda ett rött kort till en annan gäst. Den som tackar ja går till Banken, blir registrerad som vampyr och får 20 spelmarker och 1 blodspeng. Det går bara en gång per person.',
+  'Den som får någon annan att bli vampyr får själv 1 blodspeng. Det går att tjäna högst två, en för varje person man förvandlar.',
   'Kortet kan sedan förvandla ytterligare en person. Det finns bara två kort, men vampyrerna kan bli fler.',
   'Säg inte högt vem som blev vampyr. Ingen offentlig notis går ut.',
   'På hemsidan gissar gästerna vilka som är vampyrer, och vilket namn som hör till vilket porträtt. Rätt ger +1 poäng, fel ger −1 poäng, tomt ger 0 poäng. Det är poäng, inte marker. Poängen avgör vem som kan vinna överlevnadspriset.',
@@ -36,28 +37,29 @@ export const markerGuide = [
       'De kan tas med mellan borden.',
       'De kan inte köpa priser.',
       'Texas Hold’em: lilla blind är värd 1 spelmark och stora blind är värd 2. Den som vinner handen tar spelmarkerna som satsats i potten.',
-      'Själ-poker kostar 5 spelmarker att vara med. I Ride the Bus bestämmer gästen själv insatsen. Fel gissning lägger insatsen i potten.',
-      'Den som har slut får 50 nya spelmarker genom att dansa framför Prize Master, eller byter 1 prismark mot 100 spelmarker.',
+      'Själ-poker kostar 5 spelmarker att vara med. En spelare får hitta högst 6 kort och använder 5 av dem. Ett kort man rört eller manipulerat måste tas, och sedan lämnas korten till croupiern.',
+      'I Ride the Bus bestämmer gästen själv insatsen. Fel gissning lägger insatsen i potten.',
+      'Den som har slut får 50 nya spelmarker genom att dansa framför Prize Master, eller byter 1 blodspeng mot 100 spelmarker.',
     ],
   },
   {
     kind: 'pris' as const,
-    title: 'Prismarker',
+    title: 'Blodspengar',
     lines: [
-      'Bara prismarker köper priser hos Prize Master, och bara barn och ungdomar kan vinna dem.',
-      'Prismarker kan ges bort om man vill.',
-      'Texas Hold’em ger 1 prismark till den som vinner handen, utöver spelmarkerna i potten.',
-      'Själ-poker ger 1 prismark till vinnaren.',
-      'Ride the Bus ger 1 prismark efter tre rätt kort, och 3 prismarker om alla fyra blir rätt.',
-      'En ny vampyr får 1 prismark. Den som förvandlar någon annan får 1 prismark, högst två.',
-      'Nivåerna kostar 2, 4, 6, 9 och 12 prismarker.',
+      'Bara blodspengar köper priser hos Prize Master, och bara barn och ungdomar kan vinna dem.',
+      'Blodspengar kan ges bort om man vill.',
+      'Texas Hold’em ger 1 blodspeng till den som vinner handen, utöver spelmarkerna i potten.',
+      'Själ-poker ger 1 blodspeng till vinnaren.',
+      'Ride the Bus ger 1 blodspeng efter tre rätt kort, och 3 blodspengar om alla fyra blir rätt.',
+      'En ny vampyr får 1 blodspeng. Den som förvandlar någon annan får 1 blodspeng, högst två.',
+      'Nivåerna kostar 2, 4, 6, 9 och 12 blodspengar.',
     ],
   },
 ];
 
 export const prizeRules = [
-  'Priser hos Prize Master köps bara med prismarker, och bara barn och ungdomar kan vinna dem. Prismarker kan ges bort. Skillnaden mot spelmarker står under Marker.',
-  'Fem nivåer: 2, 4, 6, 9 och 12 prismarker. Prize Master tar emot prismarkerna och lämnar ut priset. Skriv upp namn, nivå och antal.',
+  'Priser hos Prize Master köps bara med blodspengar, och bara barn och ungdomar kan vinna dem. Blodspengar kan ges bort. Skillnaden mot spelmarker står under Marker.',
+  'Fem nivåer: 2, 4, 6, 9 och 12 blodspengar. Prize Master tar emot blodspengarna och lämnar ut priset. Skriv upp namn, nivå och antal.',
   'Överlevnadspriset delas ut klockan 20:30 till den som fortfarande är människa och har högst poäng på gissningarna. Poängen är inte marker, och priset lämnas inte ut vid disken innan dess.',
 ];
 
@@ -92,10 +94,15 @@ export const staffPosts: StaffPostCopy[] = [
       'Kontrollera att de tre croupiererna har varsitt bord.',
       '18:30: ta emot gästerna som Bouncern skickar ner. Pricka av registreringen, ta en bild i förklädnad och lägg den i mysteriet. Ge spelmarker till ett värde av 100.',
       'Poängen för vem som är vem och för vampyrgissningarna syns under fliken Poäng.',
-      'Under Vampyr visar du bilder på de två senaste vampyrerna. Den nya pekar på vem som förvandlade den. Knappen ger den gamla vampyren en prismark, högst två.',
+      'Under Vampyr visar du bilder på de två senaste vampyrerna. Den nya pekar på vem som förvandlade den. Knappen ger den gamla vampyren en blodspeng, högst två.',
       'Skicka gästen vidare till borden. Du ger inga marker vid ytterdörren.',
       'Du är den de andra frågar när ett bord står stilla eller någon vill ta av sig masken. Croupieren bestämmer vid sitt eget bord.',
       'Vid slutet stämmer du av med Prize Master.',
+    ],
+    shopping: [
+      '6 kortlekar.',
+      'Ljusstavar.',
+      'Blodsmarker.',
     ],
     spel: [
       'Du har inget eget bord. Du kan borden tillräckligt för att hjälpa en croupier som kör fast.',
@@ -113,12 +120,12 @@ export const staffPosts: StaffPostCopy[] = [
       '17:00: var på plats och duka bordet. Kortlek, marker och en plats där kön kan stå.',
       '18:30: var vid bordet. Förklara spelet som det står under Ditt spel. Du spelar inte med och du säger inte hur en gäst ska satsa.',
       'Håll givarna korta, så att nya gäster hinner sätta sig mellan händerna.',
-      'Vinnaren får spelmarkerna i potten och 1 prismark. Skriv upp prismarken.',
+      'Vinnaren får spelmarkerna i potten och 1 blodspeng. Skriv upp blodspengen.',
       'Blir det osämja: korten ligger kvar och du säger vad som gäller. Hämta Managern om det inte räcker.',
     ],
     spel: [
       'Varje spelare får två dolda kort. På bordet läggs gemensamma kort, först tre, sedan ett, sedan ett.',
-      'Lilla blind är värd 1 spelmark. Stora blind är värd 2 spelmarker. Spelarna satsar spelmarker mellan korten. Den som vinner handen tar spelmarkerna i potten och får 1 prismark. Den som är ensam kvar vinner också.',
+      'Lilla blind är värd 1 spelmark. Stora blind är värd 2 spelmarker. Spelarna satsar spelmarker mellan korten. Den som vinner handen tar spelmarkerna i potten och får 1 blodspeng. Den som är ensam kvar vinner också.',
       'Gäster får lämna bordet mellan händer och komma tillbaka senare.',
     ],
   },
@@ -133,14 +140,14 @@ export const staffPosts: StaffPostCopy[] = [
       '17:00: var på plats. Då bestäms var korten göms, hur lång tid en omgång tar och hur banan ställs tillbaka.',
       'Gör i ordning gömställena innan klockan 18:30.',
       'Förklara att korten spelas som vanlig poker och att bäst hand vinner. Händerna står under Ditt spel. Du spelar inte med.',
-      'Ta emot korten som hittats och spelats, och blanda in dem i leken. Den som saknar kort får fem. Den som har färre än fem kan få nya av dig.',
-      'Det kostar 5 spelmarker att vara med. Efter bettningen vinner bäst hand. Skriv upp 1 prismark och ta nästa.',
+      'En spelare får hitta högst 6 kort och använder 5 av dem i spelet. Har man rört eller manipulerat ett kort på något sätt måste man ta det. Sedan lämnas korten till dig.',
+      'Det kostar 5 spelmarker att vara med. Efter bettningen vinner bäst hand. Skriv upp 1 blodspeng och ta nästa.',
       'Håll tempot. En omgång som drar ut stoppar kön till de andra borden.',
       'Är reglerna inte låsta efter genomgången: spela inte skarpt förrän Managern sagt ja.',
     ],
     spel: [
       'Korten spelas som vanlig poker. Bäst hand vinner.',
-      'Handen är spelarens fem bästa kort. Har spelaren fler än fem räknas de fem som ger bäst hand.',
+      'Handen är de 5 kort spelaren använder.',
       'Bäst är färgstege: fem kort i följd och i samma färg. Högst är ess, kung, dam, knekt och tia i samma färg.',
       'Sedan fyrtal: fyra kort av samma valör.',
       'Sedan kåk: tre av en valör och två av en annan.',
@@ -151,10 +158,10 @@ export const staffPosts: StaffPostCopy[] = [
       'Sedan ett par: två kort av samma valör.',
       'Sist högt kort. Ess är högst, sedan kung, dam, knekt, tia och nedåt.',
       'Är händerna lika avgör det högsta kortet som skiljer dem. Är allt lika delas potten.',
-      'Spelarna letar efter kort och bygger handen av dem.',
-      'Alla kort som hittats och spelats lämnas till dig. Du kan blanda in dem i leken.',
-      'Har en spelare inga kort får den fem kort av dig. Har den färre än fem kan den få nya kort av dig.',
-      'Det kostar 5 spelmarker att vara med. Sedan bettas det. Bäst hand vinner potten och får 1 prismark.',
+      'En spelare får hitta högst 6 kort och använder 5 av dem i spelet.',
+      'Har man rört eller manipulerat ett kort på något sätt måste man ta det.',
+      'Sedan lämnas korten till croupiern.',
+      'Det kostar 5 spelmarker att vara med. Sedan bettas det. Bäst hand vinner potten och får 1 blodspeng.',
     ],
   },
   {
@@ -168,7 +175,7 @@ export const staffPosts: StaffPostCopy[] = [
       '17:00: var på plats. Lägg fram en kortlek och en pott.',
       'Förklara korten som de står under Ditt spel, innan första kortet vänds. Du spelar inte själv. Gästen väljer själv hur många spelmarker som satsas.',
       'En gäst i taget. Vänd kortet först när gästen har gissat.',
-      'Skriv upp prismarken innan nästa gäst sätter sig: 1 efter tre rätt kort, 3 om alla fyra blir rätt. Blanda och lägg en ny rad. Potten ligger kvar när någon missar.',
+      'Skriv upp blodspengen innan nästa gäst sätter sig: 1 efter tre rätt kort, 3 om alla fyra blir rätt. Blanda och lägg en ny rad. Potten ligger kvar när någon missar.',
     ],
     spel: [
       'Fyra kort på rad, baksidan upp. En gäst gissar på ett kort i taget.',
@@ -177,13 +184,13 @@ export const staffPosts: StaffPostCopy[] = [
       'Kort 3: innanför eller utanför de två kort som redan ligger. Innanför betyder mellan deras valörer. Utanför betyder högre än båda eller lägre än båda. Lika valör som något av dem räknas som fel.',
       'Kort 4: vilken färg kortet har, hjärter, ruter, spader eller klöver.',
       'Gästen bestämmer själv hur många spelmarker som satsas innan första kortet vänds. Fel gissning: insatsen går i potten och resan tar slut. Potten ligger kvar till nästa gäst.',
-      'Tre rätt kort ger 1 prismark. Den behålls även om kort 4 blir fel.',
-      'Alla fyra kort rätt ger 3 prismarker och potten i spelmarker.',
+      'Tre rätt kort ger 1 blodspeng. Den behålls även om kort 4 blir fel.',
+      'Alla fyra kort rätt ger 3 blodspengar och potten i spelmarker.',
     ],
     video: {
       href: 'https://www.youtube.com/watch?v=wt3NTJr5W2E',
       label: 'Se de fyra gissningarna',
-      note: 'Filmen visar rött eller svart, högre eller lägre, innanför eller utanför, och färg. Pyramiden och drycken efteråt spelar vi inte. Hos oss är det spelmarker och prismarker.',
+      note: 'Filmen visar rött eller svart, högre eller lägre, innanför eller utanför, och färg. Pyramiden och drycken efteråt spelar vi inte. Hos oss är det spelmarker och blodspengar.',
     },
   },
   {
@@ -197,8 +204,8 @@ export const staffPosts: StaffPostCopy[] = [
       'Om du redan är vald: var med på genomgången klockan 17:00.',
       'Ställ i ordning Banken före 18:30. Priser, skylt och en plats för röda kort.',
       'Du tar inte emot gäster vid ytterdörren och du ger inte ut spelmarkerna.',
-      'Den som dansar framför dig och har slut på spelmarker får 50 nya. En prismark kan bytas mot 100 spelmarker.',
-      'Bara barn och ungdomar kan vinna priser hos dig. En gäst får ge bort sina prismarker.',
+      'Den som dansar framför dig och har slut på spelmarker får 50 nya. En blodspeng kan bytas mot 100 spelmarker.',
+      'Bara barn och ungdomar kan vinna priser hos dig. En gäst får ge bort sina blodspengar.',
       'Du kan få ta hand om en liten bar.',
       'Rött kort: följ fliken Vampyr.',
       'Inlösen av priser: följ fliken Priser.',

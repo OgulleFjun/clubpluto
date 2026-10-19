@@ -86,7 +86,7 @@ router.post(
     const prizeChips = Number(req.body.prizeChips);
     const note = String(req.body.note || '').trim().slice(0, 300);
     if (!Number.isInteger(prizeChips) || prizeChips < 0 || prizeChips > 50) {
-      throw httpError(400, 'Ange prismarker som ett heltal mellan 0 och 50.');
+      throw httpError(400, 'Ange blodspengar som ett heltal mellan 0 och 50.');
     }
     const person = await query('SELECT id FROM participants WHERE id = $1', [participantId]);
     if (!person.rows[0]) throw httpError(404, 'Deltagaren finns inte.');
@@ -113,7 +113,7 @@ router.patch(
     }
     const prizeChips = req.body.prizeChips === undefined ? row.prize_chips : Number(req.body.prizeChips);
     if (!Number.isInteger(prizeChips) || prizeChips < 0 || prizeChips > 50) {
-      throw httpError(400, 'Ange prismarker som ett heltal mellan 0 och 50.');
+      throw httpError(400, 'Ange blodspengar som ett heltal mellan 0 och 50.');
     }
     const note = req.body.note === undefined ? row.note : String(req.body.note || '').trim().slice(0, 300);
     const voided = req.body.voided === undefined ? row.voided : Boolean(req.body.voided);

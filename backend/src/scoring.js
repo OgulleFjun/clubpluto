@@ -106,12 +106,12 @@ export function annotateWinners(rows, tieBreak) {
   }));
 }
 
-/** Prismark till den som förvandlat någon. Högst två per vampyr. */
+/** Blodspeng till den som förvandlat någon. Högst två per vampyr. */
 export function conversionCredit({ newbieIsVampire, sireIsVampire, alreadyPaid, sireChips }) {
   if (!newbieIsVampire) return { ok: false, message: 'Personen är inte registrerad som vampyr.' };
   if (!sireIsVampire) return { ok: false, message: 'Den utpekade är inte vampyr.' };
-  if (alreadyPaid) return { ok: false, message: 'Den här förvandlingen har redan gett en prismark.' };
-  if (sireChips >= 2) return { ok: false, message: 'Den vampyren har redan två prismarker från förvandlingar.' };
+  if (alreadyPaid) return { ok: false, message: 'Den här förvandlingen har redan gett en blodspeng.' };
+  if (sireChips >= 2) return { ok: false, message: 'Den vampyren har redan två blodspengar från förvandlingar.' };
   return { ok: true, nextChips: sireChips + 1 };
 }
 

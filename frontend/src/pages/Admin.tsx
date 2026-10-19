@@ -202,7 +202,7 @@ function People() {
             <strong>{person.name}</strong>
             <div className="meta">
               {person.membership === 'staff' ? 'Personal' : 'Medlem'} · {person.checkedInAt ? 'Inne' : 'Ute'} · {person.isVampire ? 'vampyr' : 'människa'}
-              {person.isVampire ? ` · ${person.conversionChips} prismarker från förvandling` : ''}
+              {person.isVampire ? ` · ${person.conversionChips} blodspengar från förvandling` : ''}
             </div>
           </button>
         ))}
@@ -233,8 +233,8 @@ function People() {
           {(selected.costumeToken || selected.photoToken) && (
             <Portrait token={selected.costumeToken || selected.photoToken || ''} alt={selected.name} />
           )}
-          <p className="meta">Dörrkod {selected.doorCode}. Inbjuden av {selected.invitedBy || 'arrangören'}. Spelmarker {selected.baseChips}, prismarker {selected.prizeChips}.</p>
-          <p>{selected.isVampire ? `Vampyr${selected.isFirst ? ', Den Förste' : ''}. ${selected.conversionChips} av 2 prismarker från förvandlingar.${selected.turnedBy ? ` Förvandlad av ${selected.turnedBy}.` : ''}` : 'Människa.'}</p>
+          <p className="meta">Dörrkod {selected.doorCode}. Inbjuden av {selected.invitedBy || 'arrangören'}. Spelmarker {selected.baseChips}, blodspengar {selected.prizeChips}.</p>
+          <p>{selected.isVampire ? `Vampyr${selected.isFirst ? ', Den Förste' : ''}. ${selected.conversionChips} av 2 blodspengar från förvandlingar.${selected.turnedBy ? ` Förvandlad av ${selected.turnedBy}.` : ''}` : 'Människa.'}</p>
           <div className="actions">
             {selected.isVampire ? (
               <button className="btn small ghost" type="button" onClick={async () => {
@@ -284,7 +284,7 @@ function People() {
           {view.message && <p className="ok">{view.message}</p>}
         </form>
         <div className="card">
-          <h3>Rätta spelmarker och prismarker</h3>
+          <h3>Rätta spelmarker och blodspengar</h3>
           <Adjust personId={selected.id} />
           <button className="btn danger" type="button" onClick={async () => {
             const kind = selected.membership === 'staff' ? 'personalen' : 'medlemmen';
@@ -323,7 +323,7 @@ function Adjust({ personId }: { personId: string }) {
       }
     })}>
       <Field label="Spelmarker, plus eller minus"><input name="baseDelta" type="number" defaultValue={0} /></Field>
-      <Field label="Prismarker, plus eller minus"><input name="prizeDelta" type="number" defaultValue={0} /></Field>
+      <Field label="Blodspengar, plus eller minus"><input name="prizeDelta" type="number" defaultValue={0} /></Field>
       <Field label="Varför"><input name="reason" required /></Field>
       <button className="btn small ghost" type="submit">Rätta</button>
       <ErrorText>{error}</ErrorText>
@@ -560,7 +560,7 @@ function PrizesAdmin() {
         <h2>Nytt pris</h2>
         <Field label="Namn"><input name="name" required /></Field>
         <Field label="Beskrivning"><textarea name="description" /></Field>
-        <Field label="Prismarker, minst 2"><input name="cost" type="number" min={2} defaultValue={2} /></Field>
+        <Field label="Blodspengar, minst 2"><input name="cost" type="number" min={2} defaultValue={2} /></Field>
         <Field label="Antal"><input name="stock" type="number" min={0} defaultValue={1} /></Field>
         <button className="btn" type="submit">Lägg till</button>
       </form>
@@ -625,7 +625,7 @@ function PrizesAdmin() {
           <select name="participantId">{people.data.participants.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select>
         </Field>
         <Field label="Antal"><input name="quantity" type="number" min={1} defaultValue={1} /></Field>
-        <label className="meta"><input type="checkbox" name="force" /> Spara även om de registrerade prismarkerna inte räcker</label>
+        <label className="meta"><input type="checkbox" name="force" /> Spara även om de registrerade blodspengarna inte räcker</label>
         <button className="btn" type="submit">Registrera utlämning</button>
         <ErrorText>{view.error}</ErrorText>
       </form>
@@ -763,7 +763,7 @@ function Settings() {
       <label className="meta"><input type="checkbox" name="identityOpen" defaultChecked={s.identityOpen} /> Mysteriet och gissningarna öppna</label>
       <label className="meta"><input type="checkbox" name="vampireConversionsOpen" defaultChecked={s.vampireConversionsOpen} /> Banken tar emot förvandlingar</label>
       <label className="meta"><input type="checkbox" name="useAliases" defaultChecked={s.useAliases} /> Alias visas på den egna sidan</label>
-      <label className="meta"><input type="checkbox" name="firstVampireGetsBonus" defaultChecked={s.firstVampireGetsBonus} /> Den Förste får 20 spelmarker och 1 prismark direkt</label>
+      <label className="meta"><input type="checkbox" name="firstVampireGetsBonus" defaultChecked={s.firstVampireGetsBonus} /> Den Förste får 20 spelmarker och 1 blodspeng direkt</label>
       <Field label="Lika poäng">
         <select name="tieBreak" defaultValue={s.tieBreak}>
           <option value="shared">Dela priset</option>
