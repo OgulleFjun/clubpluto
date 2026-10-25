@@ -19,13 +19,14 @@ export const whenWhere = {
 };
 
 export const vampireRules = [
-  'En slumpad gäst är Den Förste och börjar med två röda kort.',
-  'Den Förste kan erbjuda ett rött kort till en annan gäst. Den som tackar ja går till Banken, blir registrerad som vampyr och får 20 spelmarker och 1 blodspeng. Det går bara en gång per person.',
-  'Den som får någon annan att bli vampyr får själv 1 blodspeng. Det går att tjäna högst två, en för varje person man förvandlar.',
-  'Kortet kan sedan förvandla ytterligare en person. Det finns bara två kort, men vampyrerna kan bli fler.',
-  'Säg inte högt vem som blev vampyr. Ingen offentlig notis går ut.',
-  'På hemsidan gissar gästerna vilka som är vampyrer, och vilket namn som hör till vilket porträtt. Rätt ger +1 poäng, fel ger −1 poäng, tomt ger 0 poäng. Det är poäng, inte marker. Poängen avgör vem som kan vinna överlevnadspriset.',
-  'Vampyrer kan inte vinna överlevnadspriset, även om de har flest poäng. Klockan 20:30 går priset till den som fortfarande är människa och har högst poäng på gissningarna.',
+  'En spelare börjar som vampyr. Den kallas Den Förste och har två vampyrkort.',
+  'En vampyr kan ge ett vampyrkort till en annan gäst. Den som får kortet väljer själv. Ingen kan tvingas att bli vampyr.',
+  'Den som tar emot kortet blir vampyr och anmäler sig i Banken. Den som blir vampyr får 1 blodspeng och 20 spelmarker. Man kan bara bli vampyr en gång.',
+  'Den som gör någon annan till vampyr får 1 blodspeng. Det går att få högst 2 blodspengar på det sättet.',
+  'Den nya vampyren tar över kortet och kan ge det vidare. Det finns bara två kort, men vampyrerna kan bli fler.',
+  'Säg inte högt vem som blev vampyr. Ingen notis går ut.',
+  'I Mysteriet gissar gästerna vem som är vem och vilka som är vampyrer. Rätt ger +1 poäng, fel ger −1 poäng och en bild utan gissning ger 0. Poäng är inte marker.',
+  'Bara den som fortfarande är människa kan vinna överlevnadspriset. Klockan 20:30 går det till den människa som har flest poäng, även om en vampyr har fler.',
 ];
 
 export const markerGuide = [
@@ -51,7 +52,7 @@ export const markerGuide = [
       'Texas Hold’em ger 1 blodspeng till den som vinner handen, utöver spelmarkerna i potten.',
       'Själ-poker ger 1 blodspeng till vinnaren.',
       'Ride the Bus ger 1 blodspeng efter tre rätt kort, och 3 blodspengar om alla fyra blir rätt.',
-      'En ny vampyr får 1 blodspeng. Den som förvandlar någon annan får 1 blodspeng, högst två.',
+      'Den som blir vampyr får 1 blodspeng. Den som gör någon annan till vampyr får 1 blodspeng, högst 2.',
       'Nivåerna kostar 2, 4, 6, 9 och 12 blodspengar.',
     ],
   },
@@ -60,7 +61,7 @@ export const markerGuide = [
 export const prizeRules = [
   'Priser hos Prize Master köps bara med blodspengar, och bara barn och ungdomar kan vinna dem. Blodspengar kan ges bort. Skillnaden mot spelmarker står under Marker.',
   'Fem nivåer: 2, 4, 6, 9 och 12 blodspengar. Prize Master tar emot blodspengarna och lämnar ut priset. Skriv upp namn, nivå och antal.',
-  'Överlevnadspriset delas ut klockan 20:30 till den som fortfarande är människa och har högst poäng på gissningarna. Poängen är inte marker, och priset lämnas inte ut vid disken innan dess.',
+  'Överlevnadspriset delas ut klockan 20:30 till den människa som har flest poäng från Mysteriet. Vampyrer kan inte vinna det. Poäng är inte marker, och priset lämnas inte ut vid disken innan dess.',
 ];
 
 export function welcomeCopy() {
@@ -202,12 +203,12 @@ export const staffPosts: StaffPostCopy[] = [
     kväll: evening,
     uppgift: [
       'Om du redan är vald: var med på genomgången klockan 17:00.',
-      'Ställ i ordning Banken före 18:30. Priser, skylt och en plats för röda kort.',
+      'Ställ i ordning Banken före 18:30. Priser, skylt och en plats där nya vampyrer anmäler sig.',
       'Du tar inte emot gäster vid ytterdörren och du ger inte ut spelmarkerna.',
       'Den som dansar framför dig och har slut på spelmarker får 50 nya. En blodspeng kan bytas mot 100 spelmarker.',
       'Bara barn och ungdomar kan vinna priser hos dig. En gäst får ge bort sina blodspengar.',
       'Du kan få ta hand om en liten bar.',
-      'Rött kort: följ fliken Vampyr.',
+      'Vampyrkort: följ fliken Vampyr.',
       'Inlösen av priser: följ fliken Priser.',
     ],
     spel: [
