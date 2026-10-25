@@ -73,6 +73,8 @@ ALTER TABLE participants ADD COLUMN IF NOT EXISTS costume_token text;
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS costume_at timestamptz;
 CREATE UNIQUE INDEX IF NOT EXISTS participants_costume_token_idx ON participants (costume_token) WHERE costume_token IS NOT NULL;
 
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS costume_upload_open boolean NOT NULL DEFAULT false;
+
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS conversion_chips integer NOT NULL DEFAULT 0;
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS sire_paid boolean NOT NULL DEFAULT false;
 

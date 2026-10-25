@@ -140,6 +140,52 @@ function VampireDesk({ token }: { token: string | null }) {
   );
 }
 
+function CostumeDesk({ token }: { token: string | null }) {
+  const [desk, setDesk] = useState<{ open: boolean; closed: boolean; guests: number; withCostume: number } | null>(null);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    api<NonNullable<typeof desk>>('/posts/manager/costumes', {}, token)
+      .then(setDesk)
+      .catch((reason: Error) => setError(reason.message));
+  }, [token]);
+
+  async function toggle() {
+    if (!desk) return;
+    setBusy(true);
+    setError('');
+    try {
+      setDesk(await api<NonNullable<typeof desk>>('/posts/manager/costumes', {
+        method: 'POST',
+        body: JSON.stringify({ open: !desk.open }),
+      }, token));
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Det gick inte att ändra.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!desk) return <p>{error || 'Hämtar registreringen…'}</p>;
+  return (
+    <article className="card" style={{ marginBottom: '1rem' }}>
+      <h2>Bilder i utklädnad</h2>
+      <p>
+        {desk.open
+          ? 'Öppet. Gästerna loggar in på sin telefon och tar själva bilden i utklädnaden.'
+          : 'Stängt. Gästerna kan inte lägga upp bilder själva.'}
+      </p>
+      <p className="meta">{desk.withCostume} av {desk.guests} gäster har en bild i mysteriet.</p>
+      <button className={`btn${desk.open ? ' ghost' : ''}`} type="button" disabled={busy || (desk.closed && !desk.open)} onClick={toggle}>
+        {desk.open ? 'Stäng självregistreringen' : 'Öppna självregistreringen'}
+      </button>
+      {desk.closed && !desk.open && <p className="meta">Tävlingen är stängd.</p>}
+      <ErrorText>{error}</ErrorText>
+    </article>
+  );
+}
+
 export default function PostDetail() {
   return (
     <Guard roles={['admin', 'doorman', 'gamemaster']}>
@@ -228,6 +274,9 @@ function Detail() {
           </button>
         ))}
       </div>
+      {post.key === 'manager' && (mine || user?.role === 'admin') && tab === 'uppgift' && (
+        <CostumeDesk token={token} />
+      )}
       {tab === 'allmant' && (
         <div className="facts">
           <p>{whenWhere.date}</p>

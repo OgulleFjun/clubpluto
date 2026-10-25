@@ -4,6 +4,8 @@ import { authenticate, loadAccount, requireRoles } from '../auth.js';
 import { chipBalances, getSettings, presentScore } from '../competition.js';
 import { asyncRoute, httpError, param } from '../http.js';
 import { randomToken } from '../tokens.js';
+import { removeFile, saveImage, upload } from '../uploads.js';
+import { env } from '../config.js';
 
 const router = Router();
 const MAX_GUEST_INVITES = 2;
@@ -56,6 +58,7 @@ router.get(
         doorCode: participant.door_code,
         photoToken: participant.photo_token,
         hasPhoto: Boolean(participant.photo_path),
+        costumeToken: participant.costume_path ? participant.costume_token : null,
       },
       balances,
       invitations: {
@@ -66,6 +69,7 @@ router.get(
       phases: {
         registrationOpen: settings.registration_open,
         identityOpen: settings.identity_open,
+        costumeUploadOpen: settings.costume_upload_open,
         conversionsOpen: settings.vampire_conversions_open,
         resultsRevealed: settings.results_revealed,
         competitionClosed: Boolean(settings.competition_closed_at),
@@ -77,6 +81,37 @@ router.get(
       },
       score,
     });
+  })
+);
+
+router.post(
+  '/costume',
+  upload.single('costume'),
+  asyncRoute(async (req, res) => {
+    const participant = requireParticipant(req);
+    const settings = await getSettings();
+    if (!settings.costume_upload_open || settings.competition_closed_at) {
+      throw httpError(403, 'Bilderna i utklädnad är stängda just nu. Prata med Managern.');
+    }
+    if (participant.membership === 'staff') throw httpError(400, 'Personalen lägger inte upp bilder här.');
+    if (!req.file) throw httpError(400, 'Ta en bild av dig i utklädnaden.');
+    const costumeToken = participant.costume_token || randomToken();
+    const dest = await saveImage(req.file, env.portraitDir, `costume-${costumeToken}.jpg`);
+    try {
+      await query(
+        `UPDATE participants
+         SET costume_path = $2, costume_token = $3, costume_at = COALESCE(costume_at, now())
+         WHERE id = $1`,
+        [participant.id, dest, costumeToken]
+      );
+    } catch (error) {
+      removeFile(dest);
+      throw error;
+    }
+    if (!settings.identity_open) {
+      await query('UPDATE event_settings SET identity_open = true, updated_at = now() WHERE id = 1');
+    }
+    res.json({ ok: true, costumeToken });
   })
 );
 

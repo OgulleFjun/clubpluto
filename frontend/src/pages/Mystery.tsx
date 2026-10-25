@@ -103,7 +103,7 @@ function MysteryInner() {
       <p className="lede">
         {board.canGuess
           ? 'Svep mellan förklädnaderna. Vampyr går inte att ångra.'
-          : 'Bilderna dyker upp när Managern registrerar gästerna. Gissningar öppnar när mysteriet är igång.'}
+          : 'Bilderna dyker upp när gästerna lägger upp sig själva i utklädnad. Gissningar öppnar när mysteriet är igång.'}
       </p>
       {board.score && (
         <p>Din poäng: {board.score.total}{board.score.isWinner ? ' · överlevnadspriset' : ''}</p>

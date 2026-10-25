@@ -247,14 +247,14 @@ export function Field({
   );
 }
 
-export function Portrait({ token, alt }: { token: string; alt: string }) {
+export function Portrait({ token, alt, version }: { token: string; alt: string; version?: number }) {
   const { token: auth } = useAuth();
   const [src, setSrc] = useState('');
   useEffect(() => {
     if (!auth) return;
     let url = '';
     let cancel = false;
-    fetch(`${apiBase()}/photos/${token}`, { headers: { Authorization: `Bearer ${auth}` } })
+    fetch(`${apiBase()}/photos/${token}${version ? `?v=${version}` : ''}`, { headers: { Authorization: `Bearer ${auth}` } })
       .then((response) => (response.ok ? response.blob() : Promise.reject()))
       .then((blob) => {
         url = URL.createObjectURL(blob);
@@ -267,7 +267,7 @@ export function Portrait({ token, alt }: { token: string; alt: string }) {
       cancel = true;
       if (url) URL.revokeObjectURL(url);
     };
-  }, [auth, token]);
+  }, [auth, token, version]);
   if (!src) return <div className="portrait empty" aria-hidden />;
   return <img className="portrait" src={src} alt={alt} />;
 }

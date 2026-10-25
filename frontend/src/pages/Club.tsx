@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { ErrorText, Guard, Page, Portrait } from '../ui';
+import { ErrorText, Field, Guard, Page, Portrait, onSubmit } from '../ui';
 
 interface HomeData {
   participant: {
@@ -15,10 +15,11 @@ interface HomeData {
     doorCode: string;
     photoToken: string;
     hasPhoto: boolean;
+    costumeToken: string | null;
     membership: string;
   };
   counts: { identityGuesses: number; vampireGuesses: number };
-  phases: { identityOpen: boolean; resultsRevealed: boolean; useAliases: boolean };
+  phases: { identityOpen: boolean; costumeUploadOpen: boolean; competitionClosed: boolean; resultsRevealed: boolean; useAliases: boolean };
   score: { total: number; isWinner: boolean } | null;
 }
 
@@ -34,10 +35,31 @@ function ClubInner() {
   const { token } = useAuth();
   const [data, setData] = useState<HomeData | null>(null);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [version, setVersion] = useState(0);
+
+  function load() {
+    return api<HomeData>('/club/home', {}, token).then(setData);
+  }
 
   useEffect(() => {
-    api<HomeData>('/club/home', {}, token).then(setData).catch((reason: Error) => setError(reason.message));
+    load().catch((reason: Error) => setError(reason.message));
   }, [token]);
+
+  async function sendCostume(event: FormEvent<HTMLFormElement>) {
+    setError('');
+    setMessage('');
+    const form = event.currentTarget;
+    try {
+      await api('/club/costume', { method: 'POST', body: new FormData(form) }, token);
+      form.reset();
+      setVersion(Date.now());
+      setMessage('Bilden ligger i mysteriet.');
+      await load();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Bilden sparades inte.');
+    }
+  }
 
   if (!data) return <Page title="Din klubb">{error || 'Hämtar din sida…'}</Page>;
   const person = data.participant;
@@ -45,6 +67,20 @@ function ClubInner() {
     <Page title={person.name} lede={data.phases.useAliases && person.alias ? `Kallas ${person.alias} inne på klubben.` : 'Din sida.'}>
       <div className="member">
         {person.hasPhoto && <Portrait token={person.photoToken} alt="Ditt porträtt" />}
+        {data.phases.costumeUploadOpen && !data.phases.competitionClosed && person.membership !== 'staff' && (
+          <form className="card" onSubmit={onSubmit(sendCostume)}>
+            <h2>{person.costumeToken ? 'Din bild i mysteriet' : 'Ta en bild i din utklädnad'}</h2>
+            {person.costumeToken && <Portrait token={person.costumeToken} alt="Du i utklädnad" version={version} />}
+            <p className="meta">
+              Ta bilden med masken på, så som du ser ut i kväll. Den syns i mysteriet utan ditt namn. Visa den inte för någon.
+            </p>
+            <Field label={person.costumeToken ? 'Ny bild' : 'Bild i utklädnad'}>
+              <input name="costume" type="file" accept="image/jpeg,image/png,image/webp" capture="user" required />
+            </Field>
+            <button className="btn" type="submit">{person.costumeToken ? 'Byt bilden' : 'Lägg i mysteriet'}</button>
+            {message && <p className="ok">{message}</p>}
+          </form>
+        )}
         <p className="member-code">Dörrkod <strong>{person.doorCode}</strong></p>
         <p>{person.checkedIn ? 'Du är incheckad.' : 'Du är inte incheckad ännu.'}</p>
         <p>{person.baseChipsIssued ? 'Spelmarkerna är utlämnade.' : 'Spelmarkerna lämnas ut hos Managern.'}</p>

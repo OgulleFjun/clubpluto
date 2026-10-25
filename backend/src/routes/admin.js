@@ -315,6 +315,7 @@ router.patch(
         use_aliases = $10,
         first_vampire_gets_bonus = $11,
         tie_break = $12,
+        costume_upload_open = $13,
         updated_at = now()
        WHERE id = 1`,
       [
@@ -330,6 +331,7 @@ router.patch(
         boolOr(req.body.useAliases, settings.use_aliases),
         boolOr(req.body.firstVampireGetsBonus, settings.first_vampire_gets_bonus),
         tieBreak,
+        boolOr(req.body.costumeUploadOpen, settings.costume_upload_open),
       ]
     );
     if (Array.isArray(req.body.games)) {

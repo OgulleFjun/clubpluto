@@ -711,7 +711,7 @@ function dateTimeLocal(iso: string) {
 function Settings() {
   const view = useAdmin<{ settings: {
     clubName: string; tagline: string; eventStartsAt: string; location: string; publicIntro: string; rulesText: string;
-    registrationOpen: boolean; identityOpen: boolean; vampireConversionsOpen: boolean; useAliases: boolean;
+    registrationOpen: boolean; identityOpen: boolean; costumeUploadOpen: boolean; vampireConversionsOpen: boolean; useAliases: boolean;
     firstVampireGetsBonus: boolean; tieBreak: string; doorPasswordSet: boolean;
   } }>('/admin/overview');
   const [games, setGames] = useState<{ key: string; name: string; summary: string; rules: string }[]>([]);
@@ -736,6 +736,7 @@ function Settings() {
           rulesText: form.get('rulesText'),
           registrationOpen: form.get('registrationOpen') === 'on',
           identityOpen: form.get('identityOpen') === 'on',
+          costumeUploadOpen: form.get('costumeUploadOpen') === 'on',
           vampireConversionsOpen: form.get('vampireConversionsOpen') === 'on',
           useAliases: form.get('useAliases') === 'on',
           firstVampireGetsBonus: form.get('firstVampireGetsBonus') === 'on',
@@ -761,6 +762,7 @@ function Settings() {
       <Field label="Regler"><textarea name="rulesText" defaultValue={s.rulesText} /></Field>
       <label className="meta"><input type="checkbox" name="registrationOpen" defaultChecked={s.registrationOpen} /> Registrering öppen</label>
       <label className="meta"><input type="checkbox" name="identityOpen" defaultChecked={s.identityOpen} /> Mysteriet och gissningarna öppna</label>
+      <label className="meta"><input type="checkbox" name="costumeUploadOpen" defaultChecked={s.costumeUploadOpen} /> Gästerna lägger själva upp bilden i utklädnad</label>
       <label className="meta"><input type="checkbox" name="vampireConversionsOpen" defaultChecked={s.vampireConversionsOpen} /> Banken tar emot förvandlingar</label>
       <label className="meta"><input type="checkbox" name="useAliases" defaultChecked={s.useAliases} /> Alias visas på den egna sidan</label>
       <label className="meta"><input type="checkbox" name="firstVampireGetsBonus" defaultChecked={s.firstVampireGetsBonus} /> Den Förste får 20 spelmarker och 1 blodspeng direkt</label>

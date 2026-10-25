@@ -59,6 +59,20 @@ API: http://localhost:3010
 
 `scripts/deploy-pull.sh` gör `git reset`, backup, `npm ci`, frontend-build, `npm run migrate` och `pm2 restart clubpluto-backend`.
 
+### Bilder i utklädnad
+
+Managern öppnar och stänger självregistreringen under fliken Uppgift på sitt uppdrag. När den är öppen tar gästen själv en bild i utklädnaden på sin klubbsida, och bilden hamnar direkt i mysteriet. Den första bilden öppnar mysteriet. Har gästen ingen telefon tar Managern bilden i Dörren. Administratören kan också ändra det i kontrollpanelen.
+
+### Efter en testrunda
+
+```bash
+cd backend
+npm run reset:test                                         # visar bara vad som skulle tas bort
+npm run reset:test -- --yes --remove-since="2026-10-25 17:00"
+```
+
+Skriptet tar först en backup. Det tar bort bilder i utklädnad, gissningar, poäng, incheckningar och spelmarkerna, och stänger mysteriet och självregistreringen. Med `--remove-since` tas gäster bort som registrerades efter den tiden. Personal, porträtt för gäster som var registrerade före testet, uppdrag och vampyrer ligger kvar.
+
 ### Sådant som kan ändras utan kod
 
 Klubbnamn, tid, plats, regler, entrélösenord, om registrering och mysterium är öppna, om Den Förste får startbonus, speltexter, prisnivåer från 2 blodspengar och hur lika poäng avgörs. Allt det ligger i kontrollpanelen.

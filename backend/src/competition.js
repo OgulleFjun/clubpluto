@@ -17,6 +17,7 @@ export function presentSettings(row, { includeSecrets = false } = {}) {
     rulesText: row.rules_text,
     registrationOpen: row.registration_open,
     identityOpen: row.identity_open,
+    costumeUploadOpen: row.costume_upload_open,
     vampireConversionsOpen: row.vampire_conversions_open,
     resultsRevealed: row.results_revealed,
     useAliases: row.use_aliases,

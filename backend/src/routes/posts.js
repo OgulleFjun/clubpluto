@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { query, withTransaction } from '../db.js';
 import { authenticate, loadAccount, requireRoles } from '../auth.js';
-import { currentLeaderboard } from '../competition.js';
+import { currentLeaderboard, getSettings } from '../competition.js';
 import { creditConversion } from '../conversions.js';
 import { asyncRoute, httpError, param } from '../http.js';
 
@@ -120,6 +120,43 @@ router.post(
     await requireManager(req);
     const result = await creditConversion(String(req.body.newbieId || ''), String(req.body.sireId || ''));
     res.json(result);
+  })
+);
+
+async function costumeDesk() {
+  const settings = await getSettings();
+  const { rows } = await query(`
+    SELECT
+      count(*)::int AS guests,
+      count(*) FILTER (WHERE costume_path IS NOT NULL)::int AS with_costume
+    FROM participants
+    WHERE membership <> 'staff'
+  `);
+  return {
+    open: settings.costume_upload_open,
+    closed: Boolean(settings.competition_closed_at),
+    guests: rows[0].guests,
+    withCostume: rows[0].with_costume,
+  };
+}
+
+router.get(
+  '/manager/costumes',
+  asyncRoute(async (req, res) => {
+    await requireManager(req);
+    res.json(await costumeDesk());
+  })
+);
+
+router.post(
+  '/manager/costumes',
+  asyncRoute(async (req, res) => {
+    await requireManager(req);
+    const open = Boolean(req.body.open);
+    const settings = await getSettings();
+    if (open && settings.competition_closed_at) throw httpError(409, 'Tävlingen är redan stängd.');
+    await query('UPDATE event_settings SET costume_upload_open = $1, updated_at = now() WHERE id = 1', [open]);
+    res.json(await costumeDesk());
   })
 );
 

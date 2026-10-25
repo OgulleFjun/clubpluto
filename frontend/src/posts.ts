@@ -92,7 +92,7 @@ export const staffPosts: StaffPostCopy[] = [
       '17:00: var på plats. Gå igenom kvällen med personalen och ställ i ordning registreringen.',
       'Dräkten är en anka i hög hatt, frack och käpp. Ansiktet är täckt.',
       'Kontrollera att de tre croupiererna har varsitt bord.',
-      '18:30: ta emot gästerna som Bouncern skickar ner. Pricka av registreringen, ta en bild i förklädnad och lägg den i mysteriet. Ge spelmarker till ett värde av 100.',
+      '18:30: öppna självregistreringen med knappen ovanför. Ta emot gästerna som Bouncern skickar ner. Gästen loggar in på sin telefon och tar själv en bild i förklädnad. Har gästen ingen telefon tar du bilden i Dörren. Ge spelmarker till ett värde av 100.',
       'Poängen för vem som är vem och för vampyrgissningarna syns under fliken Poäng.',
       'Under Vampyr visar du bilder på de två senaste vampyrerna. Den nya pekar på vem som förvandlade den. Knappen ger den gamla vampyren en blodspeng, högst två.',
       'Skicka gästen vidare till borden. Du ger inga marker vid ytterdörren.',
