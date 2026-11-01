@@ -18,7 +18,7 @@ interface Account {
   id: string;
   email: string;
   name: string;
-  postKey: string | null;
+  postKeys: string[];
 }
 interface ManageData {
   posts: ManagedPost[];
@@ -75,7 +75,7 @@ function Control() {
   }
 
   return (
-    <Page title="Kontroll" lede="Bara du som administratör ser den här sidan. Flytta eller frigör ett uppdrag. En person kan bara ha ett.">
+    <Page title="Kontroll" lede="Bara du som administratör ser den här sidan. Flytta eller frigör ett uppdrag. En person kan ha flera uppdrag.">
       <ErrorText>{error}</ErrorText>
       {message && <p className="ok">{message}</p>}
       <div className="list">
@@ -90,7 +90,7 @@ function Control() {
                 {data.accounts.map((account) => (
                   <option key={account.id} value={account.id}>
                     {account.name}{account.name !== account.email ? ` · ${account.email}` : ''}
-                    {account.postKey && account.postKey !== post.key ? ' · har ett annat uppdrag' : ''}
+                    {account.postKeys.some((key) => key !== post.key) ? ' · har redan ett uppdrag' : ''}
                   </option>
                 ))}
               </select>

@@ -40,7 +40,7 @@ export const markerGuide = [
       'Texas Hold’em: lilla blind är värd 1 spelmark och stora blind är värd 2. Den som vinner handen tar spelmarkerna som satsats i potten.',
       'Själ-poker kostar 5 spelmarker att vara med. En spelare får hitta högst 6 kort och använder 5 av dem. Ett kort man rört eller manipulerat måste tas, och sedan lämnas korten till croupiern.',
       'I Ride the Bus bestämmer gästen själv insatsen. Fel gissning lägger insatsen i potten.',
-      'Den som har slut får 50 nya spelmarker genom att dansa framför Prize Master, eller byter 1 blodspeng mot 100 spelmarker.',
+      'Den som har slut får 50 nya spelmarker genom att dansa för Dansmastern, eller byter 1 blodspeng mot 100 spelmarker hos Prize Master.',
     ],
   },
   {
@@ -79,7 +79,7 @@ const evening = [
   'Samling klockan 17:00 i Folkets hus. Då går ni igenom kvällen och gör i ordning era platser.',
   'Klockan 18:30 öppnas ytterdörren. Gästen säger lösenordet till Bouncern. Den som kan det får gå ner för trappan. Den som inte kan det stannar utanför. Den som inte är registrerad förregistrerar sig på telefonen först.',
   'Nere vid registreringen möter gästen Managern. Där registreras att gästen har kommit, gästen får spelmarker till ett värde av 100 och tar en ny bild i förklädnad. Sedan får gästen reglerna och går ut i klubben.',
-  'Tre spel pågår: Texas Hold’em, Själ-poker och Ride the Bus. Banken tar emot vampyrer och priser.',
+  'Tre spel pågår: Texas Hold’em, Själ-poker och Ride the Bus. Banken tar emot vampyrer och priser. Dansmastern ger 50 spelmarker för en dans.',
 ];
 
 export const staffPosts: StaffPostCopy[] = [
@@ -208,7 +208,7 @@ export const staffPosts: StaffPostCopy[] = [
       'Om du redan är vald: var med på genomgången klockan 17:00.',
       'Ställ i ordning Banken före 18:30. Priser, skylt och en plats där nya vampyrer anmäler sig.',
       'Du tar inte emot gäster vid ytterdörren och du ger inte ut spelmarkerna.',
-      'Den som dansar framför dig och har slut på spelmarker får 50 nya. En blodspeng kan bytas mot 100 spelmarker.',
+      'En blodspeng kan bytas mot 100 spelmarker. Den som har slut på spelmarker och vill dansa skickar du till Dansmastern.',
       'Bara barn och ungdomar kan vinna priser hos dig. En gäst får ge bort sina blodspengar.',
       'Du kan få ta hand om en liten bar.',
       'Vampyrkort: följ fliken Vampyr.',
@@ -236,6 +236,24 @@ export const staffPosts: StaffPostCopy[] = [
     ],
     spel: [
       'Du spelar inte. Efter Managern går gästen till ett av de tre borden. Du behöver bara kunna visa vägen.',
+    ],
+  },
+  {
+    key: 'dansmaster',
+    title: 'Dansmaster',
+    image: '/mark.webp',
+    later: true,
+    plats: 'Dansgolvet i klubben.',
+    kväll: evening,
+    uppgift: [
+      'Om du redan är vald: var med på genomgången klockan 17:00.',
+      'Ha spelmarker hos dig före 18:30.',
+      'Den som har slut på spelmarker kan dansa för dig. Efter dansen får gästen 50 nya spelmarker av dig.',
+      'Blodspengar, vampyrer och priser sköter Prize Master i Banken.',
+      'Masken sitter på hela kvällen. Ingen ska kunna se vem du är.',
+    ],
+    spel: [
+      'Du har inget eget bord. Dansen är din station.',
     ],
   },
 ];

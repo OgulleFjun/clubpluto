@@ -675,3 +675,19 @@ SET rules_text = replace(rules_text,
     rules_version = 6,
     updated_at = now()
 WHERE id = 1 AND rules_version < 6;
+
+-- En person kan ha flera uppdrag, och Dansmastern ger 50 spelmarker för en dans.
+ALTER TABLE staff_posts DROP CONSTRAINT IF EXISTS staff_posts_account_id_key;
+
+INSERT INTO staff_posts (key, title, sort_order) VALUES
+  ('dansmaster', 'Dansmaster', 7)
+ON CONFLICT (key) DO NOTHING;
+
+UPDATE event_settings
+SET rules_text = replace(rules_text,
+      'I Banken står Prize Master. Har du slut på spelmarker kan du dansa och få 50 nya, eller byta 1 blodspeng mot 100 spelmarker. Där anmäler sig nya vampyrer, och blodspengar byts mot priser.',
+      'I Banken står Prize Master. Där kan du byta 1 blodspeng mot 100 spelmarker. Där anmäler sig nya vampyrer, och blodspengar byts mot priser.
+Har du slut på spelmarker kan du dansa för Dansmastern och få 50 nya.'),
+    rules_version = 7,
+    updated_at = now()
+WHERE id = 1 AND rules_version < 7;

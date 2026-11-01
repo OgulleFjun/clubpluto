@@ -13,15 +13,16 @@ const gameForPost = {
   'ride-the-bus': 'ride-the-bus',
 };
 const primaryPostKeys = ['manager', 'holdem', 'sjalpoker', 'ride-the-bus'];
-const laterPostKeys = ['prize-master', 'bouncer'];
+const laterPostKeys = ['prize-master', 'bouncer', 'dansmaster'];
 
 router.use(authenticate, loadAccount, requireRoles(...staffRoles));
 
 async function syncGames(client, accountId) {
   const { rows } = await client.query('SELECT key FROM staff_posts WHERE account_id = $1', [accountId]);
-  const gameKey = rows[0] ? gameForPost[rows[0].key] : null;
   await client.query('DELETE FROM gamemaster_games WHERE account_id = $1', [accountId]);
-  if (gameKey) {
+  for (const row of rows) {
+    const gameKey = gameForPost[row.key];
+    if (!gameKey) continue;
     await client.query(
       'INSERT INTO gamemaster_games (account_id, game_key) VALUES ($1, $2) ON CONFLICT DO NOTHING',
       [accountId, gameKey]
@@ -243,10 +244,12 @@ router.get(
        ORDER BY s.sort_order, s.key`
     );
     const accounts = await query(
-      `SELECT a.id, a.email, a.role, a.display_name, s.key AS post_key
+      `SELECT a.id, a.email, a.role, a.display_name,
+              array_remove(array_agg(s.key ORDER BY s.sort_order), NULL) AS post_keys
        FROM accounts a
        LEFT JOIN staff_posts s ON s.account_id = a.id
        WHERE a.active AND a.role = ANY($1::text[])
+       GROUP BY a.id
        ORDER BY COALESCE(a.display_name, a.email)`,
       [staffRoles]
     );
@@ -264,7 +267,7 @@ router.get(
         email: row.email,
         role: row.role,
         name: row.display_name || row.email,
-        postKey: row.post_key,
+        postKeys: row.post_keys,
       })),
     });
   })
@@ -287,10 +290,6 @@ router.post(
             [accountId, staffRoles]
           );
           if (!account.rows[0]) throw httpError(400, 'Välj ett aktivt personalkonto.');
-          await client.query(
-            'UPDATE staff_posts SET account_id = NULL, claimed_at = NULL WHERE account_id = $1 AND key <> $2',
-            [accountId, key]
-          );
         }
         await client.query(
           `UPDATE staff_posts
