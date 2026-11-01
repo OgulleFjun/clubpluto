@@ -105,6 +105,28 @@ function People() {
   if (!view.data) return <p>{view.error || 'Hämtar…'}</p>;
   const people = view.data.participants;
 
+  async function arrive(person: Person) {
+    setBusyId(person.id);
+    try {
+      await api(`/door/check-in/${person.id}`, { method: 'POST', body: JSON.stringify({}) }, view.token);
+      await refreshAfter(person);
+      view.setMessage(person.isFirst
+        ? `${person.name} är inne. Ge spelmarker till ett värde av 100 och de två vampyrkorten, utan att andra ser.`
+        : `${person.name} är inne. Ge spelmarker till ett värde av 100.`);
+    } catch (reason) {
+      view.setError(reason instanceof Error ? reason.message : 'Incheckningen misslyckades.');
+    } finally {
+      setBusyId('');
+    }
+  }
+
+  async function refreshAfter(person: Person) {
+    const next = await view.reload();
+    if (selected?.id === person.id) {
+      setSelected((next as { participants: Person[] }).participants.find((row) => row.id === person.id) || null);
+    }
+  }
+
   async function toggleSus(person: Person) {
     setBusyId(person.id);
     try {
@@ -134,6 +156,16 @@ function People() {
                 {person.isVampire ? ` · ${person.conversionChips} blodspengar från förvandling` : ''}
               </div>
             </button>
+            {person.membership !== 'staff' && !person.checkedInAt && (
+              <button
+                type="button"
+                className="btn small ghost"
+                disabled={busyId === person.id}
+                onClick={() => void arrive(person)}
+              >
+                Har kommit
+              </button>
+            )}
             {person.membership !== 'staff' && (
               <button
                 type="button"
@@ -149,6 +181,7 @@ function People() {
         ))}
       </div>
       <ErrorText>{view.error}</ErrorText>
+      {view.message && <p className="ok">{view.message}</p>}
       {selected && (
         <>
         <form className="card" key={selected.id} onSubmit={onSubmit(async (event) => {
@@ -209,7 +242,7 @@ function People() {
             <button className="btn small" type="submit">Spara</button>
             <button className="btn small ghost" type="button" onClick={async () => {
               await api(`/admin/participants/${selected.id}/arrival`, { method: 'POST', body: JSON.stringify({ present: !selected.checkedInAt }) }, view.token);
-              await view.reload();
+              await refreshAfter(selected);
             }}>{selected.checkedInAt ? 'Markera som ute' : 'Markera som inne'}</button>
           </div>
           <Field label="Nytt porträtt">
