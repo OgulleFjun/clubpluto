@@ -585,3 +585,52 @@ I Banken står Prize Master. Har du slut på spelmarker kan du dansa och få 50 
     rules_version = 2,
     updated_at = now()
 WHERE id = 1 AND rules_version < 2;
+
+-- Gemensam dörrkod som alla deltagare ser på sin sida.
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS door_code text;
+
+-- Överlevnadspriset är bara för SUS:are och avslöjas på nästa SUS.
+UPDATE event_settings
+SET rules_text = $rules3$Så fungerar kvällen
+
+Alla kommer förklädda och masken sitter på hela kvällen. Du spelar vid borden, gissar vem som är vem och försöker hitta vampyrerna. Den SUS:are som gissar bäst och fortfarande är människa vinner överlevnadspriset.
+
+Entré
+Bouncern släpper in en gäst i taget. Du säger kvällens lösenord och går ner till Managern. Managern registrerar dig och ger dig spelmarker till ett värde av 100.
+Logga in på hemsidan med förnamn och efternamn. Ta en bild av dig själv i utklädnaden på din sida. Bilden hamnar i Mysteriet utan ditt namn. Har du ingen telefon tar Managern bilden.
+
+Inbjudningar
+SUS-medlemmar och godkända SAS-medlemmar kan bjuda in högst två gäster. En inbjudan fungerar en gång. Gäster får inte egna inbjudningar, om inte arrangören ger dem den rätten.
+
+Marker
+Det finns två sorters marker: spelmarker och blodspengar.
+Spelmarker används vid borden. De kan tas med mellan borden men kan inte köpa priser.
+Blodspengar är vinsten. Du får dem när du vinner vid borden, när du blir vampyr och när du gör någon annan till vampyr. Bara blodspengar köper priser hos Prize Master. Priserna kostar 2, 4, 6, 9 och 12 blodspengar. Blodspengar kan ges bort. Bara barn och ungdomar kan vinna priser hos Prize Master.
+
+Vampyrerna
+En spelare börjar som vampyr. Den kallas Den Förste och har två vampyrkort.
+En vampyr kan ge ett vampyrkort till en annan gäst. Den som får kortet väljer själv. Ingen kan tvingas att bli vampyr.
+Den som tar emot kortet blir vampyr och anmäler sig i Banken. Den som blir vampyr får 1 blodspeng och 20 spelmarker.
+Den som gör någon annan till vampyr får 1 blodspeng. Det går att få högst 2 blodspengar på det sättet.
+Den nya vampyren tar över kortet och kan ge det vidare. Det finns bara två kort, men vampyrerna kan bli fler.
+Man kan bara bli vampyr en gång. Säg inte högt vem som blev vampyr. Ingen notis går ut.
+
+Mysteriet och poängen
+I Mysteriet på hemsidan sveper du mellan bilderna i utklädnad.
+Vem är vem: tryck Matcha och välj vem personen på bilden är. Rätt ger +1 poäng och fel ger −1 poäng. Du kan ändra en matchning tills tävlingen stänger. Varje namn kan bara matchas med en bild.
+Vampyr: tryck Vampyr om du tror att personen är vampyr. Rätt ger +1 poäng och fel ger −1 poäng. En vampyrgissning går inte att ändra.
+En bild du inte gissar på ger 0 poäng. Facit är vilka som är vampyrer när tävlingen stänger. Poäng är inte marker.
+
+Överlevnadspriset
+Bara SUS:are kan vinna överlevnadspriset. Alla kan gissa och få poäng, men priset går bara till en SUS:are.
+Den som är vampyr när tävlingen stänger kan inte vinna, även om den har flest poäng.
+Priset går till den SUS:are som fortfarande är människa och har flest poäng från Mysteriet. Vinnaren avslöjas på nästa SUS. Vid lika poäng bestämmer arrangören hur det avgörs.
+
+Spelen
+Texas Hold'em, Själ-poker och Ride the Bus spelas vid borden. Croupieren skriver upp blodspengarna när någon vinner. Reglerna för varje spel står under Spelen.
+
+Banken
+I Banken står Prize Master. Har du slut på spelmarker kan du dansa och få 50 nya, eller byta 1 blodspeng mot 100 spelmarker. Där anmäler sig nya vampyrer, och blodspengar byts mot priser.$rules3$,
+    rules_version = 3,
+    updated_at = now()
+WHERE id = 1 AND rules_version < 3;

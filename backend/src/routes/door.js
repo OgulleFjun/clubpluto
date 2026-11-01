@@ -99,7 +99,8 @@ router.post(
     const spoken = String(req.body.doorPassword || '');
     const skip = Boolean(req.body.skipPassword) && req.account.role === 'admin';
     if (settings.door_password_hash && !skip) {
-      const ok = await bcrypt.compare(spoken, settings.door_password_hash);
+      const ok = await bcrypt.compare(spoken.trim().toLowerCase(), settings.door_password_hash)
+        || await bcrypt.compare(spoken, settings.door_password_hash);
       if (!ok) throw httpError(403, 'Entrélösenordet stämmer inte.');
     }
     if (!settings.door_password_hash && !skip && req.account.role !== 'admin') {

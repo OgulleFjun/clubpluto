@@ -97,7 +97,7 @@ export async function loadGuessMaps() {
 export async function currentLeaderboard() {
   const settings = await getSettings();
   const participants = await query(
-    `SELECT id, name, alias, is_vampire, photo_token, name_token
+    `SELECT id, name, alias, membership, is_vampire, photo_token, name_token
      FROM participants ORDER BY name`
   );
   const maps = await loadGuessMaps();
@@ -107,6 +107,7 @@ export async function currentLeaderboard() {
       id: row.id,
       name: row.name,
       isVampire: row.is_vampire,
+      canWin: row.membership === 'sus',
     })),
     identityByGuesser: maps.identityByGuesser,
     vampireByGuesser: maps.vampireByGuesser,

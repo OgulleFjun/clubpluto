@@ -71,6 +71,7 @@ export function buildLeaderboard({ participants, identityByGuesser, vampireByGue
       id: participant.id,
       name: participant.name,
       isVampire: Boolean(participant.isVampire),
+      canWin: participant.canWin !== false,
       ...score,
     };
   });
@@ -80,7 +81,7 @@ export function buildLeaderboard({ participants, identityByGuesser, vampireByGue
 }
 
 export function annotateWinners(rows, tieBreak) {
-  const eligible = rows.filter((row) => !row.isVampire);
+  const eligible = rows.filter((row) => !row.isVampire && row.canWin !== false);
   const max = eligible.reduce((highest, row) => Math.max(highest, row.total), Number.NEGATIVE_INFINITY);
   const leaders = Number.isFinite(max) ? eligible.filter((row) => row.total === max) : [];
   const tied = leaders.length > 1;

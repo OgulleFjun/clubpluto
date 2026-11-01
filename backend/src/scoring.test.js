@@ -58,6 +58,18 @@ describe('överlevnad', () => {
     expect(board.find((row) => row.id === 'vampire-higher').isWinner).toBe(false);
   });
 
+  it('låter bara SUS:are vinna', () => {
+    const rows = annotateWinners(
+      [
+        { id: 'guest', name: 'Gäst', isVampire: false, canWin: false, total: 7, lastGuessAt: null },
+        { id: 'sus', name: 'Sussi', isVampire: false, canWin: true, total: 2, lastGuessAt: null },
+      ],
+      'shared'
+    );
+    expect(rows.find((row) => row.isWinner).id).toBe('sus');
+    expect(rows.find((row) => row.id === 'guest').isWinner).toBe(false);
+  });
+
   it('delar priset vid lika poäng', () => {
     const rows = annotateWinners(
       [

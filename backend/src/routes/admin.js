@@ -353,12 +353,15 @@ router.post(
   asyncRoute(async (req, res) => {
     const password = String(req.body.password || '');
     if (!password) {
-      await query('UPDATE event_settings SET door_password_hash = NULL, updated_at = now() WHERE id = 1');
+      await query('UPDATE event_settings SET door_password_hash = NULL, door_code = NULL, updated_at = now() WHERE id = 1');
       return res.json({ doorPasswordSet: false });
     }
     if (password.length < 4) throw httpError(400, 'Entrélösenordet behöver minst 4 tecken.');
-    const hash = await bcrypt.hash(password, 10);
-    await query('UPDATE event_settings SET door_password_hash = $1, updated_at = now() WHERE id = 1', [hash]);
+    const hash = await bcrypt.hash(password.trim().toLowerCase(), 10);
+    await query(
+      'UPDATE event_settings SET door_password_hash = $1, door_code = $2, updated_at = now() WHERE id = 1',
+      [hash, password.trim()]
+    );
     res.json({ doorPasswordSet: true });
   })
 );
@@ -483,9 +486,15 @@ router.post(
     const row = snap.rows[0];
     if (!row) throw httpError(404, 'Personen saknas i resultatlistan. Stäng tävlingen först.');
     if (row.is_vampire) throw httpError(400, 'En vampyr kan inte vinna överlevnadspriset.');
-    const max = await query('SELECT max(total_points) AS m FROM score_snapshots WHERE NOT is_vampire');
+    const member = await query('SELECT membership FROM participants WHERE id = $1', [id]);
+    if (member.rows[0]?.membership !== 'sus') throw httpError(400, 'Bara SUS:are kan vinna överlevnadspriset.');
+    const max = await query(
+      `SELECT max(s.total_points) AS m FROM score_snapshots s
+       JOIN participants p ON p.id = s.participant_id
+       WHERE NOT s.is_vampire AND p.membership = 'sus'`
+    );
     if (Number(row.total_points) !== Number(max.rows[0].m)) {
-      throw httpError(400, 'Personen har inte högst poäng bland människorna.');
+      throw httpError(400, 'Personen har inte högst poäng bland SUS:arna som är människor.');
     }
     await query('UPDATE score_snapshots SET is_winner = (participant_id = $1)', [id]);
     res.json({ ok: true, score: presentScore(row) });

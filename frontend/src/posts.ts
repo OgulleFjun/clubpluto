@@ -26,7 +26,7 @@ export const vampireRules = [
   'Den nya vampyren tar över kortet och kan ge det vidare. Det finns bara två kort, men vampyrerna kan bli fler.',
   'Säg inte högt vem som blev vampyr. Ingen notis går ut.',
   'I Mysteriet gissar gästerna vem som är vem och vilka som är vampyrer. Rätt ger +1 poäng, fel ger −1 poäng och en bild utan gissning ger 0. Poäng är inte marker.',
-  'Bara den som fortfarande är människa kan vinna överlevnadspriset. Klockan 20:30 går det till den människa som har flest poäng, även om en vampyr har fler.',
+  'Bara SUS:are kan vinna överlevnadspriset. Det går till den SUS:are som fortfarande är människa och har flest poäng, även om en vampyr har fler. Vinnaren avslöjas på nästa SUS.',
 ];
 
 export const markerGuide = [
@@ -61,7 +61,7 @@ export const markerGuide = [
 export const prizeRules = [
   'Priser hos Prize Master köps bara med blodspengar, och bara barn och ungdomar kan vinna dem. Blodspengar kan ges bort. Skillnaden mot spelmarker står under Marker.',
   'Fem nivåer: 2, 4, 6, 9 och 12 blodspengar. Prize Master tar emot blodspengarna och lämnar ut priset. Skriv upp namn, nivå och antal.',
-  'Överlevnadspriset delas ut klockan 20:30 till den människa som har flest poäng från Mysteriet. Vampyrer kan inte vinna det. Poäng är inte marker, och priset lämnas inte ut vid disken innan dess.',
+  'Bara SUS:are kan vinna överlevnadspriset. Det går till den SUS:are som fortfarande är människa och har flest poäng från Mysteriet. Vampyrer kan inte vinna det. Poäng är inte marker. Vinnaren avslöjas på nästa SUS, inte vid disken i kväll.',
 ];
 
 export function welcomeCopy() {
@@ -223,7 +223,7 @@ export const staffPosts: StaffPostCopy[] = [
     plats: 'Ytterdörren.',
     kväll: evening,
     uppgift: [
-      'Om du redan är vald: var med klockan 17:00. Entrélösenordet är 123ABC!. Skriv inte upp det där gäster kan se det.',
+      'Om du redan är vald: var med klockan 17:00. Entrélösenordet är 123abc!. Skriv inte upp det där gäster kan se det.',
       'Stå vid ytterdörren innan 18:30. Ingen kö får rinna in av sig själv.',
       '18:30: en gäst i taget. Be om lösenordet. Kan gästen det, skicka ner personen till Managern. Annars stannar gästen utanför.',
       'Du registrerar inte gästen och du ger inte ut spelmarker.',

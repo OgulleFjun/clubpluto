@@ -12,6 +12,7 @@ interface HomeData {
     checkedIn: boolean;
     baseChipsIssued: boolean;
     isVampire: boolean;
+    isFirst: boolean;
     doorCode: string;
     photoToken: string;
     hasPhoto: boolean;
@@ -85,7 +86,16 @@ function ClubInner() {
         <p>{person.checkedIn ? 'Du är incheckad.' : 'Du är inte incheckad ännu.'}</p>
         <p>{person.baseChipsIssued ? 'Spelmarkerna är utlämnade.' : 'Spelmarkerna lämnas ut hos Managern.'}</p>
         <p>De kan tas med mellan borden. Blodspengar kan ges bort. Bara barn och ungdomar kan vinna priser hos Prize Master.</p>
-        {person.isVampire && <p>Du är vampyr. Det syns inte för de andra.</p>}
+        {person.isVampire && person.isFirst && (
+          <article className="card">
+            <h2>Du är Den Förste</h2>
+            <p>Du är startvampyren. Kvällen börjar med dig.</p>
+            <p>Du har två vampyrkort. Ge ett kort till en gäst som frivilligt vill bli vampyr. Den som tar emot kortet anmäler sig i Banken och tar över kortet.</p>
+            <p>För varje person du gör till vampyr får du 1 blodspeng, högst 2.</p>
+            <p>Säg det inte till någon. Det syns inte för de andra.</p>
+          </article>
+        )}
+        {person.isVampire && !person.isFirst && <p>Du är vampyr. Det syns inte för de andra.</p>}
         <p className="meta">
           {data.counts.identityGuesses} matchningar · {data.counts.vampireGuesses} vampyrgissningar
           {data.score ? ` · ${data.score.total} poäng${data.score.isWinner ? ' · överlevnadspriset' : ''}` : ''}
