@@ -66,7 +66,7 @@ router.get(
     const { rows } = await query(
       `SELECT p.id, p.name, p.alias, p.email, p.door_code, p.membership, p.checked_in_at,
               p.base_chips_issued, p.photo_token, p.photo_path IS NOT NULL AS has_photo,
-              p.costume_path IS NOT NULL AS in_mystery,
+              p.costume_path IS NOT NULL AS in_mystery, p.is_first,
               inv.name AS invited_by
        FROM participants p
        LEFT JOIN participants inv ON inv.id = p.invited_by_id
@@ -88,6 +88,8 @@ router.get(
         photoToken: row.has_photo ? row.photo_token : null,
         inMystery: row.in_mystery,
         invitedBy: row.invited_by,
+        // Managern ger Den Förste vampyrkorten vid registreringen. Dörrvakter ser inte vampyrer.
+        ...(req.account.role === 'doorman' ? {} : { isFirst: row.is_first }),
       })),
     });
   })

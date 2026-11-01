@@ -20,6 +20,7 @@ interface Person {
   photoToken: string | null;
   inMystery: boolean;
   invitedBy: string | null;
+  isFirst?: boolean;
 }
 
 const roles = ['admin', 'doorman', 'gamemaster'];
@@ -53,12 +54,14 @@ function DoorInner() {
     refresh('').catch((reason: Error) => setError(reason.message));
   }, [token]);
 
-  async function checkIn(id: string) {
+  async function checkIn(person: Person) {
     setError('');
     setMessage('');
     try {
-      await api(`/door/check-in/${id}`, { method: 'POST', body: JSON.stringify({}) }, token);
-      setMessage('Gästen är inne. Ge spelmarker till ett värde av 100.');
+      await api(`/door/check-in/${person.id}`, { method: 'POST', body: JSON.stringify({}) }, token);
+      setMessage(person.isFirst
+        ? 'Gästen är inne. Ge spelmarker till ett värde av 100 och de två vampyrkorten, utan att andra ser.'
+        : 'Gästen är inne. Ge spelmarker till ett värde av 100.');
       await refresh();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Incheckningen misslyckades.');
@@ -120,6 +123,7 @@ function DoorInner() {
               <h2>{person.name}</h2>
               <p className="meta">{person.alias ? `${person.alias} · ` : ''}{person.email} · {person.doorCode}</p>
               <p className="meta">{person.invitedBy ? `Inbjuden av ${person.invitedBy}. ` : ''}{person.checkedInAt ? 'Inne.' : 'Inte anländ.'} {person.baseChipsIssued ? 'Marker utlämnade.' : ''} {person.inMystery ? 'Syns i mysteriet.' : ''}</p>
+              {person.isFirst && <p className="ok">Den Förste. Ge två vampyrkort vid registreringen, utan att andra ser.</p>}
               <form onSubmit={onSubmit((event) => addCostume(event, person.id))}>
                 <Field label="Bild i förklädnad">
                   <input name="costume" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required />
@@ -127,7 +131,7 @@ function DoorInner() {
                 <button className="btn small" type="submit">{person.inMystery ? 'Byt bilden i mysteriet' : 'Lägg i mysteriet'}</button>
               </form>
               {!person.checkedInAt && (
-                <button className="btn small" type="button" onClick={() => void checkIn(person.id)}>
+                <button className="btn small" type="button" onClick={() => void checkIn(person)}>
                   Har kommit · ge 100 i marker
                 </button>
               )}

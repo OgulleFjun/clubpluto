@@ -666,3 +666,12 @@ SET rules_text = replace(rules_text,
       'Har du ingen telefon tar Managern bilden.',
       'Har du ingen telefon tar Managern bilden. Sedan får du reglerna och går ut i klubben.')
 WHERE id = 1 AND rules_text NOT LIKE '%går ut i klubben.%';
+
+-- Den Förste får vampyrkorten av Managern vid registreringen.
+UPDATE event_settings
+SET rules_text = replace(rules_text,
+      'En spelare börjar som vampyr. Den kallas Den Förste och har två vampyrkort.',
+      'En spelare börjar som vampyr. Den kallas Den Förste och får två vampyrkort av Managern vid registreringen.'),
+    rules_version = 6,
+    updated_at = now()
+WHERE id = 1 AND rules_version < 6;

@@ -19,7 +19,7 @@ export const whenWhere = {
 };
 
 export const vampireRules = [
-  'En spelare börjar som vampyr. Den kallas Den Förste och har två vampyrkort.',
+  'En spelare börjar som vampyr. Den kallas Den Förste och får två vampyrkort av Managern vid registreringen.',
   'En vampyr kan ge ett vampyrkort till en annan gäst. Den som får kortet väljer själv. Ingen kan tvingas att bli vampyr.',
   'Den som tar emot kortet blir vampyr och anmäler sig i Banken. Den som blir vampyr får 1 blodspeng och 20 spelmarker. Man kan bara bli vampyr en gång.',
   'Den som gör någon annan till vampyr får 1 blodspeng. Det går att få högst 2 blodspengar på det sättet.',
@@ -96,6 +96,7 @@ export const staffPosts: StaffPostCopy[] = [
       '18:30: självregistreringen öppnar av sig själv. Knappen ovanför stänger eller öppnar den igen.',
       'Ta emot gästerna som Bouncern skickar ner. De har redan sagt lösenordet. Sök fram gästen i Dörren och tryck Har kommit. Ge spelmarker till ett värde av 100.',
       'Gästen tar en ny bild i förklädnad på sin telefon. Har gästen ingen telefon tar du bilden i Dörren. Är gästen inte registrerad och saknar telefon, registrerar du den i Dörren.',
+      'Är gästen Den Förste står det i Dörren. Ge då också de två vampyrkorten, utan att andra ser.',
       'Ge gästen reglerna i korthet och skicka ut den i klubben.',
       'Poängen för vem som är vem och för vampyrgissningarna syns under fliken Poäng. Klockan 20:30 stänger gissningarna av sig själva, och där står vinnaren av överlevnadspriset. Bara du ser den.',
       'Under Vampyr visar du bilder på de två senaste vampyrerna. Den nya pekar på vem som förvandlade den. Knappen ger den gamla vampyren en blodspeng, högst två.',

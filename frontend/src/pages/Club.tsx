@@ -90,7 +90,7 @@ function ClubInner() {
           <article className="card">
             <h2>Du är Den Förste</h2>
             <p>Du är startvampyren. Kvällen börjar med dig.</p>
-            <p>Du har två vampyrkort. Ge ett kort till en gäst som frivilligt vill bli vampyr. Den som tar emot kortet anmäler sig i Banken och tar över kortet.</p>
+            <p>Du får två vampyrkort av Managern när du registrerar dig. Ge ett kort till en gäst som frivilligt vill bli vampyr. Den som tar emot kortet anmäler sig i Banken och tar över kortet.</p>
             <p>För varje person du gör till vampyr får du 1 blodspeng, högst 2.</p>
             <p>Säg det inte till någon. Det syns inte för de andra.</p>
           </article>
