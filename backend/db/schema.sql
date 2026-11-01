@@ -651,3 +651,18 @@ SET rules_text = replace(
     rules_version = 4,
     updated_at = now()
 WHERE id = 1 AND rules_version < 4;
+
+-- Entrén som den går till: lösenord hos Bouncern, registrering och marker hos Managern, sedan reglerna.
+UPDATE event_settings
+SET rules_text = replace(rules_text,
+      'Bouncern släpper in en gäst i taget. Du säger kvällens lösenord och går ner till Managern. Managern registrerar dig och ger dig spelmarker till ett värde av 100.',
+      'Förregistrera dig på hemsidan innan du kommer. Vid ytterdörren säger du kvällens lösenord till Bouncern och går ner för trappan till registreringen. Där registrerar Managern att du har kommit och ger dig spelmarker till ett värde av 100.'),
+    rules_version = 5,
+    updated_at = now()
+WHERE id = 1 AND rules_version < 5;
+
+UPDATE event_settings
+SET rules_text = replace(rules_text,
+      'Har du ingen telefon tar Managern bilden.',
+      'Har du ingen telefon tar Managern bilden. Sedan får du reglerna och går ut i klubben.')
+WHERE id = 1 AND rules_text NOT LIKE '%går ut i klubben.%';

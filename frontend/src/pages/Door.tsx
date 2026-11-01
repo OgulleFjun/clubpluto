@@ -33,7 +33,7 @@ export default function Door() {
 }
 
 function DoorInner() {
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const [overview, setOverview] = useState<Overview | null>(null);
   const [people, setPeople] = useState<Person[]>([]);
   const [query, setQuery] = useState('');
@@ -53,19 +53,12 @@ function DoorInner() {
     refresh('').catch((reason: Error) => setError(reason.message));
   }, [token]);
 
-  async function checkIn(event: FormEvent<HTMLFormElement>, id: string) {
-    const form = new FormData(event.currentTarget);
+  async function checkIn(id: string) {
     setError('');
     setMessage('');
     try {
-      await api(`/door/check-in/${id}`, {
-        method: 'POST',
-        body: JSON.stringify({
-          doorPassword: form.get('doorPassword'),
-          skipPassword: form.get('skipPassword') === 'on',
-        }),
-      }, token);
-      setMessage('Incheckad. Spelmarker till ett värde av 100 är markerade.');
+      await api(`/door/check-in/${id}`, { method: 'POST', body: JSON.stringify({}) }, token);
+      setMessage('Gästen är inne. Ge spelmarker till ett värde av 100.');
       await refresh();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Incheckningen misslyckades.');
@@ -103,7 +96,7 @@ function DoorInner() {
   }
 
   return (
-    <Page title="Dörren" lede="Sök fram gästen och be om lösenordet. Spelmarkerna, värda 100, lämnas hos Managern.">
+    <Page title="Dörren" lede="Gästen har redan sagt lösenordet till Bouncern. Sök fram gästen, registrera att den har kommit, ge 100 i spelmarker och se till att bilden i utklädnad finns. Ge sedan reglerna och skicka ut gästen i klubben.">
       {overview && (
         <p>{overview.registered} registrerade · {overview.arrived} inne · {overview.remaining} kvar
           {!overview.doorPasswordSet ? ' · entrélösenord saknas' : ''}
@@ -134,13 +127,9 @@ function DoorInner() {
                 <button className="btn small" type="submit">{person.inMystery ? 'Byt bilden i mysteriet' : 'Lägg i mysteriet'}</button>
               </form>
               {!person.checkedInAt && (
-                <form onSubmit={onSubmit((event) => checkIn(event, person.id))}>
-                  <Field label="Entrélösenord som gästen säger"><input name="doorPassword" /></Field>
-                  {user?.role === 'admin' && (
-                    <label className="meta"><input type="checkbox" name="skipPassword" /> Hoppa över lösenordet den här gången</label>
-                  )}
-                  <button className="btn small" type="submit">Checka in</button>
-                </form>
+                <button className="btn small" type="button" onClick={() => void checkIn(person.id)}>
+                  Har kommit · ge 100 i marker
+                </button>
               )}
             </div>
           </article>

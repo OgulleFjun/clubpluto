@@ -77,8 +77,8 @@ export const primaryPostKeys = ['manager', 'holdem', 'sjalpoker', 'ride-the-bus'
 
 const evening = [
   'Samling klockan 17:00 i Folkets hus. Då går ni igenom kvällen och gör i ordning era platser.',
-  'Klockan 18:30 öppnas ytterdörren. Bouncern släpper in en gäst i taget. Den som kan lösenordet får gå ner i källaren. Den som inte kan det stannar utanför.',
-  'Hos Managern registreras gästen och får sina spelmarker. Sedan går gästen ut och spelar.',
+  'Klockan 18:30 öppnas ytterdörren. Gästen säger lösenordet till Bouncern. Den som kan det får gå ner för trappan. Den som inte kan det stannar utanför. Den som inte är registrerad förregistrerar sig på telefonen först.',
+  'Nere vid registreringen möter gästen Managern. Där registreras att gästen har kommit, gästen får spelmarker till ett värde av 100 och tar en ny bild i förklädnad. Sedan får gästen reglerna och går ut i klubben.',
   'Tre spel pågår: Texas Hold’em, Själ-poker och Ride the Bus. Banken tar emot vampyrer och priser.',
 ];
 
@@ -93,10 +93,12 @@ export const staffPosts: StaffPostCopy[] = [
       '17:00: var på plats. Gå igenom kvällen med personalen och ställ i ordning registreringen.',
       'Dräkten är en anka i hög hatt, frack och käpp. Ansiktet är täckt.',
       'Kontrollera att de tre croupiererna har varsitt bord.',
-      '18:30: självregistreringen öppnar av sig själv. Knappen ovanför stänger eller öppnar den igen. Ta emot gästerna som Bouncern skickar ner. Gästen loggar in på sin telefon och tar själv en bild i förklädnad. Har gästen ingen telefon tar du bilden i Dörren. Ge spelmarker till ett värde av 100.',
+      '18:30: självregistreringen öppnar av sig själv. Knappen ovanför stänger eller öppnar den igen.',
+      'Ta emot gästerna som Bouncern skickar ner. De har redan sagt lösenordet. Sök fram gästen i Dörren och tryck Har kommit. Ge spelmarker till ett värde av 100.',
+      'Gästen tar en ny bild i förklädnad på sin telefon. Har gästen ingen telefon tar du bilden i Dörren. Är gästen inte registrerad och saknar telefon, registrerar du den i Dörren.',
+      'Ge gästen reglerna i korthet och skicka ut den i klubben.',
       'Poängen för vem som är vem och för vampyrgissningarna syns under fliken Poäng. Klockan 20:30 stänger gissningarna av sig själva, och där står vinnaren av överlevnadspriset. Bara du ser den.',
       'Under Vampyr visar du bilder på de två senaste vampyrerna. Den nya pekar på vem som förvandlade den. Knappen ger den gamla vampyren en blodspeng, högst två.',
-      'Skicka gästen vidare till borden. Du ger inga marker vid ytterdörren.',
       'Du är den de andra frågar när ett bord står stilla eller någon vill ta av sig masken. Croupieren bestämmer vid sitt eget bord.',
       'Vid slutet stämmer du av med Prize Master.',
     ],
@@ -226,6 +228,7 @@ export const staffPosts: StaffPostCopy[] = [
       'Om du redan är vald: var med klockan 17:00. Entrélösenordet är 123abc!. Skriv inte upp det där gäster kan se det.',
       'Stå vid ytterdörren innan 18:30. Ingen kö får rinna in av sig själv.',
       '18:30: en gäst i taget. Be om lösenordet. Kan gästen det, skicka ner personen till Managern. Annars stannar gästen utanför.',
+      'Är gästen inte registrerad: be gästen förregistrera sig på clubpluto.eu på telefonen innan den går ner. Det tar en minut: förnamn, efternamn, alias och ett porträtt utan mask. Har gästen ingen telefon, skicka ner den till Managern som registrerar.',
       'Du registrerar inte gästen och du ger inte ut spelmarker.',
       'Håll ordning i entrén och i trappan. Ingen går ner utan att ha sagt lösenordet till dig.',
       'Bråk eller någon som vägrar förklädnaden: håll personen vid dörren och hämta Managern. Lämna inte ytterdörren obevakad.',
