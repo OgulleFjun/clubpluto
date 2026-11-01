@@ -101,21 +101,54 @@ interface Person {
 function People() {
   const view = useAdmin<{ participants: Person[] }>('/admin/participants');
   const [selected, setSelected] = useState<Person | null>(null);
+  const [busyId, setBusyId] = useState('');
   if (!view.data) return <p>{view.error || 'Hämtar…'}</p>;
   const people = view.data.participants;
+
+  async function toggleSus(person: Person) {
+    setBusyId(person.id);
+    try {
+      await api(`/admin/participants/${person.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ membership: person.membership === 'sus' ? 'guest' : 'sus' }),
+      }, view.token);
+      const next = await view.reload();
+      if (selected?.id === person.id) {
+        setSelected((next as { participants: Person[] }).participants.find((row) => row.id === person.id) || null);
+      }
+    } catch (reason) {
+      view.setError(reason instanceof Error ? reason.message : 'Det gick inte att spara.');
+    } finally {
+      setBusyId('');
+    }
+  }
   return (
     <div className="list">
       <div className="list">
         {people.map((person) => (
-          <button className="card" key={person.id} type="button" onClick={() => setSelected(person)} style={{ textAlign: 'left' }}>
-            <strong>{person.name}</strong>
-            <div className="meta">
-              {person.membership === 'staff' ? 'Personal' : 'Medlem'} · {person.checkedInAt ? 'Inne' : 'Ute'} · {person.isVampire ? 'vampyr' : 'människa'}
-              {person.isVampire ? ` · ${person.conversionChips} blodspengar från förvandling` : ''}
-            </div>
-          </button>
+          <div className="card" key={person.id} style={{ display: 'flex', gap: '0.7rem', alignItems: 'center' }}>
+            <button type="button" onClick={() => setSelected(person)} style={{ textAlign: 'left', flex: 1, background: 'none', border: 0, color: 'inherit', padding: 0, font: 'inherit', cursor: 'pointer' }}>
+              <strong>{person.name}</strong>
+              <div className="meta">
+                {membershipLabel(person.membership)} · {person.checkedInAt ? 'Inne' : 'Ute'} · {person.isVampire ? 'vampyr' : 'människa'}
+                {person.isVampire ? ` · ${person.conversionChips} blodspengar från förvandling` : ''}
+              </div>
+            </button>
+            {person.membership !== 'staff' && (
+              <button
+                type="button"
+                className={person.membership === 'sus' ? 'btn small' : 'btn small ghost'}
+                aria-pressed={person.membership === 'sus'}
+                disabled={busyId === person.id}
+                onClick={() => void toggleSus(person)}
+              >
+                {person.membership === 'sus' ? '✓ SUS' : 'SUS'}
+              </button>
+            )}
+          </div>
         ))}
       </div>
+      <ErrorText>{view.error}</ErrorText>
       {selected && (
         <>
         <form className="card" key={selected.id} onSubmit={onSubmit(async (event) => {
@@ -701,4 +734,11 @@ function Settings() {
       <p className="meta">Nu: {formatWhen(s.eventStartsAt)}</p>
     </form>
   );
+}
+
+function membershipLabel(membership: string) {
+  if (membership === 'staff') return 'Personal';
+  if (membership === 'sus') return 'SUS';
+  if (membership === 'sas') return 'SAS';
+  return 'Gäst';
 }
