@@ -120,5 +120,5 @@ export function conversionCredit({ newbieIsVampire, sireIsVampire, alreadyPaid, 
 export function vampireBonusDecision({ alreadyGranted, isFirstSelection, firstGetsBonus }) {
   if (alreadyGranted) return null;
   if (isFirstSelection && !firstGetsBonus) return null;
-  return { baseChips: 20, prizeChip: true };
+  return { baseChips: 0, prizeChip: true };
 }

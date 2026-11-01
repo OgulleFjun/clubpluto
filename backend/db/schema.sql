@@ -694,3 +694,12 @@ WHERE id = 1 AND rules_version < 7;
 
 -- Personalen kan lägga in sin bild i förklädnad från klockan 17:00.
 ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS staff_costume_from timestamptz NOT NULL DEFAULT '2026-11-01 17:00:00+01';
+
+-- Den som blir vampyr får bara 1 blodspeng, inga spelmarker.
+UPDATE event_settings
+SET rules_text = replace(rules_text,
+      'Den som blir vampyr får 1 blodspeng och 20 spelmarker.',
+      'Den som blir vampyr får 1 blodspeng.'),
+    rules_version = 8,
+    updated_at = now()
+WHERE id = 1 AND rules_version < 8;

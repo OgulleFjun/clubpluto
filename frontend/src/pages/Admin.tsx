@@ -744,7 +744,7 @@ function Settings() {
       <label className="meta"><input type="checkbox" name="costumeUploadOpen" defaultChecked={s.costumeUploadOpen} /> Gästerna lägger själva upp bilden i utklädnad</label>
       <label className="meta"><input type="checkbox" name="vampireConversionsOpen" defaultChecked={s.vampireConversionsOpen} /> Banken tar emot förvandlingar</label>
       <label className="meta"><input type="checkbox" name="useAliases" defaultChecked={s.useAliases} /> Alias visas på den egna sidan</label>
-      <label className="meta"><input type="checkbox" name="firstVampireGetsBonus" defaultChecked={s.firstVampireGetsBonus} /> Den Förste får 20 spelmarker och 1 blodspeng direkt</label>
+      <label className="meta"><input type="checkbox" name="firstVampireGetsBonus" defaultChecked={s.firstVampireGetsBonus} /> Den Förste får 1 blodspeng direkt</label>
       <Field label="Lika poäng">
         <select name="tieBreak" defaultValue={s.tieBreak}>
           <option value="shared">Dela priset</option>

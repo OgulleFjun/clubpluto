@@ -21,7 +21,7 @@ export const whenWhere = {
 export const vampireRules = [
   'En spelare börjar som vampyr. Den kallas Den Förste och får två vampyrkort av Managern vid registreringen.',
   'En vampyr kan ge ett vampyrkort till en annan gäst. Den som får kortet väljer själv. Ingen kan tvingas att bli vampyr.',
-  'Den som tar emot kortet blir vampyr och anmäler sig i Banken. Den som blir vampyr får 1 blodspeng och 20 spelmarker. Man kan bara bli vampyr en gång.',
+  'Den som tar emot kortet blir vampyr och anmäler sig i Banken. Den som blir vampyr får 1 blodspeng. Man kan bara bli vampyr en gång.',
   'Den som gör någon annan till vampyr får 1 blodspeng. Det går att få högst 2 blodspengar på det sättet.',
   'Den nya vampyren tar över kortet och kan ge det vidare. Det finns bara två kort, men vampyrerna kan bli fler.',
   'Säg inte högt vem som blev vampyr. Ingen notis går ut.',

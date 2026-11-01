@@ -123,13 +123,13 @@ describe('förvandlingsmark', () => {
 describe('vampyrbonus', () => {
   it('ges en gång och kan hoppas över för Den Förste', () => {
     expect(vampireBonusDecision({ alreadyGranted: false, isFirstSelection: false, firstGetsBonus: false })).toEqual({
-      baseChips: 20,
+      baseChips: 0,
       prizeChip: true,
     });
     expect(vampireBonusDecision({ alreadyGranted: true, isFirstSelection: false, firstGetsBonus: true })).toBeNull();
     expect(vampireBonusDecision({ alreadyGranted: false, isFirstSelection: true, firstGetsBonus: false })).toBeNull();
     expect(vampireBonusDecision({ alreadyGranted: false, isFirstSelection: true, firstGetsBonus: true })).toEqual({
-      baseChips: 20,
+      baseChips: 0,
       prizeChip: true,
     });
   });
