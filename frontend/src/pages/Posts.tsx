@@ -69,7 +69,7 @@ function Board() {
 }
 
 function StaffCostume({ token }: { token: string | null }) {
-  const [state, setState] = useState<{ open: boolean; opensAt: string; needsProfile: boolean; costumeToken: string | null } | null>(null);
+  const [state, setState] = useState<{ open: boolean; opensAt: string; needsProfile: boolean; isFirst?: boolean; costumeToken: string | null } | null>(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [version, setVersion] = useState(0);
@@ -98,14 +98,24 @@ function StaffCostume({ token }: { token: string | null }) {
   }
 
   if (!state || state.needsProfile) return null;
+  const first = state.isFirst && (
+    <article className="card" style={{ marginBottom: '1rem' }}>
+      <h2>Du är Den Förste</h2>
+      <p>Du är startvampyren. Kvällen börjar med dig.</p>
+      <p>Du får två vampyrkort av Managern. Ge ett kort till en gäst som frivilligt vill bli vampyr. Den som tar emot kortet anmäler sig i Banken och tar över kortet.</p>
+      <p>För varje person du gör till vampyr får du 1 blodspeng, högst 2.</p>
+      <p>Säg det inte till någon. Det syns inte för de andra.</p>
+    </article>
+  );
   if (!state.open) {
     return (
-      <p className="meta">
+      <>{first}<p className="meta">
         Klockan {new Date(state.opensAt).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })} kan du lägga in en bild av dig i förklädnaden här.
-      </p>
+      </p></>
     );
   }
   return (
+    <>{first}
     <form className="card" style={{ marginBottom: '1rem' }} onSubmit={onSubmit(send)}>
       <h2>{state.costumeToken ? 'Din bild i mysteriet' : 'Ta en bild i din förklädnad'}</h2>
       {state.costumeToken && <Portrait token={state.costumeToken} alt="Du i förklädnad" version={version} />}
@@ -117,6 +127,7 @@ function StaffCostume({ token }: { token: string | null }) {
       {message && <p className="ok">{message}</p>}
       <ErrorText>{error}</ErrorText>
     </form>
+    </>
   );
 }
 

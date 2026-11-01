@@ -132,7 +132,7 @@ router.get(
       `SELECT id, name, is_first, vampire_at, conversion_chips, sire_paid,
               photo_path, photo_token, costume_path, costume_token
        FROM participants
-       WHERE is_vampire AND membership <> 'staff'
+       WHERE is_vampire
        ORDER BY vampire_at DESC NULLS LAST, name`
     );
     const vampires = rows.map((row) => ({
@@ -214,6 +214,7 @@ router.get(
       open: staffCostumeOpen(settings),
       opensAt: settings.staff_costume_from,
       needsProfile: !req.participant,
+      isFirst: Boolean(req.participant?.is_vampire && req.participant?.is_first),
       costumeToken: req.participant?.costume_path ? req.participant.costume_token : null,
     });
   })
