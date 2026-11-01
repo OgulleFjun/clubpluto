@@ -1,5 +1,5 @@
-import { query } from './db.js';
-import { buildLeaderboard } from './scoring.js';
+import { query, withTransaction } from './db.js';
+import { annotateWinners, buildLeaderboard } from './scoring.js';
 
 export async function getSettings() {
   const { rows } = await query('SELECT * FROM event_settings WHERE id = 1');
@@ -158,4 +158,52 @@ export function presentScore(row) {
     isWinner: row.is_winner ?? row.isWinner,
     tiedForLead: row.tied_for_lead ?? row.tiedForLead,
   };
+}
+
+/** Sparar poängen som de står nu och stänger gissningarna och förvandlingarna. */
+export async function closeCompetition() {
+  const { board } = await currentLeaderboard();
+  await withTransaction(async (client) => {
+    await saveSnapshots(client, board);
+    await client.query(
+      `UPDATE event_settings SET
+        identity_open = false,
+        vampire_conversions_open = false,
+        competition_closed_at = COALESCE(competition_closed_at, now()),
+        updated_at = now()
+       WHERE id = 1`
+    );
+  });
+  return board;
+}
+
+/** Räknar om vinnaren ur de sparade poängen, till exempel när någon markerats som SUS i efterhand. */
+export async function refreshSnapshotWinners() {
+  const settings = await getSettings();
+  const { rows } = await query(
+    `SELECT s.participant_id, s.total_points, s.is_vampire, s.last_guess_at, p.name, p.membership
+     FROM score_snapshots s
+     JOIN participants p ON p.id = s.participant_id`
+  );
+  const annotated = annotateWinners(
+    rows
+      .map((row) => ({
+        id: row.participant_id,
+        name: row.name,
+        isVampire: row.is_vampire,
+        canWin: row.membership === 'sus',
+        total: row.total_points,
+        lastGuessAt: row.last_guess_at,
+      }))
+      .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, 'sv')),
+    settings.tie_break
+  );
+  await withTransaction(async (client) => {
+    for (const row of annotated) {
+      await client.query(
+        'UPDATE score_snapshots SET is_winner = $2, tied_for_lead = $3 WHERE participant_id = $1',
+        [row.id, row.isWinner, row.tiedForLead]
+      );
+    }
+  });
 }

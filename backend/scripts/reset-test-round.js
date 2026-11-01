@@ -85,6 +85,8 @@ try {
     await client.query(`
       UPDATE event_settings SET
         costume_upload_open = false,
+        costume_auto_opened_at = NULL,
+        survival_decided_at = NULL,
         identity_open = false,
         results_revealed = false,
         competition_closed_at = NULL,

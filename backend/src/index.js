@@ -10,6 +10,7 @@ import gmRoutes from './routes/gm.js';
 import adminRoutes from './routes/admin.js';
 import postRoutes from './routes/posts.js';
 import photosRouter from './routes/photos.js';
+import { startSchedule } from './schedule.js';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -64,4 +65,5 @@ app.use((error, _req, res, _next) => {
 
 app.listen(env.port, () => {
   console.log(`Club Pluto lyssnar på port ${env.port}`);
+  startSchedule();
 });

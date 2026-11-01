@@ -8,6 +8,8 @@ import {
   getSettings,
   presentScore,
   presentSettings,
+  closeCompetition,
+  refreshSnapshotWinners,
   saveSnapshots,
 } from '../competition.js';
 import { asyncRoute, httpError, param } from '../http.js';
@@ -191,6 +193,10 @@ router.patch(
         await client.query('UPDATE accounts SET display_name = $2 WHERE id = $1', [current.account_id, name]);
       }
     });
+    if (membership !== current.membership) {
+      const settings = await getSettings();
+      if (settings.competition_closed_at) await refreshSnapshotWinners();
+    }
     res.json({ ok: true });
   })
 );
@@ -422,18 +428,7 @@ router.get(
 router.post(
   '/competition/close',
   asyncRoute(async (_req, res) => {
-    const { board } = await currentLeaderboard();
-    await withTransaction(async (client) => {
-      await saveSnapshots(client, board);
-      await client.query(
-        `UPDATE event_settings SET
-          identity_open = false,
-          vampire_conversions_open = false,
-          competition_closed_at = COALESCE(competition_closed_at, now()),
-          updated_at = now()
-         WHERE id = 1`
-      );
-    });
+    const board = await closeCompetition();
     res.json({ ok: true, rows: board.length });
   })
 );

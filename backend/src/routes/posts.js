@@ -58,15 +58,47 @@ router.get(
       );
       if (!post.rows[0]) throw httpError(403, 'Poängen visas för Managern.');
     }
+    const settings = await getSettings();
+    if (settings.competition_closed_at) {
+      // Efter avgörandet visas poängen som de stod då, med vinnaren. Bara Managern och arrangören ser det här.
+      const snaps = await query(
+        `SELECT s.*, p.name, p.membership FROM score_snapshots s
+         JOIN participants p ON p.id = s.participant_id
+         WHERE p.membership <> 'staff'
+         ORDER BY s.total_points DESC, p.name`
+      );
+      res.json({
+        decidedAt: settings.competition_closed_at,
+        winners: snaps.rows.filter((row) => row.is_winner).map((row) => ({ name: row.name, total: row.total_points })),
+        tied: snaps.rows.some((row) => row.tied_for_lead),
+        rows: snaps.rows.map((row) => ({
+          id: row.participant_id,
+          name: row.name,
+          sus: row.membership === 'sus',
+          isVampire: row.is_vampire,
+          isWinner: row.is_winner,
+          total: row.total_points,
+          identityPoints: row.identity_points,
+          vampirePoints: row.vampire_points,
+          identityCorrect: row.identity_correct,
+          identityWrong: row.identity_wrong,
+          vampireCorrect: row.vampire_correct,
+          vampireWrong: row.vampire_wrong,
+        })),
+      });
+      return;
+    }
     const { board } = await currentLeaderboard();
     const people = await query('SELECT id, membership FROM participants');
     const membership = new Map(people.rows.map((row) => [row.id, row.membership]));
     res.json({
+      decideAt: settings.survival_decide_at,
       rows: board
         .filter((row) => membership.get(row.id) !== 'staff')
         .map((row) => ({
           id: row.id,
           name: row.name,
+          sus: membership.get(row.id) === 'sus',
           total: row.total,
           identityPoints: row.identityPoints,
           vampirePoints: row.vampirePoints,
@@ -155,7 +187,12 @@ router.post(
     const open = Boolean(req.body.open);
     const settings = await getSettings();
     if (open && settings.competition_closed_at) throw httpError(409, 'Tävlingen är redan stängd.');
-    await query('UPDATE event_settings SET costume_upload_open = $1, updated_at = now() WHERE id = 1', [open]);
+    await query(
+      `UPDATE event_settings
+       SET costume_upload_open = $1, costume_auto_opened_at = COALESCE(costume_auto_opened_at, now()), updated_at = now()
+       WHERE id = 1`,
+      [open]
+    );
     res.json(await costumeDesk());
   })
 );

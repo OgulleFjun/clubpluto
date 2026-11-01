@@ -202,7 +202,8 @@ function Detail() {
   const [tab, setTab] = useState<Tab>('allmant');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const [scores, setScores] = useState<{ name: string; total: number; identityCorrect: number; identityWrong: number; vampireCorrect: number; vampireWrong: number }[] | null>(null);
+  const [scores, setScores] = useState<{ name: string; sus: boolean; isWinner?: boolean; isVampire?: boolean; total: number; identityCorrect: number; identityWrong: number; vampireCorrect: number; vampireWrong: number }[] | null>(null);
+  const [survival, setSurvival] = useState<{ decideAt?: string; decidedAt?: string; winners?: { name: string; total: number }[]; tied?: boolean } | null>(null);
 
   function load() {
     return api<Board>('/posts', {}, token).then(setBoard);
@@ -214,8 +215,11 @@ function Detail() {
 
   useEffect(() => {
     if (tab !== 'poang') return;
-    api<{ rows: NonNullable<typeof scores> }>('/posts/manager/scores', {}, token)
-      .then((data) => setScores(data.rows))
+    api<{ rows: NonNullable<typeof scores> } & NonNullable<typeof survival>>('/posts/manager/scores', {}, token)
+      .then((data) => {
+        setScores(data.rows);
+        setSurvival(data);
+      })
       .catch((reason: Error) => setError(reason.message));
   }, [tab, token]);
 
@@ -298,9 +302,34 @@ function Detail() {
       {tab === 'marker' && <MarkerGuide />}
       {tab === 'poang' && (
         <div className="list">
+          {survival && (
+            <article className="card">
+              <h2>Överlevnadspriset</h2>
+              {!survival.decidedAt && (
+                <p>Avgörs av sig själv klockan {survival.decideAt ? new Date(survival.decideAt).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' }) : '20:30'}. Då sparas poängen och gissningarna stängs. Bara du ser vinnaren.</p>
+              )}
+              {survival.decidedAt && survival.winners && survival.winners.length > 0 && (
+                <>
+                  <p><strong>{survival.winners.map((winner) => `${winner.name}, ${winner.total} poäng`).join(' och ')}</strong></p>
+                  <p className="meta">
+                    Avgjort {new Date(survival.decidedAt).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}.
+                    {survival.tied ? ' Lika poäng, priset delas.' : ''} Bara du ser det här. Vinnaren avslöjas på nästa SUS.
+                  </p>
+                </>
+              )}
+              {survival.decidedAt && !survival.winners?.length && (
+                <p>
+                  {survival.tied
+                    ? 'Lika poäng. Välj vinnaren i kontrollpanelen.'
+                    : 'Ingen SUS:are som är människa har högst poäng ännu. Markera SUS:arna i kontrollpanelen, så räknas vinnaren fram ur poängen från avgörandet.'}
+                </p>
+              )}
+            </article>
+          )}
           {scores?.map((row) => (
             <article className="card" key={row.name}>
-              <h2>{row.name}</h2>
+              <h2>{row.name}{row.isWinner ? ' · vinnare' : ''}</h2>
+              <p className="meta">{row.sus ? 'SUS' : 'Inte SUS, kan inte vinna'}{row.isVampire ? ' · vampyr' : ''}</p>
               <p><strong>{row.total} poäng</strong></p>
               <p className="meta">Matchningar: {row.identityCorrect} rätt, {row.identityWrong} fel. Vampyrer: {row.vampireCorrect} rätt, {row.vampireWrong} fel.</p>
             </article>

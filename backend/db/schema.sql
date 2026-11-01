@@ -634,3 +634,20 @@ I Banken står Prize Master. Har du slut på spelmarker kan du dansa och få 50 
     rules_version = 3,
     updated_at = now()
 WHERE id = 1 AND rules_version < 3;
+
+-- Självregistreringen öppnar av sig själv när dörren öppnar, och överlevnadspriset avgörs klockan 20:30.
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS costume_auto_opened_at timestamptz;
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS survival_decide_at timestamptz NOT NULL DEFAULT '2026-11-01 20:30:00+01';
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS survival_decided_at timestamptz;
+
+-- Reglerna säger när tävlingen stänger.
+UPDATE event_settings
+SET rules_text = replace(
+      replace(rules_text,
+        'En bild du inte gissar på ger 0 poäng. Facit är vilka som är vampyrer när tävlingen stänger.',
+        'En bild du inte gissar på ger 0 poäng. Gissningarna stänger klockan 20:30. Facit är vilka som är vampyrer då.'),
+      'Du kan ändra en matchning tills tävlingen stänger.',
+      'Du kan ändra en matchning fram till klockan 20:30.'),
+    rules_version = 4,
+    updated_at = now()
+WHERE id = 1 AND rules_version < 4;

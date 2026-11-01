@@ -25,8 +25,8 @@ export const vampireRules = [
   'Den som gör någon annan till vampyr får 1 blodspeng. Det går att få högst 2 blodspengar på det sättet.',
   'Den nya vampyren tar över kortet och kan ge det vidare. Det finns bara två kort, men vampyrerna kan bli fler.',
   'Säg inte högt vem som blev vampyr. Ingen notis går ut.',
-  'I Mysteriet gissar gästerna vem som är vem och vilka som är vampyrer. Rätt ger +1 poäng, fel ger −1 poäng och en bild utan gissning ger 0. Poäng är inte marker.',
-  'Bara SUS:are kan vinna överlevnadspriset. Det går till den SUS:are som fortfarande är människa och har flest poäng, även om en vampyr har fler. Vinnaren avslöjas på nästa SUS.',
+  'I Mysteriet gissar gästerna vem som är vem och vilka som är vampyrer. Rätt ger +1 poäng, fel ger −1 poäng och en bild utan gissning ger 0. Poäng är inte marker. Gissningarna stänger klockan 20:30.',
+  'Bara SUS:are kan vinna överlevnadspriset. Klockan 20:30 går det till den SUS:are som fortfarande är människa och har flest poäng, även om en vampyr har fler. Vinnaren avslöjas på nästa SUS.',
 ];
 
 export const markerGuide = [
@@ -93,8 +93,8 @@ export const staffPosts: StaffPostCopy[] = [
       '17:00: var på plats. Gå igenom kvällen med personalen och ställ i ordning registreringen.',
       'Dräkten är en anka i hög hatt, frack och käpp. Ansiktet är täckt.',
       'Kontrollera att de tre croupiererna har varsitt bord.',
-      '18:30: öppna självregistreringen med knappen ovanför. Ta emot gästerna som Bouncern skickar ner. Gästen loggar in på sin telefon och tar själv en bild i förklädnad. Har gästen ingen telefon tar du bilden i Dörren. Ge spelmarker till ett värde av 100.',
-      'Poängen för vem som är vem och för vampyrgissningarna syns under fliken Poäng.',
+      '18:30: självregistreringen öppnar av sig själv. Knappen ovanför stänger eller öppnar den igen. Ta emot gästerna som Bouncern skickar ner. Gästen loggar in på sin telefon och tar själv en bild i förklädnad. Har gästen ingen telefon tar du bilden i Dörren. Ge spelmarker till ett värde av 100.',
+      'Poängen för vem som är vem och för vampyrgissningarna syns under fliken Poäng. Klockan 20:30 stänger gissningarna av sig själva, och där står vinnaren av överlevnadspriset. Bara du ser den.',
       'Under Vampyr visar du bilder på de två senaste vampyrerna. Den nya pekar på vem som förvandlade den. Knappen ger den gamla vampyren en blodspeng, högst två.',
       'Skicka gästen vidare till borden. Du ger inga marker vid ytterdörren.',
       'Du är den de andra frågar när ett bord står stilla eller någon vill ta av sig masken. Croupieren bestämmer vid sitt eget bord.',
