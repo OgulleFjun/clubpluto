@@ -691,3 +691,6 @@ Har du slut på spelmarker kan du dansa för Dansmastern och få 50 nya.'),
     rules_version = 7,
     updated_at = now()
 WHERE id = 1 AND rules_version < 7;
+
+-- Personalen kan lägga in sin bild i förklädnad från klockan 17:00.
+ALTER TABLE event_settings ADD COLUMN IF NOT EXISTS staff_costume_from timestamptz NOT NULL DEFAULT '2026-11-01 17:00:00+01';

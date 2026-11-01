@@ -21,6 +21,7 @@ interface Person {
   inMystery: boolean;
   invitedBy: string | null;
   isFirst?: boolean;
+  membership: string;
 }
 
 const roles = ['admin', 'doorman', 'gamemaster'];
@@ -120,7 +121,7 @@ function DoorInner() {
           <article className="card person" key={person.id}>
             {person.photoToken ? <Portrait token={person.photoToken} alt="" /> : <div className="portrait empty" />}
             <div>
-              <h2>{person.name}</h2>
+              <h2>{person.name}{person.membership === 'staff' ? ' · personal' : ''}</h2>
               <p className="meta">{person.alias ? `${person.alias} · ` : ''}{person.email} · {person.doorCode}</p>
               <p className="meta">{person.invitedBy ? `Inbjuden av ${person.invitedBy}. ` : ''}{person.checkedInAt ? 'Inne.' : 'Inte anländ.'} {person.baseChipsIssued ? 'Marker utlämnade.' : ''} {person.inMystery ? 'Syns i mysteriet.' : ''}</p>
               {person.isFirst && <p className="ok">Den Förste. Ge två vampyrkort vid registreringen, utan att andra ser.</p>}
@@ -130,7 +131,7 @@ function DoorInner() {
                 </Field>
                 <button className="btn small" type="submit">{person.inMystery ? 'Byt bilden i mysteriet' : 'Lägg i mysteriet'}</button>
               </form>
-              {!person.checkedInAt && (
+              {!person.checkedInAt && person.membership !== 'staff' && (
                 <button className="btn small" type="button" onClick={() => void checkIn(person)}>
                   Har kommit · ge 100 i marker
                 </button>

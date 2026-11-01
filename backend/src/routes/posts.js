@@ -4,6 +4,9 @@ import { authenticate, loadAccount, requireRoles } from '../auth.js';
 import { currentLeaderboard, getSettings } from '../competition.js';
 import { creditConversion } from '../conversions.js';
 import { asyncRoute, httpError, param } from '../http.js';
+import { randomToken } from '../tokens.js';
+import { removeFile, saveImage, upload } from '../uploads.js';
+import { env } from '../config.js';
 
 const router = Router();
 const staffRoles = ['admin', 'doorman', 'gamemaster'];
@@ -195,6 +198,50 @@ router.post(
       [open]
     );
     res.json(await costumeDesk());
+  })
+);
+
+function staffCostumeOpen(settings, now = new Date()) {
+  if (settings.competition_closed_at) return false;
+  return settings.costume_upload_open || now >= new Date(settings.staff_costume_from);
+}
+
+router.get(
+  '/me/costume',
+  asyncRoute(async (req, res) => {
+    const settings = await getSettings();
+    res.json({
+      open: staffCostumeOpen(settings),
+      opensAt: settings.staff_costume_from,
+      needsProfile: !req.participant,
+      costumeToken: req.participant?.costume_path ? req.participant.costume_token : null,
+    });
+  })
+);
+
+router.post(
+  '/me/costume',
+  upload.single('costume'),
+  asyncRoute(async (req, res) => {
+    const settings = await getSettings();
+    if (!staffCostumeOpen(settings)) throw httpError(403, 'Bilderna för personalen öppnar klockan 17:00.');
+    const participant = req.participant;
+    if (!participant) throw httpError(400, 'Fyll i dina uppgifter först. Logga ut och in igen.');
+    if (!req.file) throw httpError(400, 'Ta en bild av dig i förklädnaden.');
+    const costumeToken = participant.costume_token || randomToken();
+    const dest = await saveImage(req.file, env.portraitDir, `costume-${costumeToken}.jpg`);
+    try {
+      await query(
+        `UPDATE participants
+         SET costume_path = $2, costume_token = $3, costume_at = COALESCE(costume_at, now())
+         WHERE id = $1`,
+        [participant.id, dest, costumeToken]
+      );
+    } catch (error) {
+      removeFile(dest);
+      throw error;
+    }
+    res.json({ ok: true, costumeToken });
   })
 );
 

@@ -90,7 +90,7 @@ export const staffPosts: StaffPostCopy[] = [
     plats: 'Registreringen i källaren.',
     kväll: evening,
     uppgift: [
-      '17:00: var på plats. Gå igenom kvällen med personalen och ställ i ordning registreringen.',
+      '17:00: var på plats. Gå igenom kvällen med personalen och ställ i ordning registreringen. Från 17:00 lägger personalen in sin bild i förklädnad på sin telefon, under Uppdrag. Den som saknar telefon söker du fram i Dörren och tar bilden åt.',
       'Dräkten är en anka i hög hatt, frack och käpp. Ansiktet är täckt.',
       'Kontrollera att de tre croupiererna har varsitt bord.',
       '18:30: självregistreringen öppnar av sig själv. Knappen ovanför stänger eller öppnar den igen.',

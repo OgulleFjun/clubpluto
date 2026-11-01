@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { primaryPostKeys, staffPosts } from '../posts';
-import { ErrorText, Guard, Page } from '../ui';
+import { ErrorText, Field, Guard, Page, Portrait, onSubmit } from '../ui';
 
 interface PostState {
   key: string;
@@ -56,6 +56,7 @@ function Board() {
   return (
     <Page title="NOW HIRING!" lede="Välj Manager eller en croupier först. Prize Master och Bouncer öppnas när de fyra är tillsatta. Först till kvarn, ett var.">
       <ErrorText>{error}</ErrorText>
+      <StaffCostume token={token} />
       <div className="hire-row hire-primary">
         {primary.map(card)}
       </div>
@@ -66,3 +67,56 @@ function Board() {
     </Page>
   );
 }
+
+function StaffCostume({ token }: { token: string | null }) {
+  const [state, setState] = useState<{ open: boolean; opensAt: string; needsProfile: boolean; costumeToken: string | null } | null>(null);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [version, setVersion] = useState(0);
+
+  function load() {
+    return api<NonNullable<typeof state>>('/posts/me/costume', {}, token).then(setState);
+  }
+
+  useEffect(() => {
+    load().catch((reason: Error) => setError(reason.message));
+  }, [token]);
+
+  async function send(event: FormEvent<HTMLFormElement>) {
+    setError('');
+    setMessage('');
+    const form = event.currentTarget;
+    try {
+      await api('/posts/me/costume', { method: 'POST', body: new FormData(form) }, token);
+      form.reset();
+      setVersion(Date.now());
+      setMessage('Bilden ligger i mysteriet.');
+      await load();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Bilden sparades inte.');
+    }
+  }
+
+  if (!state || state.needsProfile) return null;
+  if (!state.open) {
+    return (
+      <p className="meta">
+        Klockan {new Date(state.opensAt).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })} kan du lägga in en bild av dig i förklädnaden här.
+      </p>
+    );
+  }
+  return (
+    <form className="card" style={{ marginBottom: '1rem' }} onSubmit={onSubmit(send)}>
+      <h2>{state.costumeToken ? 'Din bild i mysteriet' : 'Ta en bild i din förklädnad'}</h2>
+      {state.costumeToken && <Portrait token={state.costumeToken} alt="Du i förklädnad" version={version} />}
+      <p className="meta">Personalen är också med i mysteriet. Ta bilden med masken på. Den syns utan ditt namn. Har du ingen telefon tar Managern bilden.</p>
+      <Field label={state.costumeToken ? 'Ny bild' : 'Bild i förklädnad'}>
+        <input name="costume" type="file" accept="image/jpeg,image/png,image/webp" capture="user" required />
+      </Field>
+      <button className="btn" type="submit">{state.costumeToken ? 'Byt bilden' : 'Lägg i mysteriet'}</button>
+      {message && <p className="ok">{message}</p>}
+      <ErrorText>{error}</ErrorText>
+    </form>
+  );
+}
+

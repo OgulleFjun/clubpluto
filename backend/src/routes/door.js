@@ -70,7 +70,7 @@ router.get(
               inv.name AS invited_by
        FROM participants p
        LEFT JOIN participants inv ON inv.id = p.invited_by_id
-       WHERE ${where} AND p.membership <> 'staff'
+       WHERE ${where}
        ORDER BY p.checked_in_at NULLS FIRST, p.name
        LIMIT 80`,
       params
@@ -133,7 +133,8 @@ router.post(
       [participant.id, dest, costumeToken]
     );
     const settings = await getSettings();
-    if (!settings.competition_closed_at && !settings.identity_open) {
+    // Personalens bilder kan läggas in från 17:00 utan att mysteriet öppnar. Det öppnar med den första gästen.
+    if (participant.membership !== 'staff' && !settings.competition_closed_at && !settings.identity_open) {
       await query('UPDATE event_settings SET identity_open = true, updated_at = now() WHERE id = 1');
     }
     res.json({ ok: true, costumeToken });
