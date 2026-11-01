@@ -100,7 +100,7 @@ function DoorInner() {
   }
 
   return (
-    <Page title="Dörren" lede="Gästen har redan sagt lösenordet till Bouncern. Sök fram gästen, registrera att den har kommit, ge 100 i spelmarker och se till att bilden i utklädnad finns. Ge sedan reglerna och skicka ut gästen i klubben.">
+    <Page title="Registrera" lede="Gästen har redan sagt lösenordet till Bouncern. Sök fram gästen, registrera att den har kommit, ge 100 i spelmarker och se till att bilden i utklädnad finns. Ge sedan reglerna och skicka ut gästen i klubben.">
       {overview && (
         <p>{overview.registered} registrerade · {overview.arrived} inne · {overview.remaining} kvar
           {!overview.doorPasswordSet ? ' · entrélösenord saknas' : ''}

@@ -62,7 +62,7 @@ export function Layout() {
         {staff && user ? (
           <nav className="staff-nav">
             <NavLink to="/uppdrag" end>Uppdrag</NavLink>
-            {user.role === 'admin' && <NavLink to="/uppdrag/kontroll">Kontroll</NavLink>}
+            {(user.role === 'admin' || user.role === 'doorman') && <NavLink to="/dorren">Registrera</NavLink>}
             {user.role === 'admin' && <NavLink to="/admin">Kontrollpanel</NavLink>}
             <button
               type="button"

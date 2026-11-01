@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { ErrorText, Guard, Page } from '../ui';
@@ -28,12 +27,14 @@ interface ManageData {
 export default function PostControl() {
   return (
     <Guard roles={['admin']}>
-      <Control />
+      <Page title="Fördela uppdrag" lede="Bara du som administratör ser den här sidan.">
+        <PostAssignments />
+      </Page>
     </Guard>
   );
 }
 
-function Control() {
+export function PostAssignments() {
   const { token } = useAuth();
   const [data, setData] = useState<ManageData | null>(null);
   const [choice, setChoice] = useState<Record<string, string>>({});
@@ -71,11 +72,12 @@ function Control() {
   }
 
   if (!data) {
-    return <Page title="Kontroll">{error || 'Hämtar personalen…'}</Page>;
+    return <p>{error || 'Hämtar personalen…'}</p>;
   }
 
   return (
-    <Page title="Kontroll" lede="Bara du som administratör ser den här sidan. Flytta eller frigör ett uppdrag. En person kan ha flera uppdrag.">
+    <>
+      <p className="meta">Flytta eller frigör ett uppdrag. En person kan ha flera uppdrag.</p>
       <ErrorText>{error}</ErrorText>
       {message && <p className="ok">{message}</p>}
       <div className="list">
@@ -101,7 +103,6 @@ function Control() {
           </article>
         ))}
       </div>
-      <p className="meta">Övrigt om gäster, vampyrer och priser finns i <Link to="/admin">klubbens kontrollpanel</Link>.</p>
-    </Page>
+    </>
   );
 }

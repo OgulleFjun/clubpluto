@@ -1,19 +1,20 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api, formatWhen } from '../api';
 import { useAuth } from '../auth';
 import { ErrorText, Field, Guard, Page, Portrait, onSubmit } from '../ui';
+import { PostAssignments } from './PostControl';
 
-type Tab = 'oversikt' | 'registrera' | 'deltagare' | 'inbjudningar' | 'tavling' | 'vampyrer' | 'priser' | 'personal' | 'kvallen';
+type Tab = 'oversikt' | 'deltagare' | 'inbjudningar' | 'tavling' | 'vampyrer' | 'priser' | 'personal' | 'uppdrag' | 'kvallen';
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'oversikt', label: 'Översikt' },
-  { id: 'registrera', label: 'Registrera' },
   { id: 'deltagare', label: 'Deltagare' },
   { id: 'inbjudningar', label: 'Inbjudningar' },
   { id: 'tavling', label: 'Tävling' },
   { id: 'vampyrer', label: 'Vampyrer' },
   { id: 'priser', label: 'Priser' },
   { id: 'personal', label: 'Personal' },
+  { id: 'uppdrag', label: 'Fördela uppdrag' },
   { id: 'kvallen', label: 'Kvällen' },
 ];
 
@@ -37,107 +38,15 @@ function AdminInner() {
         ))}
       </div>
       {tab === 'oversikt' && <Overview />}
-      {tab === 'registrera' && <RegisterGuest />}
       {tab === 'deltagare' && <People />}
       {tab === 'inbjudningar' && <Invites />}
       {tab === 'tavling' && <Competition />}
       {tab === 'vampyrer' && <Vampires />}
       {tab === 'priser' && <PrizesAdmin />}
       {tab === 'personal' && <Staff />}
+      {tab === 'uppdrag' && <PostAssignments />}
       {tab === 'kvallen' && <Settings />}
     </Page>
-  );
-}
-
-function RegisterGuest() {
-  const { token } = useAuth();
-  const [query, setQuery] = useState('');
-  const [people, setPeople] = useState<{ id: string; name: string; alias: string | null; email: string; registered: boolean }[]>([]);
-  const [chosen, setChosen] = useState<{ id: string; name: string; alias: string | null; registered: boolean } | null>(null);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
-  const [searched, setSearched] = useState(false);
-  const [busy, setBusy] = useState(false);
-
-  async function search(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const q = String(new FormData(event.currentTarget).get('q') || '').trim();
-    setQuery(q);
-    setChosen(null);
-    setMessage('');
-    setError('');
-    try {
-      const data = await api<{ people: typeof people }>(`/admin/register-search?q=${encodeURIComponent(q)}`, {}, token);
-      setPeople(data.people);
-      setSearched(true);
-    } catch (reason) {
-      setPeople([]);
-      setSearched(true);
-      setError(reason instanceof Error ? reason.message : 'Sökningen misslyckades.');
-    }
-  }
-
-  async function register(event: FormEvent<HTMLFormElement>) {
-    if (!chosen) return;
-    setBusy(true);
-    setError('');
-    setMessage('');
-    try {
-      const result = await api<{ name: string }>(`/admin/register-guest/${chosen.id}`, {
-        method: 'POST',
-        body: new FormData(event.currentTarget),
-      }, token);
-      setMessage(`${result.name} är registrerad. Bilden ligger i mysteriet.`);
-      setChosen(null);
-      setPeople([]);
-      setSearched(false);
-      setQuery('');
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Registreringen misslyckades.');
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="register-kiosk">
-      {!chosen && (
-        <form className="card" onSubmit={search}>
-          <h2>Hitta dig själv</h2>
-          <Field label="Namn, e-post eller alias">
-            <input name="q" value={query} onChange={(event) => setQuery(event.target.value)} autoComplete="off" required minLength={2} />
-          </Field>
-          <button className="btn" type="submit">Sök</button>
-        </form>
-      )}
-      {!chosen && searched && people.length === 0 && !error && <p>Ingen träff. Prova namn, e-post eller alias.</p>}
-      {!chosen && (
-        <div className="list">
-          {people.map((person) => (
-            <button className="register-hit" key={person.id} type="button" onClick={() => { setChosen(person); setMessage(''); }}>
-              <strong>{person.name}</strong>
-              <span>{person.alias ? person.alias : person.email}</span>
-              {person.registered && <small>Redan registrerad</small>}
-            </button>
-          ))}
-        </div>
-      )}
-      {chosen && (
-        <form className="card" onSubmit={onSubmit(register)}>
-          <h2>{chosen.name}</h2>
-          {chosen.alias && <p>{chosen.alias}</p>}
-          <p>Ta ett foto på dig själv med masken på.</p>
-          <Field label="Foto med mask">
-            <input name="costume" type="file" accept="image/jpeg,image/png,image/webp" capture="user" required />
-          </Field>
-          <button className="btn" type="submit" disabled={busy}>Registrera</button>
-          <button className="btn ghost" type="button" onClick={() => setChosen(null)}>Tillbaka</button>
-          <ErrorText>{error}</ErrorText>
-        </form>
-      )}
-      {!chosen && <ErrorText>{error}</ErrorText>}
-      {message && <p className="ok">{message}</p>}
-    </div>
   );
 }
 
