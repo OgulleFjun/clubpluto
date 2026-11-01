@@ -305,6 +305,7 @@ function Adjust({ personId }: { personId: string }) {
   const [error, setError] = useState('');
   return (
     <form onSubmit={onSubmit(async (event) => {
+      const element = event.currentTarget;
       const form = new FormData(event.currentTarget);
       setError('');
       try {
@@ -317,7 +318,7 @@ function Adjust({ personId }: { personId: string }) {
             reason: form.get('reason'),
           }),
         }, token);
-        event.currentTarget.reset();
+        element.reset();
       } catch (reason) {
         setError(reason instanceof Error ? reason.message : 'Rättningen misslyckades.');
       }
@@ -340,6 +341,7 @@ function Invites() {
   return (
     <>
       <form className="card" onSubmit={onSubmit(async (event) => {
+        const element = event.currentTarget;
         const form = new FormData(event.currentTarget);
         try {
           const created = await api<{ invitation: { token: string } }>('/admin/invitations', {
@@ -351,7 +353,7 @@ function Invites() {
             }),
           }, view.token);
           view.setMessage(`${window.location.origin}/inbjudan/${created.invitation.token}`);
-          event.currentTarget.reset();
+          element.reset();
           await view.reload();
         } catch (reason) {
           view.setError(reason instanceof Error ? reason.message : 'Kunde inte skapa inbjudan.');
@@ -544,6 +546,7 @@ function PrizesAdmin() {
   return (
     <>
       <form className="card" onSubmit={onSubmit(async (event) => {
+        const element = event.currentTarget;
         const form = new FormData(event.currentTarget);
         await api('/admin/prizes', {
           method: 'POST',
@@ -554,7 +557,7 @@ function PrizesAdmin() {
             stock: Number(form.get('stock')),
           }),
         }, view.token);
-        event.currentTarget.reset();
+        element.reset();
         await view.reload();
       })}>
         <h2>Nytt pris</h2>
@@ -647,6 +650,7 @@ function Staff() {
   return (
     <>
       <form className="card" onSubmit={onSubmit(async (event) => {
+        const element = event.currentTarget;
         const form = new FormData(event.currentTarget);
         await api('/admin/staff', {
           method: 'POST',
@@ -657,7 +661,7 @@ function Staff() {
             gameKeys: form.getAll('gameKeys'),
           }),
         }, view.token);
-        event.currentTarget.reset();
+        element.reset();
         await view.reload();
       })}>
         <h2>Nytt konto</h2>

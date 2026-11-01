@@ -6,6 +6,7 @@ import { chipBalances, getSettings } from '../competition.js';
 import { asyncRoute, httpError, param } from '../http.js';
 import { doorCode, randomToken } from '../tokens.js';
 import { removeFile, saveImage, upload } from '../uploads.js';
+import { findByName, personName, placeholderEmail } from './auth.js';
 import { env } from '../config.js';
 
 const router = Router();
@@ -151,49 +152,40 @@ router.post(
   '/register',
   upload.single('photo'),
   asyncRoute(async (req, res) => {
-    const name = String(req.body.name || '').trim();
-    const email = String(req.body.email || '').trim().toLowerCase();
-    const password = String(req.body.password || '');
+    const name = personName(req.body);
     const alias = String(req.body.alias || '').trim();
-    const membership = ['sus', 'sas', 'guest', 'staff'].includes(req.body.membership)
-      ? req.body.membership
-      : 'guest';
-    const canInvite = req.body.canInvite === 'true' || req.body.canInvite === true;
-    if (!name || name.length > 80) throw httpError(400, 'Ange ett namn.');
+    const membership = ['sus', 'sas', 'guest'].includes(req.body.membership) ? req.body.membership : 'guest';
     if (!alias || alias.length > 40) throw httpError(400, 'Ange ett alias.');
-    if (!req.file) throw httpError(400, 'Ladda upp ett äkta porträtt, utan mask eller förklädnad.');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw httpError(400, 'Ange en giltig e-postadress.');
-    if (password.length < 8) throw httpError(400, 'Lösenordet behöver minst 8 tecken.');
+    if (!req.file) throw httpError(400, 'Ta ett äkta porträtt, utan mask eller förklädnad.');
+    if (await findByName(name, 'player')) throw httpError(400, 'Det namnet finns redan. Sök fram personen i stället.');
 
     const photoToken = randomToken();
     let photoPath = '';
     try {
-      if (req.file) photoPath = await saveImage(req.file, env.portraitDir, `${photoToken}.jpg`);
+      photoPath = await saveImage(req.file, env.portraitDir, `${photoToken}.jpg`);
       const created = await withTransaction(async (client) => {
-        const existing = await client.query('SELECT id FROM accounts WHERE email = $1', [email]);
-        if (existing.rows[0]) throw httpError(400, 'Den e-postadressen är redan registrerad.');
-        const passwordHash = await bcrypt.hash(password, 10);
+        const passwordHash = await bcrypt.hash(randomToken(), 10);
         const account = await client.query(
-          `INSERT INTO accounts (email, password_hash, role) VALUES ($1, $2, 'participant') RETURNING id`,
-          [email, passwordHash]
+          `INSERT INTO accounts (email, password_hash, role, display_name)
+           VALUES ($1, $2, 'participant', $3) RETURNING id`,
+          [placeholderEmail(name, 'player'), passwordHash, name]
         );
         const participant = await client.query(
           `INSERT INTO participants (
             account_id, name, alias, email, photo_path, photo_token, name_token, door_code,
             membership, can_invite
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,false)
           RETURNING id, name, door_code`,
           [
             account.rows[0].id,
             name,
             alias,
-            email,
-            photoPath || null,
+            placeholderEmail(name, 'player'),
+            photoPath,
             photoToken,
             randomToken(),
             doorCode(),
             membership,
-            membership === 'guest' ? false : canInvite,
           ]
         );
         return participant.rows[0];
@@ -201,6 +193,7 @@ router.post(
       res.status(201).json({ participant: created });
     } catch (error) {
       removeFile(photoPath);
+      if (error.code === '23505') throw httpError(400, 'Det namnet finns redan. Sök fram personen i stället.');
       throw error;
     }
   })

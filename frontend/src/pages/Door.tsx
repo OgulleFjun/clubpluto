@@ -73,11 +73,12 @@ function DoorInner() {
   }
 
   async function addCostume(event: FormEvent<HTMLFormElement>, id: string) {
+    const element = event.currentTarget;
     setError('');
     setMessage('');
     try {
       await api(`/door/costume/${id}`, { method: 'POST', body: new FormData(event.currentTarget) }, token);
-      event.currentTarget.reset();
+      element.reset();
       setMessage('Bilden ligger i mysteriet.');
       await refresh();
     } catch (reason) {
@@ -86,12 +87,16 @@ function DoorInner() {
   }
 
   async function walkIn(event: FormEvent<HTMLFormElement>) {
+    const element = event.currentTarget;
     setError('');
     try {
-      await api('/door/register', { method: 'POST', body: new FormData(event.currentTarget) }, token);
-      event.currentTarget.reset();
-      setMessage('Deltagaren är registrerad. Checka in personen när lösenordet är sagt.');
-      await refresh();
+      const form = new FormData(event.currentTarget);
+      await api('/door/register', { method: 'POST', body: form }, token);
+      element.reset();
+      const q = `${form.get('firstName') || ''} ${form.get('lastName') || ''}`.trim();
+      setMessage('Gästen är registrerad. Ta bilden i utklädnad och checka in personen nedanför.');
+      setQuery(q);
+      await refresh(q);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Registreringen misslyckades.');
     }
@@ -142,24 +147,22 @@ function DoorInner() {
         ))}
       </div>
       <form className="card" style={{ marginTop: '1rem' }} onSubmit={onSubmit(walkIn)}>
-        <h2>Registrera i dörren</h2>
-        <Field label="Namn"><input name="name" required /></Field>
-        <Field label="Alias"><input name="alias" required maxLength={40} /></Field>
-        <Field label="E-post"><input name="email" type="email" required /></Field>
-        <Field label="Tillfälligt lösenord"><input name="password" type="password" minLength={8} required /></Field>
+        <h2>Registrera en gäst utan telefon</h2>
+        <p className="meta">Samma uppgifter som gästerna fyller i själva. Gästen loggar sedan in med förnamn och efternamn.</p>
+        <Field label="Förnamn"><input name="firstName" required autoComplete="off" /></Field>
+        <Field label="Efternamn"><input name="lastName" required autoComplete="off" /></Field>
+        <Field label="Alias"><input name="alias" required maxLength={40} autoComplete="off" /></Field>
         <Field label="Medlemskap">
           <select name="membership" defaultValue="guest">
             <option value="guest">Gäst</option>
             <option value="sus">SUS</option>
             <option value="sas">SAS</option>
-            <option value="staff">Personal</option>
           </select>
         </Field>
-        <label className="meta"><input type="checkbox" name="canInvite" value="true" /> Får bjuda in två gäster (inte för vanliga gäster)</label>
-        <Field label="Porträtt">
-          <input name="photo" type="file" accept="image/jpeg,image/png,image/webp" required />
+        <Field label="Porträtt utan mask">
+          <input name="photo" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required />
         </Field>
-        <p className="meta">Ett äkta porträtt av ansiktet, utan mask eller förklädnad.</p>
+        <p className="meta">Ett äkta porträtt av ansiktet, utan mask eller förklädnad. Sök sedan fram gästen ovanför och lägg till bilden i utklädnad.</p>
         <button className="btn" type="submit">Spara registrering</button>
       </form>
     </Page>

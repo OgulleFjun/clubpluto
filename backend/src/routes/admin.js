@@ -187,6 +187,9 @@ router.patch(
       if (current.account_id && email !== current.email) {
         await client.query('UPDATE accounts SET email = $2 WHERE id = $1', [current.account_id, email]);
       }
+      if (current.account_id && name !== current.name) {
+        await client.query('UPDATE accounts SET display_name = $2 WHERE id = $1', [current.account_id, name]);
+      }
     });
     res.json({ ok: true });
   })

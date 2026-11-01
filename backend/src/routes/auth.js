@@ -82,7 +82,7 @@ router.post(
 
 const NAME_MAIL = '@namn.clubpluto.eu';
 
-function personName(body) {
+export function personName(body) {
   const first = String(body.firstName || '').trim().replace(/\s+/g, ' ');
   const last = String(body.lastName || '').trim().replace(/\s+/g, ' ');
   if (!first || !last) throw httpError(400, 'Skriv förnamn och efternamn.');
@@ -91,7 +91,7 @@ function personName(body) {
   return name;
 }
 
-function placeholderEmail(name, door) {
+export function placeholderEmail(name, door) {
   const hash = crypto.createHash('sha256').update(`${door}\n${name.toLowerCase()}`).digest('hex').slice(0, 16);
   return `${hash}${NAME_MAIL}`;
 }
@@ -100,7 +100,7 @@ function isPlaceholderEmail(email) {
   return String(email || '').toLowerCase().endsWith(NAME_MAIL);
 }
 
-async function findByName(name, door) {
+export async function findByName(name, door) {
   const roles = door === 'staff' ? ['admin', 'doorman', 'gamemaster'] : ['participant'];
   const { rows } = await query(
     `SELECT * FROM accounts
@@ -111,7 +111,18 @@ async function findByName(name, door) {
      LIMIT 1`,
     [name, roles]
   );
-  return rows[0] || null;
+  if (rows[0]) return rows[0];
+  // Konton från före inloggningen med efternamn har bara ett förnamn sparat.
+  const firstName = name.split(' ')[0];
+  const legacy = await query(
+    `SELECT * FROM accounts
+     WHERE lower(trim(display_name)) = lower($1)
+       AND trim(display_name) !~ '[[:space:]]'
+       AND role = ANY($2::text[])
+       AND active`,
+    [firstName, roles]
+  );
+  return legacy.rows.length === 1 ? legacy.rows[0] : null;
 }
 
 async function sessionFor(account) {

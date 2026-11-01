@@ -38,6 +38,7 @@ function InvitesInner() {
   }, [token]);
 
   async function create(event: FormEvent<HTMLFormElement>) {
+    const element = event.currentTarget;
     const form = new FormData(event.currentTarget);
     setError('');
     try {
@@ -45,7 +46,7 @@ function InvitesInner() {
         method: 'POST',
         body: JSON.stringify({ label: form.get('label') }),
       }, token);
-      event.currentTarget.reset();
+      element.reset();
       await load();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Inbjudan skapades inte.');
